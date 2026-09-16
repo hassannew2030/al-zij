@@ -30,14 +30,14 @@ html,body{
   color:var(--ink);
   font-family:'EB Garamond', serif;
 }
-.wrap{max-width:1180px;margin:0 auto;padding:56px 24px 100px;}
-header{text-align:center;margin-bottom:8px;}
-.eyebrow{font-family:'Amiri',serif;color:var(--verdigris-light);font-size:15px;margin-bottom:12px;}
-h1{font-family:'Amiri',serif;font-weight:700;font-size:clamp(36px,6vw,58px);color:var(--brass-light);margin:0 0 8px;}
-.subtitle{color:var(--ink-dim);font-style:italic;font-size:17px;max-width:600px;margin:0 auto;line-height:1.7;}
+.wrap{max-width:1180px;margin:0 auto;padding:24px 12px 100px;}
+header{text-align:center;margin-bottom:4px;}
+.eyebrow{font-family:'Amiri',serif;color:var(--verdigris-light);font-size:13px;margin-bottom:8px;}
+h1{font-family:'Amiri',serif;font-weight:700;font-size:clamp(28px,6vw,50px);color:var(--brass-light);margin:0 0 6px;}
+.subtitle{color:var(--ink-dim);font-style:italic;font-size:14px;max-width:600px;margin:0 auto;line-height:1.6;}
 
-.stage{display:flex;justify-content:center;margin:50px 0 36px;position:relative;}
-.instrument-container{width:min(640px,92vw);height:min(640px,92vw);position:relative;overflow:hidden;touch-action:none;border-radius:50%;box-shadow:0 30px 60px rgba(0,0,0,0.6);background:rgba(10,12,18,0.4);}
+.stage{display:flex;justify-content:center;margin:16px 0 18px;position:relative;}
+.instrument-container{width:min(820px,96vw);height:min(820px,96vw);position:relative;overflow:hidden;touch-action:none;border-radius:50%;box-shadow:0 30px 60px rgba(0,0,0,0.6);background:rgba(10,12,18,0.4);}
 .instrument{width:100%;height:100%;transform-origin:0 0;cursor:grab;}
 .instrument:active{cursor:grabbing;}
 .instrument svg{width:100%;height:100%;overflow:visible;}
@@ -403,29 +403,7 @@ section.philosophy p{font-size:17px;line-height:1.85;color:var(--ink);margin:0 0
     </div>
   </div>
 
-  <div style="text-align:center;margin:0 0 30px;">
-    <button onclick="startCompass()" style="background:var(--verdigris);color:#0a0c12;border:none;padding:13px 28px;border-radius:8px;font-family:'Amiri',serif;font-weight:700;font-size:15px;cursor:pointer;">تشغيل/إيقاف البوصلة الحقيقية 🧭 (تجربة حية بموبايلك)</button>
-    <p id="compassStatus" style="color:var(--verdigris-light);margin-top:12px;font-size:14px;min-height:20px;"></p>
-    <button onclick="toggleNavTool()" style="background:#d4af37;color:#0b0d17;border:none;padding:13px 28px;border-radius:8px;font-family:'Amiri',serif;font-weight:700;font-size:15px;cursor:pointer;margin-top:14px;">🧭 أداة الملاحة السريعة (خدمة منفصلة، للجوال/الآيباد)</button>
-  </div>
-
-  <!-- ===== أداة ملاحة محمولة منفصلة تماماً — نظام Canvas مستقل، لا يشارك أي متغير أو دالة مع الساعة الأساسية ===== -->
-  <div id="navToolContainer" style="display:none;max-width:400px;margin:0 auto 30px;text-align:center;background:#0b0d17;border-radius:16px;padding:20px;border:1px solid rgba(212,175,55,0.3);">
-    <h3 style="color:#d4af37;font-family:'Amiri',serif;margin:0 0 12px;">أداة الملاحة السريعة</h3>
-    <div style="position:relative;width:300px;height:300px;margin:0 auto;border-radius:50%;box-shadow:0 0 50px rgba(212,175,55,0.2), inset 0 0 20px #000;border:6px solid #d4af37;background:radial-gradient(circle,#1a1c2e 0%,#080911 100%);">
-      <canvas id="navSkyCanvas" width="300" height="300" style="position:absolute;top:0;left:0;border-radius:50%;"></canvas>
-    </div>
-    <div style="margin-top:12px;">
-      <button onclick="navRequestCompassPermission()" style="background:#d4af37;color:#0b0d17;border:none;padding:8px 16px;font-weight:bold;border-radius:20px;cursor:pointer;">تفعيل بوصلة الجوال</button>
-    </div>
-    <div style="margin-top:10px;font-size:12.5px;color:#a0a5c0;line-height:1.6;">
-      <div id="navLocationInfo">جارٍ التقاط إشارة GPS...</div>
-      <div id="navQiblaInfo">اتجاه القبلة: --°</div>
-      <div id="navHeadingInfo" style="color:#00ffcc;font-weight:bold;">اتجاه الجهاز: --°</div>
-    </div>
-  </div>
-
-  <!-- لوحة إلكترونية بكل معطيات الساعة — ملحق منفصل، مش بديل عن القراءة الميكانيكية على القرص -->
+  <!-- لوحة إلكترونية بكل معطيات الساعة — اتنقلت هنا عشان تبقى مباشرة تحت الساعة -->
   <div style="max-width:720px;margin:0 auto 30px;background:var(--bg-panel);border:1px solid var(--panel-border,rgba(201,163,93,0.22));border-radius:12px;padding:18px;">
     <h3 style="font-family:'Amiri',serif;color:var(--brass-light);text-align:center;margin:0 0 14px;font-size:17px;">لوحة البيانات الإلكترونية</h3>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;font-family:'EB Garamond',serif;font-size:13.5px;">
@@ -457,6 +435,28 @@ section.philosophy p{font-size:17px;line-height:1.85;color:var(--ink);margin:0 0
       <div style="background:rgba(0,0,0,0.2);padding:10px;border-radius:6px;text-align:center;"><div style="color:var(--verdigris-light);font-family:'Amiri',serif;font-size:12px;">معادلة الزمن</div><div id="dataEot" style="color:var(--brass-light);font-size:14px;margin-top:4px;">—</div></div>
     </div>
     <p style="text-align:center;color:var(--ink-dim,#8a8570);font-size:12px;margin:14px 0 0;">هذه اللوحة ملحق إلكتروني للتحقق من صحة الأرقام فقط — قراءة الساعة الأساسية تبقى من مواضع العقارب والحلقات على القرص.</p>
+  </div>
+
+  <div style="text-align:center;margin:0 0 30px;">
+    <button onclick="startCompass()" style="background:var(--verdigris);color:#0a0c12;border:none;padding:13px 28px;border-radius:8px;font-family:'Amiri',serif;font-weight:700;font-size:15px;cursor:pointer;">تشغيل/إيقاف البوصلة الحقيقية 🧭 (تجربة حية بموبايلك)</button>
+    <p id="compassStatus" style="color:var(--verdigris-light);margin-top:12px;font-size:14px;min-height:20px;"></p>
+    <button onclick="toggleNavTool()" style="background:#d4af37;color:#0b0d17;border:none;padding:13px 28px;border-radius:8px;font-family:'Amiri',serif;font-weight:700;font-size:15px;cursor:pointer;margin-top:14px;">🧭 أداة الملاحة السريعة (خدمة منفصلة، للجوال/الآيباد)</button>
+  </div>
+
+  <!-- ===== أداة ملاحة محمولة منفصلة تماماً — نظام Canvas مستقل، لا يشارك أي متغير أو دالة مع الساعة الأساسية ===== -->
+  <div id="navToolContainer" style="display:none;max-width:400px;margin:0 auto 30px;text-align:center;background:#0b0d17;border-radius:16px;padding:20px;border:1px solid rgba(212,175,55,0.3);">
+    <h3 style="color:#d4af37;font-family:'Amiri',serif;margin:0 0 12px;">أداة الملاحة السريعة</h3>
+    <div style="position:relative;width:300px;height:300px;margin:0 auto;border-radius:50%;box-shadow:0 0 50px rgba(212,175,55,0.2), inset 0 0 20px #000;border:6px solid #d4af37;background:radial-gradient(circle,#1a1c2e 0%,#080911 100%);">
+      <canvas id="navSkyCanvas" width="300" height="300" style="position:absolute;top:0;left:0;border-radius:50%;"></canvas>
+    </div>
+    <div style="margin-top:12px;">
+      <button onclick="navRequestCompassPermission()" style="background:#d4af37;color:#0b0d17;border:none;padding:8px 16px;font-weight:bold;border-radius:20px;cursor:pointer;">تفعيل بوصلة الجوال</button>
+    </div>
+    <div style="margin-top:10px;font-size:12.5px;color:#a0a5c0;line-height:1.6;">
+      <div id="navLocationInfo">جارٍ التقاط إشارة GPS...</div>
+      <div id="navQiblaInfo">اتجاه القبلة: --°</div>
+      <div id="navHeadingInfo" style="color:#00ffcc;font-weight:bold;">اتجاه الجهاز: --°</div>
+    </div>
   </div>
 
   <div class="legend">
@@ -512,7 +512,7 @@ section.philosophy p{font-size:17px;line-height:1.85;color:var(--ink);margin:0 0
 
   <section class="philosophy">
     <h2>ليه جيوسنتري رغم إننا عارفين إنها هليوسنتري؟</h2>
-    <p>الأداة دي مش بتحاول تشرح الفيزياء الفلكية الحديثة، هي بتحاكي **تجربة الرصد** كما عاشها الفلكي القديم فعلاً واقفاً على الأرض ناظراً للأعلى. من موقعه، الشمس والقمر والكواكب كلها بتتحرك حواليه — وده مش خطأ علمي، ده ببساطة منظور الأسطرلاب الذي صُمم من الأساس ليكون أداة رصد سطحية، لا نموذجاً كونياً.</p>
+    <p>الأداة دي مش بتحاول تشرح الفيزياء الفلكية الحديثة، هي بتحاكي *تجربة الرصد* كما عاشها الفلكي القديم فعلاً واقفاً على الأرض ناظراً للأعلى. من موقعه، الشمس والقمر والكواكب كلها بتتحرك حواليه — وده مش خطأ علمي، ده ببساطة منظور الأسطرلاب الذي صُمم من الأساس ليكون أداة رصد سطحية، لا نموذجاً كونياً.</p>
   </section>
 
   <div class="signature">
@@ -542,8 +542,8 @@ function gregorianToHijri(inputDate){
   let l = jd - 1948440 + 10632;
   const n = Math.floor((l-1)/10631);
   l = l - 10631*n + 354;
-  const j = (Math.floor((10985-l)/5316))*(Math.floor((50*l)/17719)) + (Math.floor(l/5670))*(Math.floor((43*l)/15238));
-  l = l - (Math.floor((30-j)/15))*(Math.floor((17719*j)/50)) - (Math.floor(j/16))*(Math.floor((15238*j)/43)) + 29;
+  const j = (Math.floor((10985-l)/5316))(Math.floor((50*l)/17719)) + (Math.floor(l/5670))(Math.floor((43*l)/15238));
+  l = l - (Math.floor((30-j)/15))(Math.floor((17719*j)/50)) - (Math.floor(j/16))(Math.floor((15238*j)/43)) + 29;
   const hMonth = Math.floor((24*l)/709);
   const hDay = l - Math.floor((709*hMonth)/24);
   const hYear = 30*n + j - 30;
@@ -687,18 +687,18 @@ function initStars(){
   g.innerHTML = '';
   starsData.forEach((s, i)=>{
     const el = document.createElementNS("http://www.w3.org/2000/svg","g");
-    el.setAttribute('id', `star-elem-${i}`);
-    el.innerHTML = `<circle r="2.3"/><text x="6" y="3">${s[0]}</text>`;
+    el.setAttribute('id', star-elem-${i});
+    el.innerHTML = <circle r="2.3"/><text x="6" y="3">${s[0]}</text>;
     g.appendChild(el);
   });
 }
 function updateRealStars(now){
   starsData.forEach((s, i)=>{
-    const el = document.getElementById(`star-elem-${i}`);
+    const el = document.getElementById(star-elem-${i});
     if (!el) return;
     const aa = raDecToAltAz(s[1], s[2], now);
     const p = [300 + 222*Math.sin(aa.az*DEGR), 300 - 222*Math.cos(aa.az*DEGR)];
-    el.setAttribute('transform', `translate(${p[0]} ${p[1]})`);
+    el.setAttribute('transform', translate(${p[0]} ${p[1]}));
     el.setAttribute('opacity', aa.alt > -5 ? 1 : 0.15); // dim stars currently below the horizon rather than hiding them
   });
 }
@@ -723,21 +723,21 @@ function updateDayNightAndPrayers(now){
 
   function arcPath(a0, a1, large){
     const p0 = polar(300,300,Rsol,a0), p1 = polar(300,300,Rsol,a1);
-    return `M ${p0[0]} ${p0[1]} A ${Rsol} ${Rsol} 0 ${large} 1 ${p1[0]} ${p1[1]}`;
+    return M ${p0[0]} ${p0[1]} A ${Rsol} ${Rsol} 0 ${large} 1 ${p1[0]} ${p1[1]};
   }
   document.getElementById('dayArcPath').setAttribute('d', arcPath(srAng, ssAng, largeDay));
   document.getElementById('nightArcPath').setAttribute('d', arcPath(ssAng, srAng, largeNight));
 
   const sunPos = polar(300,300,Rsol, timeToAngle(nowMin));
-  document.getElementById('sunIcon').setAttribute('transform', `translate(${sunPos[0]} ${sunPos[1]})`);
+  document.getElementById('sunIcon').setAttribute('transform', translate(${sunPos[0]} ${sunPos[1]}));
   const moonNightPos = polar(300,300,Rsol, timeToAngle(nowMin+720));
-  document.getElementById('moonNightIcon').setAttribute('transform', `translate(${moonNightPos[0]} ${moonNightPos[1]})`);
+  document.getElementById('moonNightIcon').setAttribute('transform', translate(${moonNightPos[0]} ${moonNightPos[1]}));
 
   const pg = document.getElementById('prayerMarkers');
   pg.innerHTML = '';
   [["الفجر",prayers.fajr],["الظهر",prayers.dhuhr],["العصر",prayers.asr],["المغرب",prayers.maghrib],["العشاء",prayers.isha]].forEach(([name,tmin])=>{
     const p = polar(300,300,Rsol,timeToAngle(tmin));
-    pg.innerHTML += `<circle cx="${p[0]}" cy="${p[1]}" r="4" fill="#eddba0" stroke="#0d1119" stroke-width="1"/><title>${name}</title>`;
+    pg.innerHTML += <circle cx="${p[0]}" cy="${p[1]}" r="4" fill="#eddba0" stroke="#0d1119" stroke-width="1"/><title>${name}</title>;
   });
 
   const starsN = document.getElementById('nightStarsG');
@@ -745,7 +745,7 @@ function updateDayNightAndPrayers(now){
     for(let i=0;i<9;i++){
       const a = ssAng + (i+0.5)/9 * ((srAng-ssAng+360)%360 || 300);
       const p = polar(300,300,Rsol, a);
-      starsN.innerHTML += `<circle cx="${p[0]}" cy="${p[1]}" r="${0.8+Math.random()*0.6}"/>`;
+      starsN.innerHTML += <circle cx="${p[0]}" cy="${p[1]}" r="${0.8+Math.random()*0.6}"/>;
     }
   }
 }
@@ -877,6 +877,12 @@ function handleOrientation(event){
   }
 }
 
+// ===== FIXED startCompass =====
+// السبب الأصلي للمشكلة: كان بيطلب إذن الحساس (requestPermission) جوه
+// دالة تحديد الموقع (GPS)، وهي عملية غير متزامنة (async). لما الإذن يتطلب
+// بعد انتظار الـ GPS، متصفح آيفون بيكون خرج من "سياق الضغطة المباشرة"
+// وبيرفض الطلب تلقائيًا برسالة "requires a user gesture to prompt".
+// الحل: نطلب إذن الحساس أول حاجة فورًا لحظة الضغط، وبعدين نحدد الموقع.
 function startCompass(){
   const statusEl = document.getElementById('compassStatus');
 
@@ -889,31 +895,42 @@ function startCompass(){
     return;
   }
 
-  statusEl.textContent = 'جارٍ تحديد موقعك...';
-  if (!navigator.geolocation){
-    statusEl.textContent = 'المتصفح ده مش بيدعم تحديد الموقع.';
-    return;
+  function afterPermission(){
+    window.addEventListener('deviceorientationabsolute', handleOrientation, true);
+    window.addEventListener('deviceorientation', handleOrientation, true);
+    isCompassListening = true;
   }
-  navigator.geolocation.getCurrentPosition(function(pos){
-    qiblaBearing = computeQiblaBearing(pos.coords.latitude, pos.coords.longitude);
-    observer = { lat: pos.coords.latitude, lon: pos.coords.longitude, tz: -(new Date().getTimezoneOffset()/60), name: "موقعك الحالي" };
-    statusEl.textContent = 'اتجاه القبلة من موقعك: '+Math.round(qiblaBearing)+'° من الشمال. جارٍ تفعيل حساس الاتجاه...';
-    function afterPermission(){
-      window.addEventListener('deviceorientationabsolute', handleOrientation, true);
-      window.addEventListener('deviceorientation', handleOrientation, true);
-      isCompassListening = true;
+
+  function requestLocationAndStart(){
+    statusEl.textContent = 'جارٍ تحديد موقعك...';
+    if (!navigator.geolocation){
+      statusEl.textContent = 'المتصفح ده مش بيدعم تحديد الموقع.';
+      return;
     }
-    if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function'){
-      DeviceOrientationEvent.requestPermission().then(function(r){
-        if (r === 'granted') afterPermission();
-        else statusEl.textContent = 'لازم توافق على إذن حساسات الحركة عشان البوصلة تشتغل.';
-      }).catch(function(e){ statusEl.textContent = 'خطأ في إذن الحساس: '+e.message; });
-    } else {
+    navigator.geolocation.getCurrentPosition(function(pos){
+      qiblaBearing = computeQiblaBearing(pos.coords.latitude, pos.coords.longitude);
+      observer = { lat: pos.coords.latitude, lon: pos.coords.longitude, tz: -(new Date().getTimezoneOffset()/60), name: "موقعك الحالي" };
+      statusEl.textContent = 'اتجاه القبلة من موقعك: '+Math.round(qiblaBearing)+'° من الشمال.';
       afterPermission();
-    }
-  }, function(err){
-    statusEl.textContent = 'تعذر تحديد الموقع: '+err.message+' — جرب تسمح بإذن الموقع من إعدادات المتصفح.';
-  });
+    }, function(err){
+      statusEl.textContent = 'تعذر تحديد الموقع: '+err.message+' — جرب تسمح بإذن الموقع من إعدادات المتصفح.';
+    });
+  }
+
+  // لازم نطلب إذن حساس الاتجاه فورًا هنا، كأول حاجة بعد الضغطة مباشرة —
+  // عشان أبل بترفض الطلب لو جه بعد أي عملية async زي انتظار GPS
+  if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function'){
+    statusEl.textContent = 'جارٍ طلب إذن حساس الاتجاه...';
+    DeviceOrientationEvent.requestPermission().then(function(r){
+      if (r === 'granted'){
+        requestLocationAndStart();
+      } else {
+        statusEl.textContent = 'لازم توافق على إذن حساسات الحركة عشان البوصلة تشتغل.';
+      }
+    }).catch(function(e){ statusEl.textContent = 'خطأ في إذن الحساس: '+e.message; });
+  } else {
+    requestLocationAndStart();
+  }
 }
 
 // ===== تكبير/تصغير وسحب — لاستكشاف تفاصيل القرص الكثيفة على الشاشة، مش جزء من الساعة الفعلية =====
@@ -925,7 +942,7 @@ let isPanning = false;
 let initialPinchDistance = null;
 
 function setTransform(){
-  zoomTarget.style.transform = `translate(${pointX}px, ${pointY}px) scale(${scale})`;
+  zoomTarget.style.transform = translate(${pointX}px, ${pointY}px) scale(${scale});
 }
 zoomContainer.addEventListener('mousedown', (e)=>{
   e.preventDefault();
@@ -1007,11 +1024,11 @@ function navInitGPS(){
         navLon = pos.coords.longitude;
         navCalculateQibla();
         document.getElementById('navLocationInfo').innerText =
-          `الموقع: ${navLat.toFixed(4)}°, ${navLon.toFixed(4)}° (GPS)`;
+          الموقع: ${navLat.toFixed(4)}°, ${navLon.toFixed(4)}° (GPS);
       },
       ()=>{
         document.getElementById('navLocationInfo').innerText =
-          `الموقع الافتراضي: ${navLat.toFixed(2)}°, ${navLon.toFixed(2)}° (بدون GPS)`;
+          الموقع الافتراضي: ${navLat.toFixed(2)}°, ${navLon.toFixed(2)}° (بدون GPS);
       },
       { enableHighAccuracy: true, maximumAge: 0 }
     );
@@ -1021,7 +1038,7 @@ function navCalculateQibla(){
   // نفس معادلة computeQiblaBearing الأساسية، بس بمتغيرات محلية منعزلة
   navQiblaBearingVal = computeQiblaBearing(navLat, navLon);
   document.getElementById('navQiblaInfo').innerText =
-    `اتجاه القبلة: ${navQiblaBearingVal.toFixed(1)}° من الشمال الحقيقي`;
+    اتجاه القبلة: ${navQiblaBearingVal.toFixed(1)}° من الشمال الحقيقي;
 }
 function navGetJulianDate(date = new Date()){
   const Y = date.getUTCFullYear(), M = date.getUTCMonth()+1;
@@ -1050,7 +1067,7 @@ function navHandleOrientation(event){
   if (event.webkitCompassHeading) heading = event.webkitCompassHeading;
   if (heading !== null){
     navDeviceHeading = heading;
-    document.getElementById('navHeadingInfo').innerText = `اتجاه الجهاز: ${heading.toFixed(0)}°`;
+    document.getElementById('navHeadingInfo').innerText = اتجاه الجهاز: ${heading.toFixed(0)}°;
   }
 }
 const navStarsData = [
