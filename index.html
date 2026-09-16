@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الزيج — النسخة الكاملة</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap');
+
+:root{
+  --bg-deep:#0a0c12;
+  --bg-panel:#11141d;
+  --brass:#c9a35d;
+  --brass-light:#eddba0;
+  --brass-dark:#7c5f30;
+  --ink:#cfc4a4;
+  --ink-dim:#8a8570;
+  --verdigris:#4d7d72;
+  --verdigris-light:#7fb3a8;
+  --red:#a4453a;
+}
+#qiblaArrow, #northPointerHand{
+  transition: transform 0.15s cubic-bezier(0.1,0.8,0.3,1);
+  transform-origin: 300px 300px;
+}
+*{box-sizing:border-box;}
+html,body{
+  margin:0;
+  background:radial-gradient(ellipse at 50% -10%, #1c2233 0%, var(--bg-deep) 55%);
+  color:var(--ink);
+  font-family:'EB Garamond', serif;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:56px 24px 100px;}
+header{text-align:center;margin-bottom:8px;}
+.eyebrow{font-family:'Amiri',serif;color:var(--verdigris-light);font-size:15px;margin-bottom:12px;}
+h1{font-family:'Amiri',serif;font-weight:700;font-size:clamp(36px,6vw,58px);color:var(--brass-light);margin:0 0 8px;}
+.subtitle{color:var(--ink-dim);font-style:italic;font-size:17px;max-width:600px;margin:0 auto;line-height:1.7;}
+
+.stage{display:flex;justify-content:center;margin:50px 0 36px;position:relative;}
+.instrument-container{width:min(640px,92vw);height:min(640px,92vw);position:relative;overflow:hidden;touch-action:none;border-radius:50%;box-shadow:0 30px 60px rgba(0,0,0,0.6);background:rgba(10,12,18,0.4);}
+.instrument{width:100%;height:100%;transform-origin:0 0;cursor:grab;}
+.instrument:active{cursor:grabbing;}
+.instrument svg{width:100%;height:100%;overflow:visible;}
+.zoom-controls{position:absolute;bottom:12px;left:12px;display:flex;gap:6px;z-index:10;}
+.zoom-btn{background:var(--bg-panel);color:var(--brass-light);border:1px solid var(--brass-dark);width:32px;height:32px;border-radius:6px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+
+/* rotation now driven by real time in JS, not CSS demo animations */
+
+.legend{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));
+  gap:1px;
+  background:rgba(201,163,93,0.14);
+  border:1px solid rgba(201,163,93,0.18);
+  margin-top:30px;
+}
+.legend-item{background:var(--bg-panel);padding:24px 22px;}
+.legend-item .mark{width:11px;height:11px;border-radius:50%;display:inline-block;margin-inline-start:8px;vertical-align:middle;}
+.legend-item h3{font-family:'Amiri',serif;font-size:18px;color:var(--brass-light);margin:0 0 9px;font-weight:700;}
+.legend-item p{font-size:15px;line-height:1.7;color:var(--ink);margin:0;}
+
+section.philosophy{max-width:700px;margin:80px auto 0;border-top:1px solid rgba(201,163,93,0.25);padding-top:40px;}
+section.philosophy h2{font-family:'Amiri',serif;color:var(--brass-light);font-size:24px;margin:0 0 18px;}
+section.philosophy p{font-size:17px;line-height:1.85;color:var(--ink);margin:0 0 16px;}
+
+.signature{text-align:center;margin-top:60px;color:var(--ink-dim);font-family:'Amiri',serif;font-size:14px;}
+.signature .line{width:60px;height:1px;background:var(--brass-dark);margin:0 auto 16px;}
+
+/* earth-spin now driven by real time in JS */
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">تصوّر مفاهيمي — نسخة ساعة الحائط</div>
+    <h1>الزّيج</h1>
+    <p class="subtitle">نفس المفهوم، لكن كقطعة حائط كبيرة — الأرض في المركز، وحولها القمر والكواكب والنجوم والتقويمان ومواقيت الصلاة والقبلة، وأضفنا الآن حلقة توقيت عالمي خارجية لأن المساحة الفعلية بقت تسمح.</p>
+  </header>
+
+  <div class="stage">
+    <div class="instrument-container" id="zoomContainer">
+      <div class="instrument" id="zoomTarget">
+      <svg viewBox="-45 -45 690 690">
+        <defs>
+          <radialGradient id="plate" cx="50%" cy="45%" r="65%">
+            <stop offset="0%" stop-color="#1d2436"/><stop offset="100%" stop-color="#0d1119"/>
+          </radialGradient>
+          <radialGradient id="subBg" cx="50%" cy="45%" r="65%">
+            <stop offset="0%" stop-color="#181e2d"/><stop offset="100%" stop-color="#0a0d15"/>
+          </radialGradient>
+          <linearGradient id="brassGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#eddba0"/><stop offset="100%" stop-color="#8a6a34"/>
+          </linearGradient>
+          <linearGradient id="dayNight" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#f2c879" stop-opacity="0.85"/>
+            <stop offset="48%" stop-color="#c9a35d" stop-opacity="0.5"/>
+            <stop offset="52%" stop-color="#2a3450" stop-opacity="0.55"/>
+            <stop offset="100%" stop-color="#0d1119" stop-opacity="0.9"/>
+          </linearGradient>
+        </defs>
+
+        <!-- base plate -->
+        <circle cx="300" cy="300" r="290" fill="url(#plate)" stroke="#3a3020" stroke-width="2"/>
+
+        <!-- world-time ring: fixed city names (schematic, ~3hr spacing eastward from Mecca) -->
+        <circle cx="300" cy="300" r="322" fill="none" stroke="var(--brass-dark)" stroke-width="0.8" opacity="0.5"/>
+        <g font-family="Amiri, serif" font-size="12" fill="var(--brass-light)" text-anchor="middle">
+          <text x="300" y="-15">مكة</text>
+          <text x="583" y="83">جاكرتا</text>
+          <text x="622" y="300">طوكيو</text>
+          <text x="583" y="524">سيدني</text>
+          <text x="300" y="618">لوس أنجلوس</text>
+          <text x="17" y="524">نيويورك</text>
+          <text x="-22" y="300">لندن</text>
+          <text x="17" y="83">القاهرة</text>
+        </g>
+        <!-- rotating 24h reference ring (moves with the solar/day-night cycle) -->
+        <g class="ring-solar" id="worldTimeRing">
+          <circle cx="300" cy="300" r="304" fill="none" stroke="var(--verdigris)" stroke-width="0.6" opacity="0.4"/>
+          <g font-family="'EB Garamond',serif" font-size="9" fill="var(--verdigris-light)" text-anchor="middle">
+            <text x="300" y="0">٠</text><text x="504" y="70">٣</text>
+            <text x="574" y="300">٦</text><text x="504" y="530">٩</text>
+            <text x="300" y="600">١٢</text><text x="96" y="530">١٥</text>
+            <text x="26" y="300">١٨</text><text x="96" y="70">٢١</text>
+          </g>
+        </g>
+
+        <!-- ===== four corner complications, in the blank space outside the circular plate ===== -->
+        <!-- top-left: equation of time -->
+        <g>
+          <circle cx="40" cy="40" r="26" fill="url(#subBg)" stroke="var(--brass)" stroke-width="1.2"/>
+          <path d="M 18 52 A 26 26 0 0 1 62 52" fill="none" stroke="var(--brass-dark)" stroke-width="1"/>
+          <text x="18" y="63" font-size="7" fill="var(--ink-dim)" text-anchor="middle">−</text>
+          <text x="62" y="63" font-size="7" fill="var(--ink-dim)" text-anchor="middle">+</text>
+          <g id="eotHand"><line x1="40" y1="40" x2="40" y2="20" stroke="var(--red)" stroke-width="1.2"/><polygon points="40,16 43,20 40,24 37,20" fill="var(--red)"/></g>
+          <circle cx="40" cy="40" r="2" fill="var(--red)"/>
+          <text x="40" y="76" font-family="Amiri, serif" font-size="7" fill="var(--brass-dark)" text-anchor="middle">معادلة الزمن</text>
+        </g>
+
+        <!-- top-right: lunar power reserve -->
+        <g>
+          <circle cx="560" cy="40" r="26" fill="url(#subBg)" stroke="var(--brass)" stroke-width="1.2"/>
+          <path d="M 538 52 A 26 26 0 0 1 582 52" fill="none" stroke="var(--brass-dark)" stroke-width="1"/>
+          <text x="538" y="63" font-family="Amiri, serif" font-size="6" fill="var(--ink-dim)" text-anchor="middle">فارغ</text>
+          <text x="582" y="63" font-family="Amiri, serif" font-size="6" fill="var(--ink-dim)" text-anchor="middle">ممتلئ</text>
+          <g id="reserveHand"><line x1="560" y1="40" x2="560" y2="20" stroke="var(--verdigris-light)" stroke-width="1.2"/><polygon points="560,16 563,20 560,24 557,20" fill="var(--verdigris-light)"/></g>
+          <circle cx="560" cy="40" r="2" fill="var(--verdigris-light)"/>
+          <text x="560" y="76" font-family="Amiri, serif" font-size="7" fill="var(--brass-dark)" text-anchor="middle">احتياطي قمري</text>
+        </g>
+
+        <!-- bottom-left: retrograde day-of-week -->
+        <g>
+          <circle cx="40" cy="560" r="34" fill="url(#subBg)" stroke="var(--brass)" stroke-width="1.3"/>
+          <g font-family="Amiri, serif" font-size="5.2" fill="var(--brass-light)" text-anchor="middle">
+            <text x="14" y="572">أحد</text>
+            <text x="18" y="555">اثنين</text>
+            <text x="28" y="542">ثلاثاء</text>
+            <text x="40" y="537">أربعاء</text>
+            <text x="52" y="542">خميس</text>
+            <text x="62" y="555">جمعة</text>
+            <text x="66" y="572">سبت</text>
+          </g>
+          <g id="dayHandCorner">
+            <line x1="40" y1="560" x2="40" y2="530" stroke="var(--red)" stroke-width="1.3"/>
+          </g>
+          <circle cx="40" cy="560" r="2" fill="var(--red)"/>
+          <text x="40" y="600" font-family="Amiri, serif" font-size="7" fill="var(--brass-dark)" text-anchor="middle">يوم الأسبوع</text>
+        </g>
+
+        <!-- bottom-right: decorative tourbillon -->
+        <g>
+          <circle cx="560" cy="560" r="32" fill="url(#subBg)" stroke="var(--brass)" stroke-width="1.4"/>
+          <g id="tourbillonCage">
+            <circle cx="560" cy="560" r="21" fill="none" stroke="var(--brass-light)" stroke-width="1"/>
+            <line x1="560" y1="539" x2="560" y2="581" stroke="var(--brass-light)" stroke-width="1"/>
+            <line x1="539" y1="560" x2="581" y2="560" stroke="var(--brass-light)" stroke-width="1"/>
+            <circle cx="560" cy="560" r="4" fill="var(--red)"/>
+            <circle cx="560" cy="545" r="2" fill="var(--brass-light)"/>
+          </g>
+          <text x="560" y="600" font-family="Amiri, serif" font-size="7" fill="var(--brass-dark)" text-anchor="middle">توربيون زخرفي</text>
+        </g>
+
+        <!-- calendar ring: Hijri (outer) + Gregorian (inner) -->
+        <circle cx="300" cy="300" r="278" fill="none" stroke="var(--brass-dark)" stroke-width="0.8" opacity="0.5"/>
+        <circle cx="300" cy="300" r="262" fill="none" stroke="var(--brass-dark)" stroke-width="0.8" opacity="0.5"/>
+        <!-- physical pointers replacing the old digital date readout -->
+        <g id="hijriMonthHand"><line x1="300" y1="300" x2="300" y2="26" stroke="var(--verdigris-light)" stroke-width="1.4"/><polygon points="300,20 304,26 300,32 296,26" fill="var(--verdigris-light)"/></g>
+        <g id="gregMonthHand"><line x1="300" y1="300" x2="300" y2="42" stroke="var(--red)" stroke-width="1.4"/><polygon points="300,36 304,42 300,48 296,42" fill="var(--red)"/></g>
+        <g font-family="Amiri, serif" font-size="11" fill="var(--brass-light)" text-anchor="middle">
+          <text x="300" y="24">محرم</text>
+          <text x="440" y="61">صفر</text>
+          <text x="542" y="164">ربيع أول</text>
+          <text x="578" y="304">ربيع ثاني</text>
+          <text x="542" y="444">جمادى أولى</text>
+          <text x="440" y="546">جمادى آخرة</text>
+          <text x="300" y="584">رجب</text>
+          <text x="160" y="546">شعبان</text>
+          <text x="58" y="444">رمضان</text>
+          <text x="22" y="304">شوال</text>
+          <text x="58" y="164">ذو القعدة</text>
+          <text x="160" y="61">ذو الحجة</text>
+        </g>
+        <g font-family="'EB Garamond', serif" font-size="9.5" fill="var(--ink-dim)" text-anchor="middle" letter-spacing="0.5">
+          <text x="300" y="42">JAN</text>
+          <text x="431" y="77">FEB</text>
+          <text x="527" y="173">MAR</text>
+          <text x="562" y="304">APR</text>
+          <text x="527" y="435">MAY</text>
+          <text x="431" y="531">JUN</text>
+          <text x="300" y="566">JUL</text>
+          <text x="169" y="531">AUG</text>
+          <text x="73" y="435">SEP</text>
+          <text x="38" y="304">OCT</text>
+          <text x="73" y="173">NOV</text>
+          <text x="169" y="77">DEC</text>
+        </g>
+
+        <!-- zodiac ring -->
+        <circle cx="300" cy="300" r="248" fill="none" stroke="var(--brass-dark)" stroke-width="0.8" opacity="0.55"/>
+        <g font-size="17" fill="var(--brass)" text-anchor="middle" dominant-baseline="middle">
+          <text x="300" y="50">♈</text>
+          <text x="427" y="87">♉</text>
+          <text x="521" y="173">♊</text>
+          <text x="555" y="300">♋</text>
+          <text x="521" y="427">♌</text>
+          <text x="427" y="521">♍</text>
+          <text x="300" y="555">♎</text>
+          <text x="173" y="521">♏</text>
+          <text x="79" y="427">♐</text>
+          <text x="45" y="300">♑</text>
+          <text x="79" y="173">♒</text>
+          <text x="173" y="79">♓</text>
+        </g>
+
+        <!-- dual-hand system: north pointer (reference) + qibla pointer, both driven live by the compass sensor -->
+        <g id="northPointerHand">
+          <line x1="300" y1="300" x2="300" y2="80" stroke="var(--verdigris-light)" stroke-width="2" stroke-dasharray="6 3" stroke-linecap="round"/>
+          <polygon points="300,62 293,82 307,82" fill="var(--verdigris-light)"/>
+          <text x="300" y="52" font-family="Amiri, serif" font-size="13" fill="var(--verdigris-light)" text-anchor="middle" font-weight="bold">ش</text>
+        </g>
+        <g id="qiblaArrow">
+          <line x1="300" y1="300" x2="300" y2="95" stroke="var(--red)" stroke-width="2.6" stroke-linecap="round"/>
+          <polygon points="300,72 291,95 309,95" fill="var(--red)"/>
+          <text x="330" y="90" font-family="Amiri, serif" font-size="13" fill="var(--red)">القبلة</text>
+        </g>
+
+        <!-- star ring: famous fixed stars, real RA/Dec → Alt/Az projection, not decorative rotation -->
+        <g id="starRing">
+          <circle cx="300" cy="300" r="222" fill="none" stroke="url(#brassGrad)" stroke-width="1" opacity="0.4"/>
+          <g id="starsReal" fill="var(--brass-light)" font-family="Amiri, serif" font-size="10"></g>
+        </g>
+
+        <!-- day/night + prayer time band — now driven by REAL sunrise/sunset, not a fixed top/bottom split -->
+        <g id="dayNightBand">
+          <path id="dayArcPath" d="" fill="none" stroke="#f2c879" stroke-width="16" opacity="0.55"/>
+          <path id="nightArcPath" d="" fill="none" stroke="#161c2c" stroke-width="16" opacity="0.9"/>
+          <g id="nightStarsG" fill="#eddba0"></g>
+          <g id="sunIcon">
+            <circle cx="0" cy="0" r="8" fill="#f7d978" stroke="#c9a035" stroke-width="1.2"/>
+            <g stroke="#f2c879" stroke-width="1.4">
+              <line x1="0" y1="-14" x2="0" y2="-20"/>
+              <line x1="0" y1="14" x2="0" y2="20"/>
+              <line x1="-14" y1="0" x2="-20" y2="0"/>
+              <line x1="14" y1="0" x2="20" y2="0"/>
+              <line x1="-9.9" y1="-9.9" x2="-14.5" y2="-14.5"/>
+              <line x1="9.9" y1="-9.9" x2="14.5" y2="-14.5"/>
+              <line x1="-9.9" y1="9.9" x2="-14.5" y2="14.5"/>
+              <line x1="9.9" y1="9.9" x2="14.5" y2="14.5"/>
+            </g>
+            <!-- وش بسيط زي إيموجي 🌞 -->
+            <circle cx="-2.6" cy="-1.8" r="0.9" fill="#8a5a20"/>
+            <circle cx="2.6" cy="-1.8" r="0.9" fill="#8a5a20"/>
+            <path d="M -3.2 2.2 Q 0 5 3.2 2.2" fill="none" stroke="#8a5a20" stroke-width="1" stroke-linecap="round"/>
+          </g>
+          <g id="moonNightIcon">
+            <circle cx="0" cy="0" r="7" fill="#dfe3ea"/>
+            <circle cx="4" cy="-3" r="6" fill="#161c2c"/>
+          </g>
+          <g id="prayerMarkers" font-family="Amiri, serif" font-size="9.5" fill="var(--ink)"></g>
+        </g>
+
+        <!-- planetary orbits: Ptolemaic order -->
+        <g class="p-saturn" id="planetSaturn"><line x1="300" y1="300" x2="300" y2="190" stroke="var(--brass-dark)" stroke-width="1"/><circle cx="300" cy="190" r="7" fill="#8f7b52"/></g>
+        <g class="p-jupiter" id="planetJupiter"><line x1="300" y1="300" x2="300" y2="205" stroke="var(--brass-dark)" stroke-width="1"/><circle cx="300" cy="205" r="8" fill="#cdbb9a"/></g>
+        <g class="p-mars" id="planetMars"><line x1="300" y1="300" x2="300" y2="220" stroke="var(--brass-dark)" stroke-width="1"/><circle cx="300" cy="220" r="5.5" fill="#c1613f"/></g>
+        <g class="p-venus" id="planetVenus"><line x1="300" y1="300" x2="300" y2="235" stroke="var(--brass-dark)" stroke-width="1"/><circle cx="300" cy="235" r="6.5" fill="#e8cd93"/></g>
+        <g class="p-mercury" id="planetMercury"><line x1="300" y1="300" x2="300" y2="250" stroke="var(--brass-dark)" stroke-width="1"/><circle cx="300" cy="250" r="5" fill="#b5b5b5"/></g>
+
+        <!-- القمر له فلكه الخاص الكامل، بنفس حجم ووضوح فلك الشمس — ﴿كُلٌّ فِي فَلَكٍ يَسْبَحُونَ﴾ -->
+        <circle cx="300" cy="300" r="200" fill="none" stroke="#8a8fa0" stroke-width="14" opacity="0.28"/>
+        <circle cx="300" cy="300" r="200" fill="none" stroke="#c9d0dc" stroke-width="1" opacity="0.4"/>
+
+        <!-- moon: full phase cycle, in its own full orbit -->
+        <g class="moon-orbit" id="moonOrbit">
+          <g transform="translate(300,100)">
+            <circle r="14" fill="#e9e2cf"/>
+            <!-- نسيج فوهات كثيف وواقعي، مستوحى من قرص القمر في COSMOSIGN — الظل المنزلق (بدقة فلكية مستمرة) هو اللي بيوري أي جزء منه في أي لحظة -->
+            <g fill="#c9bfa8" opacity="0.5">
+              <circle cx="-4" cy="-6" r="2.6"/>
+              <circle cx="5" cy="-3" r="1.8"/>
+              <circle cx="-1" cy="4" r="3.2"/>
+              <circle cx="7" cy="6" r="1.4"/>
+              <circle cx="-8" cy="2" r="1.6"/>
+              <circle cx="2" cy="-9" r="1.2"/>
+              <circle cx="-9" cy="-4" r="1.1"/>
+              <circle cx="9" cy="-7" r="1.3"/>
+              <circle cx="0" cy="9" r="1.5"/>
+              <circle cx="-5" cy="8" r="0.9"/>
+              <circle cx="10" cy="1" r="1.7"/>
+              <circle cx="-2" cy="-2" r="0.8"/>
+              <circle cx="4" cy="10" r="1.0"/>
+              <circle cx="-11" cy="6" r="0.8"/>
+            </g>
+            <g fill="#8a8570" opacity="0.3">
+              <circle cx="-3" cy="-5" r="1.1"/>
+              <circle cx="6" cy="4" r="0.7"/>
+              <circle cx="-6" cy="0" r="0.9"/>
+              <circle cx="1" cy="7" r="0.6"/>
+              <circle cx="8" cy="-2" r="0.8"/>
+            </g>
+            <clipPath id="moonClip"><circle r="14"/></clipPath>
+            <g clip-path="url(#moonClip)">
+              <circle class="moon-shadow" id="moonShadow" cx="-14" cy="0" r="14" fill="#12141c"/>
+            </g>
+            <circle r="14" fill="none" stroke="#8a8570" stroke-width="0.6"/>
+          </g>
+        </g>
+
+        <!-- solstice / equinox markers on the ecliptic -->
+        <g fill="var(--verdigris-light)">
+          <circle cx="300" cy="44" r="3.2"/>
+          <circle cx="556" cy="300" r="3.2"/>
+          <circle cx="300" cy="556" r="3.2"/>
+          <circle cx="44" cy="300" r="3.2"/>
+        </g>
+
+        <!-- moonrise / moonset ticks (schematic, independent of sun) -->
+        <g font-family="Amiri, serif" font-size="8" fill="var(--ink-dim)">
+          <circle cx="264" cy="237.6" r="2.5" fill="#e9e2cf"/>
+          <text x="240" y="230" text-anchor="end">شروق القمر</text>
+          <circle cx="336" cy="362.4" r="2.5" fill="#5a5f70"/>
+          <text x="345" y="378">غروب القمر</text>
+        </g>
+
+        <!-- eclipse nodes: where moon's path crosses the ecliptic (custom-drawn, not font-dependent) -->
+        <g stroke="#c1613f" stroke-width="1.3" fill="none">
+          <circle cx="356" cy="271" r="5"/><line x1="349" y1="271" x2="363" y2="271"/>
+          <circle cx="244" cy="337" r="5"/><line x1="237" y1="337" x2="251" y2="337"/><line x1="240" y1="333" x2="248" y2="341"/>
+        </g>
+
+        <!-- Earth at center: tilted axis + spinning globe -->
+        <g transform="rotate(23.5 300 300)">
+          <clipPath id="earthClip"><circle cx="300" cy="300" r="34"/></clipPath>
+          <circle cx="300" cy="300" r="34" fill="#1d4a5c"/>
+          <g clip-path="url(#earthClip)">
+            <g class="earth-spin" id="earthSpin">
+              <path d="M270,288 Q280,278 292,284 Q302,276 310,288 Q300,300 286,296 Q276,300 270,288Z" fill="#3d7a4a" opacity="0.9"/>
+              <path d="M275,310 Q288,304 305,314 Q295,322 282,320 Q273,320 275,310Z" fill="#3d7a4a" opacity="0.8"/>
+              <path d="M320,296 Q330,290 338,300 Q332,308 322,306Z" fill="#3d7a4a" opacity="0.75"/>
+              <path d="M242,300 Q250,294 258,302 Q252,310 244,308Z" fill="#3d7a4a" opacity="0.7"/>
+              <path d="M298,266 Q306,262 312,270 Q306,276 300,272Z" fill="#3d7a4a" opacity="0.6"/>
+            </g>
+            <!-- night-side shading, fixed relative to sun -->
+            <rect x="300" y="266" width="34" height="68" fill="#04070c" opacity="0.35"/>
+          </g>
+          <circle cx="300" cy="300" r="34" fill="none" stroke="var(--brass)" stroke-width="2"/>
+          <line x1="300" y1="258" x2="300" y2="342" stroke="var(--brass-light)" stroke-width="1.3" opacity="0.8"/>
+          <text x="300" y="252" font-family="'EB Garamond',serif" font-size="9" fill="var(--brass-light)" text-anchor="middle">N</text>
+          <text x="300" y="354" font-family="'EB Garamond',serif" font-size="9" fill="var(--brass-light)" text-anchor="middle">S</text>
+        </g>
+        <line x1="300" y1="300" x2="300" y2="266" stroke="var(--brass-light)" stroke-width="2"/>
+        <circle cx="300" cy="300" r="3" fill="var(--brass-light)"/>
+        <!-- 12 static hour markers for the analog hands (fixed, don't rotate — "12" is the true-up reference) -->
+        <!-- حزام مخصص للأرقام، منفصل تماماً عن حزام الشمس/الليل وعن مدارات الكواكب -->
+        <circle cx="300" cy="300" r="130" fill="none" stroke="#8a8570" stroke-width="0.6" opacity="0.35"/>
+        <g font-family="'EB Garamond', serif" font-size="15" font-weight="700" fill="var(--brass-light)" text-anchor="middle">
+          <text x="365" y="191">1</text>
+          <text x="412.6" y="239">2</text>
+          <text x="430" y="304">3</text>
+          <text x="412.6" y="369">4</text>
+          <text x="365" y="417">5</text>
+          <text x="300" y="434">6</text>
+          <text x="235" y="417">7</text>
+          <text x="187.4" y="369">8</text>
+          <text x="170" y="304">9</text>
+          <text x="187.4" y="239">10</text>
+          <text x="235" y="191">11</text>
+          <text x="300" y="174">12</text>
+        </g>
+
+        <!-- analog time hands (drawn last so they sit on top of everything) — "12" is up, relies on the clock being hung level -->
+        <g id="hourHand"><line x1="300" y1="300" x2="300" y2="230" stroke="#e8e0cc" stroke-width="6.5" stroke-linecap="round"/><line x1="300" y1="300" x2="300" y2="230" stroke="#181c26" stroke-width="4.5" stroke-linecap="round"/></g>
+        <g id="minuteHand"><line x1="300" y1="300" x2="300" y2="160" stroke="#e8e0cc" stroke-width="4.5" stroke-linecap="round"/><line x1="300" y1="300" x2="300" y2="160" stroke="#181c26" stroke-width="2.5" stroke-linecap="round"/></g>
+        <g id="secondHand"><line x1="300" y1="320" x2="300" y2="145" stroke="#e8574a" stroke-width="1.4"/></g>
+        <circle cx="300" cy="300" r="6" fill="var(--brass-light)" stroke="var(--brass-dark)" stroke-width="1"/>
+      </svg>
+      </div>
+      <div class="zoom-controls">
+        <button class="zoom-btn" onclick="zoomIn()" type="button">+</button>
+        <button class="zoom-btn" onclick="zoomOut()" type="button">−</button>
+        <button class="zoom-btn" onclick="resetZoom()" type="button">⟲</button>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center;margin:0 0 30px;">
+    <button onclick="startCompass()" style="background:var(--verdigris);color:#0a0c12;border:none;padding:13px 28px;border-radius:8px;font-family:'Amiri',serif;font-weight:700;font-size:15px;cursor:pointer;">تشغيل/إيقاف البوصلة الحقيقية 🧭 (تجربة حية بموبايلك)</button>
+    <p id="compassStatus" style="color:var(--verdigris-light);margin-top:12px;font-size:14px;min-height:20px;"></p>
+    <button onclick="toggleNavTool()" style="background:#d4af37;color:#0b0d17;border:none;padding:13px 28px;border-radius:8px;font-family:'Amiri',serif;font-weight:700;font-size:15px;cursor:pointer;margin-top:14px;">🧭 أداة الملاحة السريعة (خدمة منفصلة، للجوال/الآيباد)</button>
+  </div>
+
+  <!-- ===== أداة ملاحة محمولة منفصلة تماماً — نظام Canvas مستقل، لا يشارك أي متغير أو دالة مع الساعة الأساسية ===== -->
+  <div id="navToolContainer" style="display:none;max-width:400px;margin:0 auto 30px;text-align:center;background:#0b0d17;border-radius:16px;padding:20px;border:1px solid rgba(212,175,55,0.3);">
+    <h3 style="color:#d4af37;font-family:'Amiri',serif;margin:0 0 12px;">أداة الملاحة السريعة</h3>
+    <div style="position:relative;width:300px;height:300px;margin:0 auto;border-radius:50%;box-shadow:0 0 50px rgba(212,175,55,0.2), inset 0 0 20px #000;border:6px solid #d4af37;background:radial-gradient(circle,#1a1c2e 0%,#080911 100%);">
+      <canvas id="navSkyCanvas" width="300" height="300" style="position:absolute;top:0;left:0;border-radius:50%;"></canvas>
+    </div>
+    <div style="margin-top:12px;">
+      <button onclick="navRequestCompassPermission()" style="background:#d4af37;color:#0b0d17;border:none;padding:8px 16px;font-weight:bold;border-radius:20px;cursor:pointer;">تفعيل بوصلة الجوال</button>
+    </div>
+    <div style="margin-top:10px;font-size:12.5px;color:#a0a5c0;line-height:1.6;">
+      <div id="navLocationInfo">جارٍ التقاط إشارة GPS...</div>
+      <div id="navQiblaInfo">اتجاه القبلة: --°</div>
+      <div id="navHeadingInfo" style="color:#00ffcc;font-weight:bold;">اتجاه الجهاز: --°</div>
+    </div>
+  </div>
+
+  <!-- لوحة إلكترونية بكل معطيات الساعة — ملحق منفصل، مش بديل عن القراءة الميكانيكية على القرص -->
+  <div style="max-width:720px;margin:0 auto 30px;background:var(--bg-panel);border:1px solid var(--panel-border,rgba(201,163,93,0.22));border-radius:12px;padding:18px;">
+    <h3 style="font-family:'Amiri',serif;color:var(--brass-light);text-align:center;margin:0 0 14px;font-size:17px;">لوحة البيانات الإلكترونية</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;font-family:'EB Garamond',serif;font-size:13.5px;">
+      <div style="background:rgba(0,0,0,0.2);padding:10px;border-radius:6px;text-align:center;"><div style="color:var(--verdigris-light);font-family:'Amiri',serif;font-size:12px;">الوقت الآن</div><div id="dataTime" style="color:var(--brass-light);font-size:17px;margin-top:4px;">—</div></div>
+      <div style="background:rgba(0,0,0,0.2);padding:10px;border-radius:6px;text-align:center;"><div style="color:var(--verdigris-light);font-family:'Amiri',serif;font-size:12px;">اليوم</div><div id="dataDay" style="color:var(--brass-light);font-size:15px;margin-top:4px;">—</div></div>
+      <div style="background:rgba(0,0,0,0.2);padding:10px;border-radius:6px;text-align:center;"><div style="color:var(--verdigris-light);font-family:'Amiri',serif;font-size:12px;">التاريخ الميلادي</div><div id="dataGreg" style="color:var(--brass-light);font-size:14px;margin-top:4px;">—</div></div>
+      <div style="background:rgba(0,0,0,0.2);padding:10px;border-radius:6px;text-align:center;">
+        <div style="color:var(--verdigris-light);font-family:'Amiri',serif;font-size:12px;">التاريخ الهجري</div>
+        <div id="dataHijri" style="color:var(--brass-light);font-size:14px;margin-top:4px;">—</div>
+        <div style="margin-top:5px;">
+          <button onclick="adjustHijri(-1)" style="background:var(--brass-dark);color:var(--brass-light);border:none;padding:2px 9px;border-radius:4px;cursor:pointer;font-family:'Amiri',serif;margin:0 3px;">-1</button>
+          <button onclick="adjustHijri(1)" style="background:var(--brass-dark);color:var(--brass-light);border:none;padding:2px 9px;border-radius:4px;cursor:pointer;font-family:'Amiri',serif;margin:0 3px;">+1</button>
+        </div>
+      </div>
+      <div style="background:rgba(0,0,0,0.2);padding:10px;border-radius:6px;text-align:center;"><div style="color:var(--verdigris-light);font-family:'Amiri',serif;font-size:12px;">الموقع المستخدم</div><div id="dataLoc" style="color:var(--brass-light);font-size:13px;margin-top:4px;">—</div></div>
+      <div style="background:rgba(0,0,0,0.2);padding:10px;border-radius:6px;text-align:center;"><div style="color:var(--verdigris-light);font-family:'Amiri',serif;font-size:12px;">اتجاه القبلة</div><div id="dataQibla" style="color:var(--red);font-size:15px;margin-top:4px;">—</div></div>
+      <div style="grid-column:1/-1;background:rgba(0,0,0,0.2);padding:12px;border-radius:6px;">
+        <div style="color:var(--verdigris-light);font-family:'Amiri',serif;font-size:12px;text-align:center;margin-bottom:8px;">مواقيت الصلاة</div>
+        <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;text-align:center;">
+          <div id="boxFajr" style="border-radius:5px;padding:3px;transition:box-shadow 0.3s;"><div style="font-family:'Amiri',serif;font-size:11px;color:var(--ink-dim,#8a8570);">الفجر</div><div id="dataFajr" style="color:var(--brass-light);font-size:11.5px;margin-top:2px;">—</div></div>
+          <div style="border-radius:5px;padding:3px;"><div style="font-family:'Amiri',serif;font-size:11px;color:var(--ink-dim,#8a8570);">الشروق</div><div id="dataSunrise" style="color:var(--brass-light);font-size:11.5px;margin-top:2px;">—</div></div>
+          <div id="boxDhuhr" style="border-radius:5px;padding:3px;transition:box-shadow 0.3s;"><div style="font-family:'Amiri',serif;font-size:11px;color:var(--ink-dim,#8a8570);">الظهر</div><div id="dataDhuhr" style="color:var(--brass-light);font-size:11.5px;margin-top:2px;">—</div></div>
+          <div id="boxAsr" style="border-radius:5px;padding:3px;transition:box-shadow 0.3s;"><div style="font-family:'Amiri',serif;font-size:11px;color:var(--ink-dim,#8a8570);">العصر</div><div id="dataAsr" style="color:var(--brass-light);font-size:11.5px;margin-top:2px;">—</div></div>
+          <div id="boxMaghrib" style="border-radius:5px;padding:3px;transition:box-shadow 0.3s;"><div style="font-family:'Amiri',serif;font-size:11px;color:var(--ink-dim,#8a8570);">المغرب</div><div id="dataMaghrib" style="color:var(--brass-light);font-size:11.5px;margin-top:2px;">—</div></div>
+          <div id="boxIsha" style="border-radius:5px;padding:3px;transition:box-shadow 0.3s;"><div style="font-family:'Amiri',serif;font-size:11px;color:var(--ink-dim,#8a8570);">العشاء</div><div id="dataIsha" style="color:var(--brass-light);font-size:11.5px;margin-top:2px;">—</div></div>
+        </div>
+      </div>
+      <div style="background:rgba(0,0,0,0.2);padding:10px;border-radius:6px;text-align:center;"><div style="color:var(--verdigris-light);font-family:'Amiri',serif;font-size:12px;">طور القمر</div><div id="dataMoon" style="color:var(--brass-light);font-size:14px;margin-top:4px;">—</div></div>
+      <div style="background:rgba(0,0,0,0.2);padding:10px;border-radius:6px;text-align:center;"><div style="color:var(--verdigris-light);font-family:'Amiri',serif;font-size:12px;">معادلة الزمن</div><div id="dataEot" style="color:var(--brass-light);font-size:14px;margin-top:4px;">—</div></div>
+    </div>
+    <p style="text-align:center;color:var(--ink-dim,#8a8570);font-size:12px;margin:14px 0 0;">هذه اللوحة ملحق إلكتروني للتحقق من صحة الأرقام فقط — قراءة الساعة الأساسية تبقى من مواضع العقارب والحلقات على القرص.</p>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item">
+      <h3><span class="mark" style="background:#1d4a5c"></span>الأرض — المركز</h3>
+      <p>محور المجموعة كلها، كما يراها راصد واقف عليها فعلياً. المحور مائل بزاوية 23.5° وهي نفس الزاوية الحقيقية لميل الأرض، والكرة تدور حول نفسها لتمثل دورة الليل والنهار — وهي الحركة الأصلية التي تُبنى عليها كل الحلقات الأخرى.</p>
+    </div>
+    <div class="legend-item">
+      <h3><span class="mark" style="background:#e9e2cf"></span>القمر</h3>
+      <p>أقرب الأجرام مداراً حول الأرض، يمر بدورة كاملة من المحاق إلى البدر وعودة إلى المحاق بحركة الظل المستمرة. له فلكه المرئي الخاص (الدائرة المنقّطة)، منفصل عن فلك الشمس — ﴿وَهُوَ الَّذِي خَلَقَ اللَّيْلَ وَالنَّهَارَ وَالشَّمْسَ وَالْقَمَرَ كُلٌّ فِي فَلَكٍ يَسْبَحُونَ﴾ (الأنبياء: ٣٣).</p>
+    </div>
+    <div class="legend-item">
+      <h3><span class="mark" style="background:#b5b5b5"></span>الكواكب الخمسة</h3>
+      <p>عطارد والزهرة والمريخ والمشتري وزحل — الكواكب المتحيّرة المرئية بالعين المجردة، مرتبة بالترتيب البطلمي القديم بالإضافة إلى الشمس على النطاق الذهبي.</p>
+    </div>
+    <div class="legend-item">
+      <h3><span class="mark" style="background:linear-gradient(90deg,#f2c879,#2a3450)"></span>مواقيت الصلاة والنهار</h3>
+      <p>النطاق الذهبي/الداكن يحمل الشمس ومواقيت الفجر والظهر والعصر والمغرب والعشاء موزعة على مسارها اليومي.</p>
+    </div>
+    <div class="legend-item">
+      <h3><span class="mark" style="background:#eddba0"></span>النجوم المشهورة</h3>
+      <p>الشعرى، الدبران، رجل الجبار، السماك الرامح، النسر الواقع، القطبية، ويد الجوزاء — أغلب أسمائها بالإنجليزية أصلاً مأخوذة من العربية.</p>
+    </div>
+    <div class="legend-item">
+      <h3><span class="mark" style="background:var(--brass)"></span>الأبراج الاثنا عشر</h3>
+      <p>حلقة ثابتة تمثل مسار الشمس السنوي الظاهري عبر البروج، من الحمل إلى الحوت.</p>
+    </div>
+    <div class="legend-item">
+      <h3><span class="mark" style="background:var(--brass-dark)"></span>التقويم المزدوج</h3>
+      <p>الشهور الهجرية في الحلقة الخارجية، والميلادية في الحلقة الداخلية لها — يذكّران بأن العام القمري والشمسي لا يتطابقان أبداً.</p>
+    </div>
+    <div class="legend-item">
+      <h3><span class="mark" style="background:var(--verdigris)"></span>القبلة</h3>
+      <p>سهم ثابت لا يدور مع باقي الحلقات، يشير لاتجاه واحد محدد دوماً — أقدم وظيفة عملية اشتهر بها الأسطرلاب العربي.</p>
+    </div>
+    <div class="legend-item">
+      <h3><span class="mark" style="background:var(--ink-dim)"></span>القبلة</h3>
+      <p>حساس بوصلة معوَّض الميل (مغناطيسي + تسارعي + جيروسكوب معاً) بيحدد الاتجاه الصحيح لحظياً ومستمر، وموتور صغير بيحرك السهم تلقائياً — بدون أي تدخل يدوي وقت التركيب، وبدون الحاجة لرِجل قابلة للطي أو قفل ميكانيكي.</p>
+    </div>
+    <div class="legend-item">
+      <h3><span class="mark" style="background:var(--verdigris-light)"></span>الانقلابان والاعتدالان</h3>
+      <p>4 نقاط ثابتة على حلقة البروج: الاعتدال الربيعي (الحمل)، الانقلاب الصيفي (السرطان)، الاعتدال الخريفي (الميزان)، الانقلاب الشتوي (الجدي) — أطراف رحلة الشمس السنوية الظاهرية.</p>
+    </div>
+    <div class="legend-item">
+      <h3><span class="mark" style="background:#e9e2cf"></span>شروق وغروب القمر</h3>
+      <p>علامتان منفصلتان عن شروق وغروب الشمس تماماً، لأن القمر يشرق ويغرب في أوقات مختلفة كل يوم بمعدل يتأخر نحو 50 دقيقة يومياً.</p>
+    </div>
+    <div class="legend-item">
+      <h3><span class="mark" style="background:#7fb3a8"></span>حلقة التوقيت العالمي</h3>
+      <p>حلقة خارجية جديدة أضفناها بعد ما بقت المساحة تسمح — 8 مدن مرجعية بفارق تقريبي 3 ساعات بينها، تبدأ من مكة. حلقة داخلية بتدور مع دورة الليل والنهار تدّيك فكرة تقريبية عن التوقيت في كل مدينة. تقريبية وتوضيحية، مش دقيقة بالثانية.</p>
+    </div>
+  </div>
+
+  <section class="philosophy">
+    <h2>ليه جيوسنتري رغم إننا عارفين إنها هليوسنتري؟</h2>
+    <p>الأداة دي مش بتحاول تشرح الفيزياء الفلكية الحديثة، هي بتحاكي **تجربة الرصد** كما عاشها الفلكي القديم فعلاً واقفاً على الأرض ناظراً للأعلى. من موقعه، الشمس والقمر والكواكب كلها بتتحرك حواليه — وده مش خطأ علمي، ده ببساطة منظور الأسطرلاب الذي صُمم من الأساس ليكون أداة رصد سطحية، لا نموذجاً كونياً.</p>
+  </section>
+
+  <div class="signature">
+    <div class="line"></div>
+    تصوّر مفاهيمي لساعة حائط — القطر المقترح 60–100 سم · التاريخ الهجري تقريبي بالحساب الجدولي، لا الرؤية الفعلية للهلال
+  </div>
+</div>
+
+<script>
+const arDays = ["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
+const hijriMonths = ["محرم","صفر","ربيع الأول","ربيع الآخر","جمادى الأولى","جمادى الآخرة","رجب","شعبان","رمضان","شوال","ذو القعدة","ذو الحجة"];
+
+let hijriOffset = 0;
+function adjustHijri(val){
+  hijriOffset += val;
+  tick();
+}
+
+function gregorianToHijri(inputDate){
+  const date = new Date(inputDate);
+  date.setDate(date.getDate() + hijriOffset);
+  const day = date.getDate(), month = date.getMonth()+1, year = date.getFullYear();
+  let jd = Math.floor((1461*(year + 4800 + Math.floor((month-14)/12)))/4) +
+           Math.floor((367*(month-2-12*Math.floor((month-14)/12)))/12) -
+           Math.floor((3*Math.floor((year+4900+Math.floor((month-14)/12))/100))/4) +
+           day - 32075;
+  let l = jd - 1948440 + 10632;
+  const n = Math.floor((l-1)/10631);
+  l = l - 10631*n + 354;
+  const j = (Math.floor((10985-l)/5316))*(Math.floor((50*l)/17719)) + (Math.floor(l/5670))*(Math.floor((43*l)/15238));
+  l = l - (Math.floor((30-j)/15))*(Math.floor((17719*j)/50)) - (Math.floor(j/16))*(Math.floor((15238*j)/43)) + 29;
+  const hMonth = Math.floor((24*l)/709);
+  const hDay = l - Math.floor((709*hMonth)/24);
+  const hYear = 30*n + j - 30;
+  return {day: hDay, month: hMonth, year: hYear};
+}
+
+function pad(n){ return n.toString().padStart(2,'0'); }
+function minToHHMM(mins){
+  const m = ((Math.round(mins) % 1440) + 1440) % 1440;
+  const hh24 = Math.floor(m/60);
+  const hh12 = hh24%12 || 12;
+  const ampm = hh24 < 12 ? 'AM' : 'PM';
+  return pad(hh12)+':'+pad(m%60)+' '+ampm;
+}
+function updateDataPanel(now, h){
+  const set = (id,val)=>{ const el=document.getElementById(id); if(el) el.textContent = val; };
+  const h12 = now.getHours()%12 || 12;
+  const ampm = now.getHours() < 12 ? 'AM' : 'PM';
+  set('dataTime', pad(h12)+':'+pad(now.getMinutes())+':'+pad(now.getSeconds())+' '+ampm);
+  set('dataDay', arDays[now.getDay()]);
+  set('dataGreg', now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate()));
+  set('dataHijri', h.day+' '+hijriMonths[h.month-1]+' '+h.year+'هـ');
+  set('dataLoc', observer.name+' • '+observer.lat.toFixed(2)+'°, '+observer.lon.toFixed(2)+'°');
+  const q = isCompassListening ? qiblaBearing : computeQiblaBearing(observer.lat, observer.lon);
+  set('dataQibla', Math.round(q)+'° من الشمال');
+  const pr = realPrayerTimes(now);
+  set('dataFajr', minToHHMM(pr.fajr));
+  set('dataSunrise', minToHHMM(pr.sunrise));
+  set('dataDhuhr', minToHHMM(pr.dhuhr));
+  set('dataAsr', minToHHMM(pr.asr));
+  set('dataMaghrib', minToHHMM(pr.maghrib));
+  set('dataIsha', minToHHMM(pr.isha));
+
+  // تمييز الصلاة الجاية بإطار مضيء
+  const nowMinOfDay = now.getHours()*60 + now.getMinutes() + now.getSeconds()/60;
+  const prayerBoxes = [['boxFajr',pr.fajr],['boxDhuhr',pr.dhuhr],['boxAsr',pr.asr],['boxMaghrib',pr.maghrib],['boxIsha',pr.isha]];
+  let nextId = prayerBoxes[0][0]; // لو الوقت بعد العشاء، الجاية فجر بكرة
+  for (const [id, tmin] of prayerBoxes){
+    if (tmin > nowMinOfDay){ nextId = id; break; }
+  }
+  prayerBoxes.forEach(([id]) => {
+    const el = document.getElementById(id);
+    if (el) el.style.boxShadow = (id === nextId) ? '0 0 0 2px var(--brass), 0 0 10px rgba(201,163,93,0.5)' : 'none';
+  });
+  const age = moonAgeDays(now);
+  set('dataMoon', (age/SYNODIC*100).toFixed(0)+'٪ ('+age.toFixed(1)+' يوم)');
+  set('dataEot', (equationOfTimeMinutes(now)>=0?'+':'')+equationOfTimeMinutes(now).toFixed(1)+' دقيقة');
+}
+
+
+function rot(id, angle, cx, cy){
+  const el = document.getElementById(id);
+  if(el) el.setAttribute('transform', 'rotate('+angle+' '+cx+' '+cy+')');
+}
+function dayOfYear(date){
+  const start = new Date(date.getFullYear(),0,0);
+  return Math.floor((date - start)/86400000);
+}
+function equationOfTimeMinutes(date){
+  const N = dayOfYear(date);
+  const B = (2*Math.PI/365)*(N-81);
+  return 9.87*Math.sin(2*B) - 7.53*Math.cos(B) - 1.5*Math.sin(B);
+}
+const SYNODIC = 29.530588853;
+
+// ===== real astronomy engine (replaces the old simplified approximations) =====
+const DEGR = Math.PI/180, RADD = 180/Math.PI;
+let observer = { lat: 21.4225, lon: 39.8262, tz: 3, name: "مكة المكرمة (افتراضي)" }; // Mecca default; overwritten by real GPS if the person uses the compass button
+let calcMethod = "EGYPT";
+
+const starsData = [
+  ["الشعرى", 6+45/60+8.9/3600, -16.7161],
+  ["الدبران", 4+35/60+55.2/3600, 16.5093],
+  ["رجل الجبار", 5+14/60+32.3/3600, -8.205],
+  ["يد الجوزاء", 5+55/60+10.3/3600, 7.407],
+  ["السماك الرامح", 14+15/60+39.7/3600, 19.1825],
+  ["النسر الواقع", 18+36/60+56.3/3600, 38.7837],
+  ["القطبية", 2+31/60+49.1/3600, 89.2641]
+];
+
+function normDeg(x){ x%=360; return x<0?x+360:x; }
+function sind(x){ return Math.sin(x*DEGR); }
+function cosd(x){ return Math.cos(x*DEGR); }
+function atan2d(y,x){ return Math.atan2(y,x)*RADD; }
+function jdOf(d){ return d.getTime()/86400000 + 2440587.5; }
+
+function gmst(d){
+  const T = (jdOf(d)-2451545)/36525;
+  return normDeg(280.46061837 + 360.98564736629*(jdOf(d)-2451545) + 0.000387933*T*T - T*T*T/38710000);
+}
+function localSidereal(d){ return normDeg(gmst(d) + observer.lon); }
+function raDecToAltAz(raH, dec, d){
+  let H = normDeg(localSidereal(d) - raH*15); if (H>180) H -= 360;
+  const sinAlt = sind(dec)*sind(observer.lat) + cosd(dec)*cosd(observer.lat)*cosd(H);
+  const alt = Math.asin(Math.max(-1,Math.min(1,sinAlt)))*RADD;
+  const az = normDeg(atan2d(sind(H), cosd(H)*sind(observer.lat) - Math.tan(dec*DEGR)*cosd(observer.lat)) + 180);
+  return { alt, az };
+}
+
+function solarDeclinationEq(d){
+  const day = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), 12,0,0));
+  const N = Math.floor((day - Date.UTC(d.getUTCFullYear(),0,0))/86400000);
+  const g = 2*Math.PI/365*(N-1);
+  const eq = 229.18*(.000075+.001868*Math.cos(g)-.032077*Math.sin(g)-.014615*Math.cos(2*g)-.040849*Math.sin(2*g));
+  const dec = .006918-.399912*Math.cos(g)+.070257*Math.sin(g)-.006758*Math.cos(2*g)+.000907*Math.sin(2*g)-.002697*Math.cos(3*g)+.00148*Math.sin(3*g);
+  return { eq, dec };
+}
+function sunTimes(d){
+  const { eq, dec } = solarDeclinationEq(d);
+  const zen = 90.833;
+  let cosHa = (cosd(zen)/(cosd(observer.lat)*Math.cos(dec)) - Math.tan(observer.lat*DEGR)*Math.tan(dec));
+  cosHa = Math.max(-1, Math.min(1, cosHa));
+  const ha = Math.acos(cosHa)*RADD;
+  const noon = 720 - 4*observer.lon - eq + 60*observer.tz;
+  return { sunrise: noon - 4*ha, sunset: noon + 4*ha, noon };
+}
+function altHa(d, altDeg){
+  const { dec } = solarDeclinationEq(d);
+  let cosHa = (sind(altDeg) - sind(observer.lat)*Math.sin(dec)) / (cosd(observer.lat)*Math.cos(dec));
+  cosHa = Math.max(-1, Math.min(1, cosHa));
+  return Math.acos(cosHa)*RADD;
+}
+function realPrayerTimes(d){
+  const t = sunTimes(d);
+  const hDate = gregorianToHijri(d);
+  let fajrAngle=-19.5, ishaAngle=-17.5, ishaFixed=0;
+  if (calcMethod==="UMM_AL_QURA"){ fajrAngle=-18.5; ishaFixed = (hDate.month===9) ? 120 : 90; }
+  else if (calcMethod==="MWL"){ fajrAngle=-18; ishaAngle=-17; }
+  else if (calcMethod==="ISNA"){ fajrAngle=-15; ishaAngle=-15; }
+  const fajr = t.noon - 4*altHa(d, fajrAngle);
+  const isha = ishaFixed ? t.sunset + ishaFixed : t.noon + 4*altHa(d, ishaAngle);
+  const { dec } = solarDeclinationEq(d);
+  const decDeg = dec*RADD;
+  // -0.566° يمثل انكسار الغلاف الجوي للضوء، تصحيح فلكي حقيقي مستخدم في مكتبات مواقيت الصلاة الاحترافية
+  const asrAlt = Math.atan(1/(1+Math.abs(Math.tan((observer.lat-decDeg)*DEGR))))*RADD - 0.566;
+  return { fajr, sunrise:t.sunrise, dhuhr:t.noon, asr:t.noon+4*altHa(d,asrAlt), maghrib:t.sunset, isha, noon:t.noon };
+}
+function initStars(){
+  const g = document.getElementById('starsReal');
+  if (!g) return;
+  g.innerHTML = '';
+  starsData.forEach((s, i)=>{
+    const el = document.createElementNS("http://www.w3.org/2000/svg","g");
+    el.setAttribute('id', `star-elem-${i}`);
+    el.innerHTML = `<circle r="2.3"/><text x="6" y="3">${s[0]}</text>`;
+    g.appendChild(el);
+  });
+}
+function updateRealStars(now){
+  starsData.forEach((s, i)=>{
+    const el = document.getElementById(`star-elem-${i}`);
+    if (!el) return;
+    const aa = raDecToAltAz(s[1], s[2], now);
+    const p = [300 + 222*Math.sin(aa.az*DEGR), 300 - 222*Math.cos(aa.az*DEGR)];
+    el.setAttribute('transform', `translate(${p[0]} ${p[1]})`);
+    el.setAttribute('opacity', aa.alt > -5 ? 1 : 0.15); // dim stars currently below the horizon rather than hiding them
+  });
+}
+
+function polar(cx, cy, r, angleDeg){
+  const t = angleDeg*DEGR;
+  return [cx + r*Math.sin(t), cy - r*Math.cos(t)];
+}
+function timeToAngle(minutes){
+  return ((minutes % 1440) + 1440) % 1440 / 1440 * 360 - 180;
+}
+function updateDayNightAndPrayers(now){
+  const Rsol = 165;
+  const times = sunTimes(now);
+  const prayers = realPrayerTimes(now);
+  const nowMin = now.getHours()*60 + now.getMinutes() + now.getSeconds()/60;
+
+  const srAng = timeToAngle(times.sunrise), ssAng = timeToAngle(times.sunset);
+  const dayLen = ((times.sunset - times.sunrise) % 1440 + 1440) % 1440;
+  const largeDay = dayLen > 720 ? 1 : 0;
+  const largeNight = 1 - largeDay;
+
+  function arcPath(a0, a1, large){
+    const p0 = polar(300,300,Rsol,a0), p1 = polar(300,300,Rsol,a1);
+    return `M ${p0[0]} ${p0[1]} A ${Rsol} ${Rsol} 0 ${large} 1 ${p1[0]} ${p1[1]}`;
+  }
+  document.getElementById('dayArcPath').setAttribute('d', arcPath(srAng, ssAng, largeDay));
+  document.getElementById('nightArcPath').setAttribute('d', arcPath(ssAng, srAng, largeNight));
+
+  const sunPos = polar(300,300,Rsol, timeToAngle(nowMin));
+  document.getElementById('sunIcon').setAttribute('transform', `translate(${sunPos[0]} ${sunPos[1]})`);
+  const moonNightPos = polar(300,300,Rsol, timeToAngle(nowMin+720));
+  document.getElementById('moonNightIcon').setAttribute('transform', `translate(${moonNightPos[0]} ${moonNightPos[1]})`);
+
+  const pg = document.getElementById('prayerMarkers');
+  pg.innerHTML = '';
+  [["الفجر",prayers.fajr],["الظهر",prayers.dhuhr],["العصر",prayers.asr],["المغرب",prayers.maghrib],["العشاء",prayers.isha]].forEach(([name,tmin])=>{
+    const p = polar(300,300,Rsol,timeToAngle(tmin));
+    pg.innerHTML += `<circle cx="${p[0]}" cy="${p[1]}" r="4" fill="#eddba0" stroke="#0d1119" stroke-width="1"/><title>${name}</title>`;
+  });
+
+  const starsN = document.getElementById('nightStarsG');
+  if (starsN.childElementCount === 0){
+    for(let i=0;i<9;i++){
+      const a = ssAng + (i+0.5)/9 * ((srAng-ssAng+360)%360 || 300);
+      const p = polar(300,300,Rsol, a);
+      starsN.innerHTML += `<circle cx="${p[0]}" cy="${p[1]}" r="${0.8+Math.random()*0.6}"/>`;
+    }
+  }
+}
+
+function moonAgeDays(date){
+  const knownNewMoon = Date.UTC(2000,0,6,18,14,0);
+  let diff = (date.getTime() - knownNewMoon)/86400000;
+  let age = diff % SYNODIC;
+  if(age < 0) age += SYNODIC;
+  return age;
+}
+function dayArcAngle(dayIndex){
+  return -80 + dayIndex*(160/6); // retrograde: Sunday=-80°, Saturday=+80°, snaps back
+}
+function realAngle(now, periodDays, reverse){
+  const dayMs = 86400000;
+  const cycles = now.getTime() / (periodDays*dayMs);
+  const ang = (cycles % 1) * 360;
+  return reverse ? -ang : ang;
+}
+// day/night must be anchored to the viewer's actual local clock, not the raw UTC epoch —
+// otherwise "day" on the ring has no real connection to whether it's actually day right now.
+// At local noon (12:00) the sun icon (ring-local top) must align with the fixed 12 o'clock mark.
+function localDayAngle(now){
+  const fraction = (now.getHours() + now.getMinutes()/60 + now.getSeconds()/3600) / 24;
+  return fraction*360 - 180;
+}
+
+function tick(){
+  const now = new Date();
+  const h = gregorianToHijri(now);
+
+  // analog time hands — real mechanical relationship (12:1 hour:minute, matching the motion-works design)
+  const hh = now.getHours()%12, mm = now.getMinutes(), ss = now.getSeconds();
+  rot('hourHand', (hh + mm/60)/12*360, 300, 300);
+  rot('minuteHand', (mm + ss/60)/60*360, 300, 300);
+  // secondHand و tourbillonCage اتنقلوا لحلقة requestAnimationFrame منفصلة أسفل — حركة سلسة كل فريم بدل قفزة كل ثانية
+
+  // calendar month pointers (replace the old digital date text)
+  rot('gregMonthHand', now.getMonth()*30 + (now.getDate()/31)*30, 300, 300);
+  rot('hijriMonthHand', (h.month-1)*30 + (h.day/30)*30, 300, 300);
+
+  // equation of time (top-left corner gauge)
+  const eot = equationOfTimeMinutes(now);
+  rot('eotHand', Math.max(-45, Math.min(45, (eot/16)*45)), 40, 40);
+
+  // lunar power reserve (top-right corner gauge)
+  const age = moonAgeDays(now);
+  const half = SYNODIC/2;
+  const fullness = age <= half ? 1 - (age/half) : (age-half)/half;
+  rot('reserveHand', -45 + fullness*90, 560, 40);
+
+  // retrograde day-of-week (bottom-left corner)
+  rot('dayHandCorner', dayArcAngle(now.getDay()), 40, 560);
+
+  // real astronomical speeds — no more fast demo animation
+  rot('worldTimeRing', realAngle(now, 1), 300, 300);
+  rot('earthSpin', localDayAngle(now), 300, 300);
+  updateRealStars(now);
+  updateDayNightAndPrayers(now);
+  updateDataPanel(now, h);
+
+  // الوضع الافتراضي (بدون بوصلة حية): الشمال ثابت لفوق، والقبلة بتوري زاويتها المحسوبة من موقع المراقب الحالي
+  if (!isCompassListening){
+    rot('northPointerHand', 0, 300, 300);
+    rot('qiblaArrow', computeQiblaBearing(observer.lat, observer.lon), 300, 300);
+  }
+  rot('moonOrbit', realAngle(now, 27.321661), 300, 300);
+  rot('planetMercury', realAngle(now, 87.9691), 300, 300);
+  rot('planetVenus', realAngle(now, 224.701, true), 300, 300);
+  rot('planetMars', realAngle(now, 686.980), 300, 300);
+  rot('planetJupiter', realAngle(now, 4332.589, true), 300, 300);
+  rot('planetSaturn', realAngle(now, 10759.22), 300, 300);
+
+  // moon phase shadow, real synodic age (same triangular sweep, real speed)
+  const moonShadowOffset = age <= half ? (age/half)*28 : ((SYNODIC-age)/half)*28;
+  document.getElementById('moonShadow').setAttribute('cx', -14 + moonShadowOffset);
+
+  // decorative tourbillon (bottom-right corner) — one rotation per minute
+  // (الدوران السلس اتنقل لحلقة animateSmooth)
+}
+
+// ===== live compass state — declared BEFORE tick() first runs, since tick() reads these =====
+const KAABA_LAT = 21.4225, KAABA_LON = 39.8262;
+let qiblaBearing = null;
+let isCompassListening = false;
+let currentHeading = 0;
+let targetHeading = 0;
+
+initStars();
+tick();
+setInterval(tick, 1000);
+
+function animateSmooth(){
+  const now = new Date();
+  const sec = now.getSeconds(), ms = now.getMilliseconds();
+  rot('secondHand', (sec + ms/1000)/60*360, 300, 300);
+  rot('tourbillonCage', (sec*1000 + ms)/60000*360, 560, 560);
+
+  if (isCompassListening){
+    let diff = targetHeading - currentHeading;
+    diff = (diff + 180) % 360 - 180; // يمنع القفزة الكاذبة عند عبور حد ٣٦٠°/٠°
+    currentHeading += diff * 0.08; // فلتر تنعيم أنعم، مستقل عن معدل إرسال الحساس نفسه
+    rot('northPointerHand', -currentHeading, 300, 300);
+    rot('qiblaArrow', qiblaBearing - currentHeading, 300, 300);
+    const statusEl = document.getElementById('compassStatus');
+    statusEl.textContent = 'البوصلة نشطة — اتجاهك: '+Math.round(((currentHeading%360)+360)%360)+'° — القبلة: '+Math.round(qiblaBearing)+'° من الشمال الحقيقي';
+  }
+  requestAnimationFrame(animateSmooth);
+}
+requestAnimationFrame(animateSmooth);
+
+function toRad(d){ return d*Math.PI/180; }
+function toDeg(r){ return r*180/Math.PI; }
+
+function computeQiblaBearing(lat, lon){
+  const phi1 = toRad(lat), phi2 = toRad(KAABA_LAT);
+  const dLon = toRad(KAABA_LON - lon);
+  const y = Math.sin(dLon)*Math.cos(phi2);
+  const x = Math.cos(phi1)*Math.sin(phi2) - Math.sin(phi1)*Math.cos(phi2)*Math.cos(dLon);
+  return (toDeg(Math.atan2(y,x)) + 360) % 360;
+}
+
+function handleOrientation(event){
+  if (typeof event.webkitCompassHeading !== 'undefined' && event.webkitCompassHeading !== null){
+    targetHeading = event.webkitCompassHeading; // iOS Safari: already 0°=N, clockwise
+  } else if (event.alpha !== null){
+    targetHeading = (360 - event.alpha) % 360; // Android approximation
+  }
+}
+
+function startCompass(){
+  const statusEl = document.getElementById('compassStatus');
+
+  // لو شغالة بالفعل، الزرار بيوقفها وينضّف المستمع القديم بدل ما يضيف واحد فوق التاني
+  if (isCompassListening){
+    window.removeEventListener('deviceorientationabsolute', handleOrientation, true);
+    window.removeEventListener('deviceorientation', handleOrientation, true);
+    isCompassListening = false;
+    statusEl.textContent = 'تم إيقاف البوصلة الحية.';
+    return;
+  }
+
+  statusEl.textContent = 'جارٍ تحديد موقعك...';
+  if (!navigator.geolocation){
+    statusEl.textContent = 'المتصفح ده مش بيدعم تحديد الموقع.';
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(function(pos){
+    qiblaBearing = computeQiblaBearing(pos.coords.latitude, pos.coords.longitude);
+    observer = { lat: pos.coords.latitude, lon: pos.coords.longitude, tz: -(new Date().getTimezoneOffset()/60), name: "موقعك الحالي" };
+    statusEl.textContent = 'اتجاه القبلة من موقعك: '+Math.round(qiblaBearing)+'° من الشمال. جارٍ تفعيل حساس الاتجاه...';
+    function afterPermission(){
+      window.addEventListener('deviceorientationabsolute', handleOrientation, true);
+      window.addEventListener('deviceorientation', handleOrientation, true);
+      isCompassListening = true;
+    }
+    if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function'){
+      DeviceOrientationEvent.requestPermission().then(function(r){
+        if (r === 'granted') afterPermission();
+        else statusEl.textContent = 'لازم توافق على إذن حساسات الحركة عشان البوصلة تشتغل.';
+      }).catch(function(e){ statusEl.textContent = 'خطأ في إذن الحساس: '+e.message; });
+    } else {
+      afterPermission();
+    }
+  }, function(err){
+    statusEl.textContent = 'تعذر تحديد الموقع: '+err.message+' — جرب تسمح بإذن الموقع من إعدادات المتصفح.';
+  });
+}
+
+// ===== تكبير/تصغير وسحب — لاستكشاف تفاصيل القرص الكثيفة على الشاشة، مش جزء من الساعة الفعلية =====
+const zoomContainer = document.getElementById('zoomContainer');
+const zoomTarget = document.getElementById('zoomTarget');
+let scale = 1, pointX = 0, pointY = 0;
+let panStart = { x: 0, y: 0 };
+let isPanning = false;
+let initialPinchDistance = null;
+
+function setTransform(){
+  zoomTarget.style.transform = `translate(${pointX}px, ${pointY}px) scale(${scale})`;
+}
+zoomContainer.addEventListener('mousedown', (e)=>{
+  e.preventDefault();
+  panStart = { x: e.clientX - pointX, y: e.clientY - pointY };
+  isPanning = true;
+});
+zoomContainer.addEventListener('mousemove', (e)=>{
+  if (!isPanning) return;
+  e.preventDefault();
+  pointX = e.clientX - panStart.x;
+  pointY = e.clientY - panStart.y;
+  setTransform();
+});
+window.addEventListener('mouseup', ()=>{ isPanning = false; });
+zoomContainer.addEventListener('wheel', (e)=>{
+  e.preventDefault();
+  const xs = (e.clientX - pointX) / scale, ys = (e.clientY - pointY) / scale;
+  scale = (-e.deltaY > 0) ? scale*1.2 : scale/1.2;
+  scale = Math.min(Math.max(1, scale), 5);
+  if (scale === 1){ pointX = 0; pointY = 0; }
+  else { pointX = e.clientX - xs*scale; pointY = e.clientY - ys*scale; }
+  setTransform();
+});
+zoomContainer.addEventListener('touchstart', (e)=>{
+  if (e.touches.length === 1){
+    isPanning = true;
+    panStart = { x: e.touches[0].clientX - pointX, y: e.touches[0].clientY - pointY };
+  } else if (e.touches.length === 2){
+    isPanning = false;
+    initialPinchDistance = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY);
+  }
+});
+zoomContainer.addEventListener('touchmove', (e)=>{
+  if (isPanning && e.touches.length === 1){
+    pointX = e.touches[0].clientX - panStart.x;
+    pointY = e.touches[0].clientY - panStart.y;
+    setTransform();
+  } else if (e.touches.length === 2 && initialPinchDistance){
+    const d = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY);
+    scale = Math.min(Math.max(1, scale*(d/initialPinchDistance)), 5);
+    initialPinchDistance = d;
+    if (scale === 1){ pointX = 0; pointY = 0; }
+    setTransform();
+  }
+});
+zoomContainer.addEventListener('touchend', ()=>{ isPanning = false; initialPinchDistance = null; });
+function zoomIn(){ scale = Math.min(scale*1.3, 5); setTransform(); }
+function zoomOut(){ scale = Math.max(scale/1.3, 1); if (scale===1){ pointX=0; pointY=0; } setTransform(); }
+function resetZoom(){ scale = 1; pointX = 0; pointY = 0; setTransform(); }
+
+// ================================================================
+// أداة الملاحة السريعة — معزولة بالكامل، كل اسم بادئته nav حتى لا
+// يتصادم مع أي متغير أو دالة في محرك الساعة الأساسي أعلاه
+// ================================================================
+let navToolStarted = false;
+let navDeviceHeading = 0;
+let navLat = 21.5433, navLon = 39.1728; // جدة كخيار افتراضي
+let navQiblaBearingVal = 0;
+
+function toggleNavTool(){
+  const el = document.getElementById('navToolContainer');
+  const showing = el.style.display !== 'none';
+  el.style.display = showing ? 'none' : 'block';
+  if (!showing){
+    if (!navToolStarted){
+      navToolStarted = true;
+      navInitGPS();
+      navCalculateQibla();
+    }
+    navDrawLoop();
+  }
+}
+
+function navInitGPS(){
+  if ('geolocation' in navigator){
+    navigator.geolocation.watchPosition(
+      (pos)=>{
+        navLat = pos.coords.latitude;
+        navLon = pos.coords.longitude;
+        navCalculateQibla();
+        document.getElementById('navLocationInfo').innerText =
+          `الموقع: ${navLat.toFixed(4)}°, ${navLon.toFixed(4)}° (GPS)`;
+      },
+      ()=>{
+        document.getElementById('navLocationInfo').innerText =
+          `الموقع الافتراضي: ${navLat.toFixed(2)}°, ${navLon.toFixed(2)}° (بدون GPS)`;
+      },
+      { enableHighAccuracy: true, maximumAge: 0 }
+    );
+  }
+}
+function navCalculateQibla(){
+  // نفس معادلة computeQiblaBearing الأساسية، بس بمتغيرات محلية منعزلة
+  navQiblaBearingVal = computeQiblaBearing(navLat, navLon);
+  document.getElementById('navQiblaInfo').innerText =
+    `اتجاه القبلة: ${navQiblaBearingVal.toFixed(1)}° من الشمال الحقيقي`;
+}
+function navGetJulianDate(date = new Date()){
+  const Y = date.getUTCFullYear(), M = date.getUTCMonth()+1;
+  const D = date.getUTCDate() + (date.getUTCHours()+date.getUTCMinutes()/60+date.getUTCSeconds()/3600)/24;
+  let y = (M<=2) ? Y-1 : Y, m = (M<=2) ? M+12 : M;
+  const A = Math.floor(y/100), B = 2-A+Math.floor(A/4);
+  return Math.floor(365.25*(y+4716)) + Math.floor(30.6001*(m+1)) + D + B - 1524.5;
+}
+function navGetLocalSiderealTime(date = new Date()){
+  const D = navGetJulianDate(date) - 2451545.0;
+  let GMST = 280.46061837 + 360.98564736629*D;
+  let LST = (GMST + navLon) % 360;
+  return (LST < 0) ? LST+360 : LST;
+}
+function navRequestCompassPermission(){
+  if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function'){
+    DeviceOrientationEvent.requestPermission().then(r=>{
+      if (r === 'granted') window.addEventListener('deviceorientation', navHandleOrientation, true);
+    });
+  } else {
+    window.addEventListener('deviceorientation', navHandleOrientation, true);
+  }
+}
+function navHandleOrientation(event){
+  let heading = event.alpha;
+  if (event.webkitCompassHeading) heading = event.webkitCompassHeading;
+  if (heading !== null){
+    navDeviceHeading = heading;
+    document.getElementById('navHeadingInfo').innerText = `اتجاه الجهاز: ${heading.toFixed(0)}°`;
+  }
+}
+const navStarsData = [
+  { name: "القطبية", ra: 37.95, dec: 89.26, mag: 4 },
+  { name: "الشعرى", ra: 101.28, dec: -16.71, mag: 3 },
+  { name: "الدبران", ra: 68.98, dec: 16.50, mag: 2.5 },
+  { name: "النسر الواقع", ra: 279.23, dec: 38.78, mag: 3 }
+];
+function navDrawLoop(){
+  const canvas = document.getElementById('navSkyCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height, radius = w/2;
+  ctx.clearRect(0,0,w,h);
+  const lst = navGetLocalSiderealTime(new Date());
+  ctx.save();
+  ctx.translate(radius, radius);
+  ctx.rotate((-navDeviceHeading*Math.PI)/180);
+
+  ctx.save();
+  ctx.rotate(-(lst*Math.PI)/180);
+  navStarsData.forEach(star=>{
+    const a = (star.ra*Math.PI)/180;
+    const d = ((90-star.dec)/180)*(radius-40);
+    const x = d*Math.sin(a), y = -d*Math.cos(a);
+    ctx.beginPath(); ctx.arc(x,y,star.mag,0,Math.PI*2);
+    ctx.fillStyle = star.dec > 80 ? '#00ffcc' : '#ffffff';
+    ctx.fill();
+    ctx.fillStyle = '#a0a5c0'; ctx.font = '8px Tahoma';
+    ctx.fillText(star.name, x+7, y+3);
+  });
+  ctx.restore();
+
+  const dirs = [{l:'N',a:0},{l:'E',a:90},{l:'S',a:180},{l:'W',a:270}];
+  ctx.fillStyle = '#d4af37'; ctx.font = 'bold 10px Tahoma'; ctx.textAlign = 'center';
+  dirs.forEach(d=>{
+    const r = (d.a*Math.PI)/180;
+    ctx.fillText(d.l, (radius-20)*Math.sin(r), -(radius-20)*Math.cos(r));
+  });
+
+  ctx.save();
+  ctx.rotate((navQiblaBearingVal*Math.PI)/180);
+  ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(0,-radius+35);
+  ctx.strokeStyle = '#00ffcc'; ctx.lineWidth = 3; ctx.stroke();
+  ctx.beginPath(); ctx.arc(0,-radius+35,5,0,Math.PI*2); ctx.fillStyle = '#00ffcc'; ctx.fill();
+  ctx.restore();
+
+  ctx.restore();
+  if (document.getElementById('navToolContainer').style.display !== 'none'){
+    requestAnimationFrame(navDrawLoop);
+  }
+}
+</script>
+</body>
+</html>
