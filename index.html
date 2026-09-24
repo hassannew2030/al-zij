@@ -20,7 +20,6 @@
   --red:#a4453a;
 }
 #qiblaArrow, #northPointerHand{
-  transition: transform 0.15s cubic-bezier(0.1,0.8,0.3,1);
   transform-origin: 300px 300px;
 }
 *{box-sizing:border-box;}
@@ -30,16 +29,15 @@ html,body{
   color:var(--ink);
   font-family:'EB Garamond', serif;
 }
-.wrap{max-width:1180px;margin:0 auto;padding:24px 12px 100px;}
+.wrap{max-width:1180px;margin:0 auto;padding:8px 4px 100px;}
 header{text-align:center;margin-bottom:4px;}
 .eyebrow{font-family:'Amiri',serif;color:var(--verdigris-light);font-size:13px;margin-bottom:8px;}
 h1{font-family:'Amiri',serif;font-weight:700;font-size:clamp(28px,6vw,50px);color:var(--brass-light);margin:0 0 6px;}
 .subtitle{color:var(--ink-dim);font-style:italic;font-size:14px;max-width:600px;margin:0 auto;line-height:1.6;}
 
-.stage{display:flex;justify-content:center;margin:16px 0 18px;position:relative;}
-.instrument-container{width:min(820px,96vw);height:min(820px,96vw);position:relative;overflow:hidden;touch-action:none;border-radius:50%;box-shadow:0 30px 60px rgba(0,0,0,0.6);background:rgba(10,12,18,0.4);}
-.instrument{width:100%;height:100%;transform-origin:0 0;cursor:grab;}
-.instrument:active{cursor:grabbing;}
+.stage{display:flex;justify-content:center;margin:4px 0 12px;position:relative;}
+.instrument-container{width:min(980px,99vw);height:min(980px,99vw);position:relative;overflow:hidden;touch-action:none;border-radius:50%;box-shadow:0 30px 60px rgba(0,0,0,0.6);background:rgba(10,12,18,0.4);}
+.instrument{width:100%;height:100%;transform-origin:50% 50%;}
 .instrument svg{width:100%;height:100%;overflow:visible;}
 .zoom-controls{position:absolute;bottom:12px;left:12px;display:flex;gap:6px;z-index:10;}
 .zoom-btn{background:var(--bg-panel);color:var(--brass-light);border:1px solid var(--brass-dark);width:32px;height:32px;border-radius:6px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
@@ -71,12 +69,6 @@ section.philosophy p{font-size:17px;line-height:1.85;color:var(--ink);margin:0 0
 </head>
 <body>
 <div class="wrap">
-  <header>
-    <div class="eyebrow">تصوّر مفاهيمي — نسخة ساعة الحائط</div>
-    <h1>الزّيج</h1>
-    <p class="subtitle">نفس المفهوم، لكن كقطعة حائط كبيرة — الأرض في المركز، وحولها القمر والكواكب والنجوم والتقويمان ومواقيت الصلاة والقبلة، وأضفنا الآن حلقة توقيت عالمي خارجية لأن المساحة الفعلية بقت تسمح.</p>
-  </header>
-
   <div class="stage">
     <div class="instrument-container" id="zoomContainer">
       <div class="instrument" id="zoomTarget">
@@ -437,6 +429,12 @@ section.philosophy p{font-size:17px;line-height:1.85;color:var(--ink);margin:0 0
     <p style="text-align:center;color:var(--ink-dim,#8a8570);font-size:12px;margin:14px 0 0;">هذه اللوحة ملحق إلكتروني للتحقق من صحة الأرقام فقط — قراءة الساعة الأساسية تبقى من مواضع العقارب والحلقات على القرص.</p>
   </div>
 
+  <header>
+    <div class="eyebrow">تصوّر مفاهيمي — نسخة ساعة الحائط</div>
+    <h1>الزّيج</h1>
+    <p class="subtitle">نفس المفهوم، لكن كقطعة حائط كبيرة — الأرض في المركز، وحولها القمر والكواكب والنجوم والتقويمان ومواقيت الصلاة والقبلة، وأضفنا الآن حلقة توقيت عالمي خارجية لأن المساحة الفعلية بقت تسمح.</p>
+  </header>
+
   <div style="text-align:center;margin:0 0 30px;">
     <button onclick="startCompass()" style="background:var(--verdigris);color:#0a0c12;border:none;padding:13px 28px;border-radius:8px;font-family:'Amiri',serif;font-weight:700;font-size:15px;cursor:pointer;">تشغيل/إيقاف البوصلة الحقيقية 🧭 (تجربة حية بموبايلك)</button>
     <p id="compassStatus" style="color:var(--verdigris-light);margin-top:12px;font-size:14px;min-height:20px;"></p>
@@ -512,7 +510,7 @@ section.philosophy p{font-size:17px;line-height:1.85;color:var(--ink);margin:0 0
 
   <section class="philosophy">
     <h2>ليه جيوسنتري رغم إننا عارفين إنها هليوسنتري؟</h2>
-    <p>الأداة دي مش بتحاول تشرح الفيزياء الفلكية الحديثة، هي بتحاكي *تجربة الرصد* كما عاشها الفلكي القديم فعلاً واقفاً على الأرض ناظراً للأعلى. من موقعه، الشمس والقمر والكواكب كلها بتتحرك حواليه — وده مش خطأ علمي، ده ببساطة منظور الأسطرلاب الذي صُمم من الأساس ليكون أداة رصد سطحية، لا نموذجاً كونياً.</p>
+    <p>الأداة دي مش بتحاول تشرح الفيزياء الفلكية الحديثة، هي بتحاكي **تجربة الرصد** كما عاشها الفلكي القديم فعلاً واقفاً على الأرض ناظراً للأعلى. من موقعه، الشمس والقمر والكواكب كلها بتتحرك حواليه — وده مش خطأ علمي، ده ببساطة منظور الأسطرلاب الذي صُمم من الأساس ليكون أداة رصد سطحية، لا نموذجاً كونياً.</p>
   </section>
 
   <div class="signature">
@@ -542,8 +540,8 @@ function gregorianToHijri(inputDate){
   let l = jd - 1948440 + 10632;
   const n = Math.floor((l-1)/10631);
   l = l - 10631*n + 354;
-  const j = (Math.floor((10985-l)/5316))(Math.floor((50*l)/17719)) + (Math.floor(l/5670))(Math.floor((43*l)/15238));
-  l = l - (Math.floor((30-j)/15))(Math.floor((17719*j)/50)) - (Math.floor(j/16))(Math.floor((15238*j)/43)) + 29;
+  const j = (Math.floor((10985-l)/5316))*(Math.floor((50*l)/17719)) + (Math.floor(l/5670))*(Math.floor((43*l)/15238));
+  l = l - (Math.floor((30-j)/15))*(Math.floor((17719*j)/50)) - (Math.floor(j/16))*(Math.floor((15238*j)/43)) + 29;
   const hMonth = Math.floor((24*l)/709);
   const hDay = l - Math.floor((709*hMonth)/24);
   const hYear = 30*n + j - 30;
@@ -687,18 +685,18 @@ function initStars(){
   g.innerHTML = '';
   starsData.forEach((s, i)=>{
     const el = document.createElementNS("http://www.w3.org/2000/svg","g");
-    el.setAttribute('id', star-elem-${i});
-    el.innerHTML = <circle r="2.3"/><text x="6" y="3">${s[0]}</text>;
+    el.setAttribute('id', `star-elem-${i}`);
+    el.innerHTML = `<circle r="2.3"/><text x="6" y="3">${s[0]}</text>`;
     g.appendChild(el);
   });
 }
 function updateRealStars(now){
   starsData.forEach((s, i)=>{
-    const el = document.getElementById(star-elem-${i});
+    const el = document.getElementById(`star-elem-${i}`);
     if (!el) return;
     const aa = raDecToAltAz(s[1], s[2], now);
     const p = [300 + 222*Math.sin(aa.az*DEGR), 300 - 222*Math.cos(aa.az*DEGR)];
-    el.setAttribute('transform', translate(${p[0]} ${p[1]}));
+    el.setAttribute('transform', `translate(${p[0]} ${p[1]})`);
     el.setAttribute('opacity', aa.alt > -5 ? 1 : 0.15); // dim stars currently below the horizon rather than hiding them
   });
 }
@@ -723,21 +721,21 @@ function updateDayNightAndPrayers(now){
 
   function arcPath(a0, a1, large){
     const p0 = polar(300,300,Rsol,a0), p1 = polar(300,300,Rsol,a1);
-    return M ${p0[0]} ${p0[1]} A ${Rsol} ${Rsol} 0 ${large} 1 ${p1[0]} ${p1[1]};
+    return `M ${p0[0]} ${p0[1]} A ${Rsol} ${Rsol} 0 ${large} 1 ${p1[0]} ${p1[1]}`;
   }
   document.getElementById('dayArcPath').setAttribute('d', arcPath(srAng, ssAng, largeDay));
   document.getElementById('nightArcPath').setAttribute('d', arcPath(ssAng, srAng, largeNight));
 
   const sunPos = polar(300,300,Rsol, timeToAngle(nowMin));
-  document.getElementById('sunIcon').setAttribute('transform', translate(${sunPos[0]} ${sunPos[1]}));
+  document.getElementById('sunIcon').setAttribute('transform', `translate(${sunPos[0]} ${sunPos[1]})`);
   const moonNightPos = polar(300,300,Rsol, timeToAngle(nowMin+720));
-  document.getElementById('moonNightIcon').setAttribute('transform', translate(${moonNightPos[0]} ${moonNightPos[1]}));
+  document.getElementById('moonNightIcon').setAttribute('transform', `translate(${moonNightPos[0]} ${moonNightPos[1]})`);
 
   const pg = document.getElementById('prayerMarkers');
   pg.innerHTML = '';
   [["الفجر",prayers.fajr],["الظهر",prayers.dhuhr],["العصر",prayers.asr],["المغرب",prayers.maghrib],["العشاء",prayers.isha]].forEach(([name,tmin])=>{
     const p = polar(300,300,Rsol,timeToAngle(tmin));
-    pg.innerHTML += <circle cx="${p[0]}" cy="${p[1]}" r="4" fill="#eddba0" stroke="#0d1119" stroke-width="1"/><title>${name}</title>;
+    pg.innerHTML += `<circle cx="${p[0]}" cy="${p[1]}" r="4" fill="#eddba0" stroke="#0d1119" stroke-width="1"/><title>${name}</title>`;
   });
 
   const starsN = document.getElementById('nightStarsG');
@@ -745,7 +743,7 @@ function updateDayNightAndPrayers(now){
     for(let i=0;i<9;i++){
       const a = ssAng + (i+0.5)/9 * ((srAng-ssAng+360)%360 || 300);
       const p = polar(300,300,Rsol, a);
-      starsN.innerHTML += <circle cx="${p[0]}" cy="${p[1]}" r="${0.8+Math.random()*0.6}"/>;
+      starsN.innerHTML += `<circle cx="${p[0]}" cy="${p[1]}" r="${0.8+Math.random()*0.6}"/>`;
     }
   }
 }
@@ -775,6 +773,7 @@ function localDayAngle(now){
 }
 
 function tick(){
+ try {
   const now = new Date();
   const h = gregorianToHijri(now);
 
@@ -826,6 +825,9 @@ function tick(){
 
   // decorative tourbillon (bottom-right corner) — one rotation per minute
   // (الدوران السلس اتنقل لحلقة animateSmooth)
+ } catch(e){
+  console.error('tick error:', e);
+ }
 }
 
 // ===== live compass state — declared BEFORE tick() first runs, since tick() reads these =====
@@ -839,20 +841,34 @@ initStars();
 tick();
 setInterval(tick, 1000);
 
+// ملحوظة دفاعية: أي خطأ جواه الحلقة دي كان ممكن يوقف الحلقة كلها بصمت
+// (لأن requestAnimationFrame(animateSmooth) في الآخر ما كانش بينفّذ لو حصل exception قبله)
+// فدلوقتي لفيناها بـ try/catch عشان: 1) الحلقة تفضل شغالة دايماً، 2) لو فيه خطأ فعلي يبان في نص الحالة بدل ما يختفي بصمت
 function animateSmooth(){
-  const now = new Date();
-  const sec = now.getSeconds(), ms = now.getMilliseconds();
-  rot('secondHand', (sec + ms/1000)/60*360, 300, 300);
-  rot('tourbillonCage', (sec*1000 + ms)/60000*360, 560, 560);
+  try {
+    const now = new Date();
+    const sec = now.getSeconds(), ms = now.getMilliseconds();
+    rot('secondHand', (sec + ms/1000)/60*360, 300, 300);
+    rot('tourbillonCage', (sec*1000 + ms)/60000*360, 560, 560);
 
-  if (isCompassListening){
-    let diff = targetHeading - currentHeading;
-    diff = (diff + 180) % 360 - 180; // يمنع القفزة الكاذبة عند عبور حد ٣٦٠°/٠°
-    currentHeading += diff * 0.08; // فلتر تنعيم أنعم، مستقل عن معدل إرسال الحساس نفسه
-    rot('northPointerHand', -currentHeading, 300, 300);
-    rot('qiblaArrow', qiblaBearing - currentHeading, 300, 300);
+    if (isCompassListening){
+      let diff = targetHeading - currentHeading;
+      diff = (diff + 180) % 360 - 180; // يمنع القفزة الكاذبة عند عبور حد ٣٦٠°/٠°
+      currentHeading += diff * 0.15; // فلتر تنعيم، مستقل عن معدل إرسال الحساس نفسه
+      rot('northPointerHand', -currentHeading, 300, 300);
+      rot('qiblaArrow', qiblaBearing - currentHeading, 300, 300);
+      const statusEl = document.getElementById('compassStatus');
+      if (statusEl){
+        if (orientationEventCount === 0){
+          statusEl.textContent = 'البوصلة شغالة بس لسه مفيش قراءة من حساس الاتجاه — جرب تحرك/تلف الموبايل شوية.';
+        } else {
+          statusEl.textContent = 'البوصلة نشطة (قراءات: '+orientationEventCount+') — اتجاهك: '+Math.round(((currentHeading%360)+360)%360)+'° — القبلة: '+Math.round(qiblaBearing)+'° من الشمال الحقيقي';
+        }
+      }
+    }
+  } catch(e){
     const statusEl = document.getElementById('compassStatus');
-    statusEl.textContent = 'البوصلة نشطة — اتجاهك: '+Math.round(((currentHeading%360)+360)%360)+'° — القبلة: '+Math.round(qiblaBearing)+'° من الشمال الحقيقي';
+    if (statusEl) statusEl.textContent = 'خطأ داخلي في حلقة الحركة: '+e.message;
   }
   requestAnimationFrame(animateSmooth);
 }
@@ -869,7 +885,9 @@ function computeQiblaBearing(lat, lon){
   return (toDeg(Math.atan2(y,x)) + 360) % 360;
 }
 
+let orientationEventCount = 0; // عداد تشخيصي — لو فضل صفر يبقى الحساس مش بيبعت للصفحة أصلاً
 function handleOrientation(event){
+  orientationEventCount++;
   if (typeof event.webkitCompassHeading !== 'undefined' && event.webkitCompassHeading !== null){
     targetHeading = event.webkitCompassHeading; // iOS Safari: already 0°=N, clockwise
   } else if (event.alpha !== null){
@@ -878,7 +896,7 @@ function handleOrientation(event){
 }
 
 // ===== FIXED startCompass =====
-// السبب الأصلي للمشكلة: كان بيطلب إذن الحساس (requestPermission) جوه
+// السبب الأصلي للمشكلة: كان بيطلب إذن الحساس (requestPermission) *جوه*
 // دالة تحديد الموقع (GPS)، وهي عملية غير متزامنة (async). لما الإذن يتطلب
 // بعد انتظار الـ GPS، متصفح آيفون بيكون خرج من "سياق الضغطة المباشرة"
 // وبيرفض الطلب تلقائيًا برسالة "requires a user gesture to prompt".
@@ -933,65 +951,40 @@ function startCompass(){
   }
 }
 
-// ===== تكبير/تصغير وسحب — لاستكشاف تفاصيل القرص الكثيفة على الشاشة، مش جزء من الساعة الفعلية =====
+// ===== تكبير/تصغير بس، من غير أي سحب — الساعة ثابتة في مكانها دايمًا =====
 const zoomContainer = document.getElementById('zoomContainer');
 const zoomTarget = document.getElementById('zoomTarget');
-let scale = 1, pointX = 0, pointY = 0;
-let panStart = { x: 0, y: 0 };
-let isPanning = false;
+let scale = 1;
 let initialPinchDistance = null;
+let initialPinchScale = 1;
 
 function setTransform(){
-  zoomTarget.style.transform = translate(${pointX}px, ${pointY}px) scale(${scale});
+  zoomTarget.style.transform = `scale(${scale})`;
 }
-zoomContainer.addEventListener('mousedown', (e)=>{
-  e.preventDefault();
-  panStart = { x: e.clientX - pointX, y: e.clientY - pointY };
-  isPanning = true;
-});
-zoomContainer.addEventListener('mousemove', (e)=>{
-  if (!isPanning) return;
-  e.preventDefault();
-  pointX = e.clientX - panStart.x;
-  pointY = e.clientY - panStart.y;
-  setTransform();
-});
-window.addEventListener('mouseup', ()=>{ isPanning = false; });
 zoomContainer.addEventListener('wheel', (e)=>{
   e.preventDefault();
-  const xs = (e.clientX - pointX) / scale, ys = (e.clientY - pointY) / scale;
-  scale = (-e.deltaY > 0) ? scale*1.2 : scale/1.2;
+  scale = (-e.deltaY > 0) ? scale*1.15 : scale/1.15;
   scale = Math.min(Math.max(1, scale), 5);
-  if (scale === 1){ pointX = 0; pointY = 0; }
-  else { pointX = e.clientX - xs*scale; pointY = e.clientY - ys*scale; }
   setTransform();
 });
 zoomContainer.addEventListener('touchstart', (e)=>{
-  if (e.touches.length === 1){
-    isPanning = true;
-    panStart = { x: e.touches[0].clientX - pointX, y: e.touches[0].clientY - pointY };
-  } else if (e.touches.length === 2){
-    isPanning = false;
+  if (e.touches.length === 2){
     initialPinchDistance = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY);
+    initialPinchScale = scale;
   }
 });
 zoomContainer.addEventListener('touchmove', (e)=>{
-  if (isPanning && e.touches.length === 1){
-    pointX = e.touches[0].clientX - panStart.x;
-    pointY = e.touches[0].clientY - panStart.y;
-    setTransform();
-  } else if (e.touches.length === 2 && initialPinchDistance){
+  if (e.touches.length === 2 && initialPinchDistance){
+    e.preventDefault();
     const d = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY);
-    scale = Math.min(Math.max(1, scale*(d/initialPinchDistance)), 5);
-    initialPinchDistance = d;
-    if (scale === 1){ pointX = 0; pointY = 0; }
+    scale = Math.min(Math.max(1, initialPinchScale*(d/initialPinchDistance)), 5);
     setTransform();
   }
-});
-zoomContainer.addEventListener('touchend', ()=>{ isPanning = false; initialPinchDistance = null; });
+}, {passive:false});
+zoomContainer.addEventListener('touchend', ()=>{ initialPinchDistance = null; });
 function zoomIn(){ scale = Math.min(scale*1.3, 5); setTransform(); }
-function zoomOut(){ scale = Math.max(scale/1.3, 1); if (scale===1){ pointX=0; pointY=0; } setTransform(); }
-function resetZoom(){ scale = 1; pointX = 0; pointY = 0; setTransform(); }
+function zoomOut(){ scale = Math.max(scale/1.3, 1); setTransform(); }
+function resetZoom(){ scale = 1; setTransform(); }
 
 // ================================================================
 // أداة الملاحة السريعة — معزولة بالكامل، كل اسم بادئته nav حتى لا
@@ -1024,11 +1017,11 @@ function navInitGPS(){
         navLon = pos.coords.longitude;
         navCalculateQibla();
         document.getElementById('navLocationInfo').innerText =
-          الموقع: ${navLat.toFixed(4)}°, ${navLon.toFixed(4)}° (GPS);
+          `الموقع: ${navLat.toFixed(4)}°, ${navLon.toFixed(4)}° (GPS)`;
       },
       ()=>{
         document.getElementById('navLocationInfo').innerText =
-          الموقع الافتراضي: ${navLat.toFixed(2)}°, ${navLon.toFixed(2)}° (بدون GPS);
+          `الموقع الافتراضي: ${navLat.toFixed(2)}°, ${navLon.toFixed(2)}° (بدون GPS)`;
       },
       { enableHighAccuracy: true, maximumAge: 0 }
     );
@@ -1038,7 +1031,7 @@ function navCalculateQibla(){
   // نفس معادلة computeQiblaBearing الأساسية، بس بمتغيرات محلية منعزلة
   navQiblaBearingVal = computeQiblaBearing(navLat, navLon);
   document.getElementById('navQiblaInfo').innerText =
-    اتجاه القبلة: ${navQiblaBearingVal.toFixed(1)}° من الشمال الحقيقي;
+    `اتجاه القبلة: ${navQiblaBearingVal.toFixed(1)}° من الشمال الحقيقي`;
 }
 function navGetJulianDate(date = new Date()){
   const Y = date.getUTCFullYear(), M = date.getUTCMonth()+1;
@@ -1067,7 +1060,7 @@ function navHandleOrientation(event){
   if (event.webkitCompassHeading) heading = event.webkitCompassHeading;
   if (heading !== null){
     navDeviceHeading = heading;
-    document.getElementById('navHeadingInfo').innerText = اتجاه الجهاز: ${heading.toFixed(0)}°;
+    document.getElementById('navHeadingInfo').innerText = `اتجاه الجهاز: ${heading.toFixed(0)}°`;
   }
 }
 const navStarsData = [
