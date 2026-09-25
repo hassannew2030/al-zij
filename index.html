@@ -37,6 +37,12 @@ h1{font-family:'Amiri',serif;font-weight:700;font-size:clamp(28px,6vw,50px);colo
 
 .stage{display:flex;justify-content:center;margin:4px 0 12px;position:relative;}
 .instrument-container{width:min(980px,99vw);height:min(980px,99vw);position:relative;overflow:hidden;touch-action:none;border-radius:50%;box-shadow:0 30px 60px rgba(0,0,0,0.6);background:rgba(10,12,18,0.4);}
+/* وضع "شاشة ويندوز" — الساعة تاخد الشاشة كلها، أكبر حجم ممكن يتناسب مع أي أبعاد شاشة (أفقية أو رأسية) */
+body.window-screen-mode{overflow:hidden;height:100vh;display:flex;align-items:center;justify-content:center;}
+body.window-screen-mode .wrap > *{display:none !important;}
+body.window-screen-mode .wrap .stage{display:flex !important;width:100vw;height:100vh;margin:0;}
+body.window-screen-mode .instrument-container{width:min(96vw,96vh) !important;height:min(96vw,96vh) !important;}
+body.window-screen-mode #windowScreenExitBtn{display:block !important;}
 .instrument{width:100%;height:100%;transform-origin:50% 50%;}
 .instrument svg{width:100%;height:100%;overflow:visible;}
 .zoom-controls{position:absolute;bottom:12px;left:12px;display:flex;gap:6px;z-index:10;}
@@ -66,23 +72,32 @@ section.philosophy p{font-size:17px;line-height:1.85;color:var(--ink);margin:0 0
 
 /* earth-spin now driven by real time in JS */
 .simple-view .detail-only{display:none;}
+@keyframes prayerFlash{0%,100%{background:linear-gradient(90deg,#c0453a,#e8574a);}50%{background:#ffffff;}}
+.prayer-flash{animation:prayerFlash 0.5s ease-in-out 20;}
 </style>
 </head>
 <body>
 <div class="wrap">
   <!-- ===== بطاقة النظرة الأولى — أول حاجة يشوفها أي حد يفتح الصفحة، الـ5 معلومات اللي فعلاً بيتشافوا كل مرة، مفيش زيادة ولا تفاصيل استكشافية ===== -->
   <div id="glanceCard" style="max-width:420px;margin:12px auto 22px;background:linear-gradient(180deg,#161c2c,#0d1119);border:1px solid var(--brass-dark);border-radius:16px;padding:20px;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,0.5);">
-    <div style="font-family:'EB Garamond',serif;color:var(--brass-light);font-size:34px;font-weight:600;letter-spacing:1px;" id="glanceTime">—</div>
+    <div style="font-family:'EB Garamond',serif;color:var(--brass-light);font-size:34px;font-weight:600;text-align:center;direction:rtl;" id="glanceTime">—</div>
     <div style="background:rgba(120,181,167,0.12);border:1px solid rgba(120,181,167,0.3);border-radius:8px;padding:5px 10px;display:inline-block;margin-top:8px;">
       <span style="font-family:'Amiri',serif;color:var(--verdigris-light);font-size:12px;">📍 </span>
       <span id="glanceLocation" style="font-family:'Amiri',serif;color:var(--brass-light);font-size:12.5px;">—</span>
     </div>
-    <div style="font-family:'Amiri',serif;color:var(--ink-dim);font-size:13px;margin-top:8px;line-height:1.8;" id="glanceDate">—</div>
+    <div id="glanceDayName" style="font-family:'Amiri',serif;font-weight:700;color:var(--gold,#eddba0);font-size:19px;margin-top:10px;">—</div>
+    <div id="glanceDate" style="font-family:'Amiri',serif;color:var(--ink-dim);font-size:12.5px;margin-top:3px;">—</div>
     <div style="height:1px;background:rgba(201,163,93,0.25);margin:14px 0;"></div>
     <div>
       <div style="font-family:'Amiri',serif;color:var(--verdigris-light);font-size:12px;">الصلاة الجاية</div>
       <div id="glancePrayer" style="font-family:'Amiri',serif;color:var(--brass-light);font-size:20px;margin-top:3px;">—</div>
-      <div id="glancePrayerCountdown" style="font-family:'EB Garamond',serif;color:var(--red);font-size:13px;margin-top:2px;">—</div>
+      <div style="position:relative;background:#2a3547;border-radius:10px;height:44px;margin-top:8px;overflow:hidden;" id="glancePrayerBarWrap">
+        <div id="glancePrayerBar" style="position:absolute;inset:0 0 0 auto;width:0%;background:linear-gradient(90deg,#c0453a,#e8574a);border-radius:10px;transition:width 1s linear;"></div>
+        <div style="position:relative;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+          <div style="font-family:'Amiri',serif;color:rgba(255,255,255,0.85);font-size:10px;">باقي على الأذان</div>
+          <div id="glancePrayerCountdown" style="font-family:'EB Garamond',serif;font-weight:700;color:#fff;font-size:17px;">—</div>
+        </div>
+      </div>
     </div>
     <div style="height:1px;background:rgba(201,163,93,0.25);margin:14px 0;"></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
@@ -112,13 +127,23 @@ section.philosophy p{font-size:17px;line-height:1.85;color:var(--ink);margin:0 0
         <div id="glanceMoonName" style="font-family:'Amiri',serif;color:var(--brass-light);font-size:12px;margin-top:2px;">—</div>
       </div>
       <div style="background:rgba(0,0,0,0.2);border-radius:10px;padding:10px;">
-        <div style="font-family:'Amiri',serif;color:var(--verdigris-light);font-size:12px;">الشمس</div>
-        <div id="glanceSun" style="font-family:'EB Garamond',serif;color:var(--brass-light);font-size:12.5px;margin-top:14px;line-height:1.8;">—</div>
+        <div style="font-family:'Amiri',serif;color:var(--verdigris-light);font-size:12px;margin-bottom:4px;">الشمس</div>
+        <div style="display:flex;flex-direction:column;gap:5px;align-items:center;">
+          <div style="display:flex;align-items:center;gap:5px;">
+            <svg viewBox="0 0 24 24" width="15" height="15"><path d="M12 3v6M5 11l2 2M19 11l-2 2M2 18h20M6 18a6 6 0 0 1 12 0" fill="none" stroke="#e8b34a" stroke-width="1.6" stroke-linecap="round"/></svg>
+            <span id="glanceSunrise" style="font-family:'EB Garamond',serif;color:var(--brass-light);font-size:12.5px;">—</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:5px;">
+            <svg viewBox="0 0 24 24" width="15" height="15"><path d="M12 3v4M5 13l2-2M19 13l-2-2M2 18h20M6 18a6 6 0 0 1 12 0" fill="none" stroke="#8f6a9a" stroke-width="1.6" stroke-linecap="round"/></svg>
+            <span id="glanceSunset" style="font-family:'EB Garamond',serif;color:var(--brass-light);font-size:12.5px;">—</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
   <div class="stage">
+    <button id="windowScreenExitBtn" onclick="toggleWindowScreen()" style="display:none;position:fixed;top:10px;left:10px;z-index:999;background:rgba(10,12,18,0.9);color:var(--brass-light);border:1px solid var(--brass-dark);width:34px;height:34px;border-radius:50%;font-size:15px;cursor:pointer;line-height:1;">✕</button>
     <div class="instrument-container" id="zoomContainer">
       <div class="instrument" id="zoomTarget">
       <svg viewBox="-45 -45 690 690">
@@ -312,7 +337,7 @@ section.philosophy p{font-size:17px;line-height:1.85;color:var(--ink);margin:0 0
         <circle cx="300" cy="300" r="262" fill="none" stroke="var(--brass-dark)" stroke-width="0.8" opacity="0.5"/>
         <!-- physical pointers replacing the old digital date readout — ألوان مختلفة تمامًا عن أسهم القبلة/الشمال/الظل، وشكلهم "معين" مش "مثلث" عشان محدش يلخبط بين النوعين -->
         <g id="hijriMonthHand"><line x1="300" y1="300" x2="300" y2="26" stroke="#8fa8c9" stroke-width="1.4"/><polygon points="300,20 304,26 300,32 296,26" fill="#8fa8c9"/></g>
-        <g id="gregMonthHand"><line x1="300" y1="300" x2="300" y2="42" stroke="#c9a35d" stroke-width="1.8"/><polygon points="300,32 308,42 300,52 292,42" fill="#c9a35d" stroke="#0d1119" stroke-width="0.6"/></g>
+        <g id="gregMonthHand"><line x1="300" y1="300" x2="300" y2="42" stroke="#ffd23f" stroke-width="1.8"/><polygon points="300,32 308,42 300,52 292,42" fill="#ffd23f" stroke="#0d1119" stroke-width="0.6"/></g>
         <g font-family="Amiri, serif" font-size="11" fill="var(--brass-light)" text-anchor="middle">
           <text x="300" y="24">محرم</text>
           <text x="440" y="61">صفر</text>
@@ -590,21 +615,34 @@ section.philosophy p{font-size:17px;line-height:1.85;color:var(--ink);margin:0 0
 
         <!-- عقرب الثانية بشكل سهم — قصيّر عمدًا (نصف قطره أصغر من حزام الأرقام) عشان يفضل بعيد عن الأرقام في كل زاوية -->
         <g id="secondHand">
-          <line x1="300" y1="322" x2="300" y2="205" stroke="#e8574a" stroke-width="1.6" stroke-linecap="round"/>
-          <polygon points="300,188 306,205 294,205" fill="#e8574a"/>
-          <circle cx="300" cy="322" r="3" fill="#e8574a"/>
+          <line x1="300" y1="300" x2="300" y2="205" stroke="#ff5b4d" stroke-width="1.8" stroke-linecap="round"/>
+          <polygon points="300,188 306,205 294,205" fill="#ff5b4d"/>
         </g>
 
         <!-- عقرب الدقيقة اتحط هنا قصدًا (قبل حزام الأرقام) عشان يشتغل تحت طبقة الأرقام مش فوقها، زي عقرب الثانية بالظبط -->
         <g id="minuteHand">
-          <polygon points="300,314 305,252 300,185 295,252" fill="#dfe6ec" stroke="#8a9aa5" stroke-width="0.8"/>
-          <line x1="300" y1="308" x2="300" y2="192" stroke="#1a3a4a" stroke-width="1.2"/>
-          <circle cx="300" cy="308" r="3" fill="#dfe6ec" stroke="#8a9aa5" stroke-width="0.6"/>
+          <polygon points="300,304 305,252 300,185 295,252" fill="#dfe6ec" stroke="#8a9aa5" stroke-width="0.8"/>
+          <line x1="300" y1="300" x2="300" y2="192" stroke="#1a3a4a" stroke-width="1.2"/>
         </g>
 
         <!-- 12 static hour markers for the analog hands (fixed, don't rotate — "12" is the true-up reference) -->
         <!-- حزام مخصص للأرقام، منفصل تماماً عن حزام الشمس/الليل وعن مدارات الكواكب -->
         <circle cx="300" cy="300" r="130" fill="none" stroke="#8a8570" stroke-width="0.6" opacity="0.35"/>
+        <!-- نقط الدقائق الـ60 — نقطة أكبر كل 5 دقايق (تتوافق مع أماكن الأرقام)، ونقطة صغيرة لكل دقيقة بينهم، زي حزام الدقائق في الساعات الحقيقية -->
+        <g id="minuteTicks" fill="var(--brass-dark)">
+          <circle cx="300.00" cy="178.00" r="1.8"/><circle cx="312.75" cy="178.67" r="1.0"/><circle cx="325.37" cy="180.67" r="1.0"/><circle cx="337.70" cy="183.97" r="1.0"/><circle cx="349.62" cy="188.55" r="1.0"/>
+          <circle cx="361.00" cy="194.34" r="1.8"/><circle cx="371.71" cy="201.30" r="1.0"/><circle cx="381.63" cy="209.34" r="1.0"/><circle cx="390.66" cy="218.37" r="1.0"/><circle cx="398.70" cy="228.29" r="1.0"/>
+          <circle cx="405.66" cy="239.00" r="1.8"/><circle cx="411.45" cy="250.38" r="1.0"/><circle cx="416.03" cy="262.30" r="1.0"/><circle cx="419.33" cy="274.63" r="1.0"/><circle cx="421.33" cy="287.25" r="1.0"/>
+          <circle cx="422.00" cy="300.00" r="1.8"/><circle cx="421.33" cy="312.75" r="1.0"/><circle cx="419.33" cy="325.37" r="1.0"/><circle cx="416.03" cy="337.70" r="1.0"/><circle cx="411.45" cy="349.62" r="1.0"/>
+          <circle cx="405.66" cy="361.00" r="1.8"/><circle cx="398.70" cy="371.71" r="1.0"/><circle cx="390.66" cy="381.63" r="1.0"/><circle cx="381.63" cy="390.66" r="1.0"/><circle cx="371.71" cy="398.70" r="1.0"/>
+          <circle cx="361.00" cy="405.66" r="1.8"/><circle cx="349.62" cy="411.45" r="1.0"/><circle cx="337.70" cy="416.03" r="1.0"/><circle cx="325.37" cy="419.33" r="1.0"/><circle cx="312.75" cy="421.33" r="1.0"/>
+          <circle cx="300.00" cy="422.00" r="1.8"/><circle cx="287.25" cy="421.33" r="1.0"/><circle cx="274.63" cy="419.33" r="1.0"/><circle cx="262.30" cy="416.03" r="1.0"/><circle cx="250.38" cy="411.45" r="1.0"/>
+          <circle cx="239.00" cy="405.66" r="1.8"/><circle cx="228.29" cy="398.70" r="1.0"/><circle cx="218.37" cy="390.66" r="1.0"/><circle cx="209.34" cy="381.63" r="1.0"/><circle cx="201.30" cy="371.71" r="1.0"/>
+          <circle cx="194.34" cy="361.00" r="1.8"/><circle cx="188.55" cy="349.62" r="1.0"/><circle cx="183.97" cy="337.70" r="1.0"/><circle cx="180.67" cy="325.37" r="1.0"/><circle cx="178.67" cy="312.75" r="1.0"/>
+          <circle cx="178.00" cy="300.00" r="1.8"/><circle cx="178.67" cy="287.25" r="1.0"/><circle cx="180.67" cy="274.63" r="1.0"/><circle cx="183.97" cy="262.30" r="1.0"/><circle cx="188.55" cy="250.38" r="1.0"/>
+          <circle cx="194.34" cy="239.00" r="1.8"/><circle cx="201.30" cy="228.29" r="1.0"/><circle cx="209.34" cy="218.37" r="1.0"/><circle cx="218.37" cy="209.34" r="1.0"/><circle cx="228.29" cy="201.30" r="1.0"/>
+          <circle cx="239.00" cy="194.34" r="1.8"/><circle cx="250.38" cy="188.55" r="1.0"/><circle cx="262.30" cy="183.97" r="1.0"/><circle cx="274.63" cy="180.67" r="1.0"/><circle cx="287.25" cy="178.67" r="1.0"/>
+        </g>
         <g font-family="'EB Garamond', serif" font-size="15" font-weight="700" fill="var(--brass-light)" text-anchor="middle">
           <text x="365" y="191">1</text>
           <text x="412.6" y="239">2</text>
@@ -622,9 +660,8 @@ section.philosophy p{font-size:17px;line-height:1.85;color:var(--ink);margin:0 0
 
         <!-- عقرب الساعة بس فوق الأرقام — عقرب الساعة أقصر أصلاً وبيوصل لمنتصف المسافة تقريبًا فمش بيتقاطع مع الأرقام غالبًا -->
         <g id="hourHand">
-          <polygon points="300,312 307,270 300,230 293,270" fill="#dfe6ec" stroke="#8a9aa5" stroke-width="0.8"/>
-          <line x1="300" y1="305" x2="300" y2="237" stroke="#1a3a4a" stroke-width="1.4"/>
-          <circle cx="300" cy="305" r="3.5" fill="#dfe6ec" stroke="#8a9aa5" stroke-width="0.6"/>
+          <polygon points="300,304 307,270 300,230 293,270" fill="#dfe6ec" stroke="#8a9aa5" stroke-width="0.8"/>
+          <line x1="300" y1="300" x2="300" y2="237" stroke="#1a3a4a" stroke-width="1.4"/>
         </g>
         <circle cx="300" cy="300" r="6" fill="var(--brass-light)" stroke="var(--brass-dark)" stroke-width="1"/>
       </svg>
@@ -642,6 +679,7 @@ section.philosophy p{font-size:17px;line-height:1.85;color:var(--ink);margin:0 0
     <button id="glanceBtn" onclick="toggleGlanceCard()" style="background:var(--bg-panel);color:var(--brass-light);border:1px solid var(--brass-dark);padding:9px 18px;border-radius:20px;font-family:'Amiri',serif;font-size:13px;cursor:pointer;white-space:nowrap;margin:0 4px;">👁️ نظرة أولى</button>
     <button id="trueSkyBtn" onclick="toggleTrueSky()" style="background:var(--bg-panel);color:var(--verdigris-light);border:1px solid var(--verdigris);padding:9px 18px;border-radius:20px;font-family:'Amiri',serif;font-size:13px;cursor:pointer;white-space:nowrap;margin:0 4px;">🌌 حقيقة السماء</button>
     <button id="verifyBtn" onclick="verifyAgainstInternet()" style="background:var(--bg-panel);color:#f0938a;border:1px solid var(--red);padding:9px 18px;border-radius:20px;font-family:'Amiri',serif;font-size:13px;cursor:pointer;white-space:nowrap;margin:0 4px;">⚖️ الميزان (تحقق)</button>
+    <button id="windowScreenBtn" onclick="toggleWindowScreen()" style="background:var(--bg-panel);color:var(--brass-light);border:1px solid var(--brass-dark);padding:9px 18px;border-radius:20px;font-family:'Amiri',serif;font-size:13px;cursor:pointer;white-space:nowrap;margin:0 4px;">🖥️ شاشة ويندوز</button>
   </div>
   <p id="trueSkyStatus" style="text-align:center;color:var(--ink-dim);font-size:12px;margin:0 0 4px;min-height:16px;"></p>
   <p id="verifyStatus" style="text-align:center;color:var(--ink-dim);font-size:12px;margin:0 0 20px;min-height:16px;"></p>
@@ -720,6 +758,10 @@ section.philosophy p{font-size:17px;line-height:1.85;color:var(--ink);margin:0 0
   <div style="max-width:400px;margin:0 auto 20px;background:var(--bg-panel);border:1px solid rgba(201,163,93,0.22);border-radius:12px;padding:16px;text-align:center;">
     <div style="color:var(--verdigris-light);font-family:'Amiri',serif;font-size:13px;">إحداثياتك = <span id="dataCityName" style="color:var(--brass-light);">—</span></div>
     <div style="color:var(--ink-dim);font-family:'Amiri',serif;font-size:13px;margin-top:8px;">أنت تبعد عن القبلة = <span id="dataKaabaDist" style="color:var(--red);">—</span></div>
+    <div style="margin-top:12px;">
+      <button id="lockLocationBtn" onclick="toggleLocationLock()" style="background:var(--bg-panel);color:var(--verdigris-light);border:1px solid var(--verdigris);padding:7px 16px;border-radius:16px;font-family:'Amiri',serif;font-size:12.5px;cursor:pointer;">🔓 ثبّت هذا الموقع (لو صح)</button>
+    </div>
+    <p id="locationLockStatus" style="font-size:11.5px;color:var(--ink-dim);margin-top:6px;min-height:14px;"></p>
   </div>
 
   <div style="text-align:center;margin:0 0 20px;">
@@ -761,7 +803,7 @@ section.philosophy p{font-size:17px;line-height:1.85;color:var(--ink);margin:0 0
   <div class="legend">
     <div class="legend-item">
       <h3><span class="mark" style="background:#a4453a"></span>مفتاح الأسهم الخمسة من المركز</h3>
-      <p><b style="color:#a4453a">أحمر</b> = القبلة · <b style="color:#7fb3a8">تركوازي</b> = الشمال (يتحرك مع البوصلة الحقيقية) · <b style="color:#e8a94a">برتقالي</b> = اتجاه الظل المتوقع (قارنه بظلك الحقيقي تحت الشمس) · <b style="color:#8fa8c9">أزرق فاتح</b> = مؤشر التاريخ الهجري · <b style="color:#c9a35d">ذهبي</b> = مؤشر التاريخ الميلادي. كل سهم له شكل ولون ثابت لا يتكرر في أي عنصر تاني بالساعة.</p>
+      <p><b style="color:#a4453a">أحمر</b> = القبلة · <b style="color:#7fb3a8">تركوازي</b> = الشمال (يتحرك مع البوصلة الحقيقية) · <b style="color:#e8a94a">برتقالي</b> = اتجاه الظل المتوقع (قارنه بظلك الحقيقي تحت الشمس) · <b style="color:#8fa8c9">أزرق فاتح</b> = مؤشر التاريخ الهجري · <b style="color:#ffd23f">أصفر واضح</b> = مؤشر التاريخ الميلادي (ثابت مع البوصلة عمدًا، لأنه بيتحرك مع التاريخ مش مع اتجاهك). كل سهم له شكل ولون ثابت لا يتكرر في أي عنصر تاني بالساعة.</p>
     </div>
     <div class="legend-item">
       <h3><span class="mark" style="background:#1d4a5c"></span>الأرض — المركز</h3>
@@ -1018,7 +1060,7 @@ class Observer {
       .then(r => r.json())
       .then(d => {
         const c = d.current.temperature_2m, f = (c*9/5+32);
-        if (tempEl) tempEl.textContent = c.toFixed(1)+'° C / '+f.toFixed(1)+'° F';
+        if (tempEl) tempEl.innerHTML = c.toFixed(1)+'°C&nbsp; <span style="color:var(--brass-dark);">|</span> &nbsp;'+f.toFixed(1)+'°F';
         if (feelsEl) feelsEl.textContent = d.current.apparent_temperature.toFixed(1)+'° C';
         if (humEl) humEl.textContent = Math.round(d.current.relative_humidity_2m)+'٪';
         if (cloudEl) cloudEl.textContent = Math.round(d.current.cloud_cover)+'٪';
@@ -1237,8 +1279,10 @@ class ClockRenderer {
     const prayerBoxes = [['boxFajr',pr.fajr],['boxDhuhr',pr.dhuhr],['boxAsr',pr.asr],['boxMaghrib',pr.maghrib],['boxIsha',pr.isha]];
     let nextId = prayerBoxes[0][0]; // لو الوقت بعد العشاء، الجاية فجر بكرة
     let remainMin = (prayerBoxes[0][1] + 1440) - nowMinOfDay;
-    for (const [id, tmin] of prayerBoxes){
-      if (tmin > nowMinOfDay){ nextId = id; remainMin = tmin - nowMinOfDay; break; }
+    let prevPrayerMin = prayerBoxes[prayerBoxes.length-1][1]; // عشاء النهاردة كنقطة بداية افتراضية (لو الوقت بعد العشاء)
+    for (let pi=0; pi<prayerBoxes.length; pi++){
+      const [id, tmin] = prayerBoxes[pi];
+      if (tmin > nowMinOfDay){ nextId = id; remainMin = tmin - nowMinOfDay; prevPrayerMin = pi>0 ? prayerBoxes[pi-1][1] : prayerBoxes[prayerBoxes.length-1][1]-1440; break; }
     }
     prayerBoxes.forEach(([id]) => {
       const el = document.getElementById(id);
@@ -1248,14 +1292,15 @@ class ClockRenderer {
     set('dataPrayerCountdown', '⏳ متبقي '+(remH>0? remH+' س ':'')+remM+' د على '+prayerNames[nextId]);
     // ===== بطاقة النظرة الأولى — نفس القيم بالظبط بس معروضة مختصرة ومرتبة =====
     const glanceH12 = now.getHours()%12 || 12, glanceAmpm = now.getHours() < 12 ? 'صباحًا' : 'مساءً';
-    set('glanceTime', AstroMath.pad(glanceH12)+':'+AstroMath.pad(now.getMinutes())+':'+AstroMath.pad(now.getSeconds())+' '+glanceAmpm);
-    // الترتيب: اليوم، ثم الهجري، ثم الميلادي
+    set('glanceTime', glanceAmpm+' '+AstroMath.pad(glanceH12)+':'+AstroMath.pad(now.getMinutes())+':'+AstroMath.pad(now.getSeconds()));
+    // الترتيب: اسم اليوم بارز، وتحته الهجري والميلادي مع بعض بخط أصغر
     const gregShort = now.toLocaleDateString('ar-EG',{day:'numeric',month:'long',year:'numeric'});
+    set('glanceDayName', this.hijri.arDays[now.getDay()]);
     const glanceDateEl = document.getElementById('glanceDate');
-    if (glanceDateEl) glanceDateEl.innerHTML = this.hijri.arDays[now.getDay()]+'<br>'+h.day+' '+this.hijri.hijriMonths[h.month-1]+' '+h.year+'هـ &nbsp;•&nbsp; '+gregShort;
+    if (glanceDateEl) glanceDateEl.innerHTML = h.day+' '+this.hijri.hijriMonths[h.month-1]+' '+h.year+'هـ &nbsp;•&nbsp; '+gregShort;
     const glanceLocEl = document.getElementById('dataCityName');
     if (glanceLocEl) set('glanceLocation', glanceLocEl.textContent);
-    // اسم الصلاة + وقتها الفعلي + العد التنازلي
+    // اسم الصلاة + وقتها الفعلي
     const prayerTimeMap = {boxFajr: pr.fajr, boxDhuhr: pr.dhuhr, boxAsr: pr.asr, boxMaghrib: pr.maghrib, boxIsha: pr.isha};
     const glancePrayerEl = document.getElementById('glancePrayer');
     if (glancePrayerEl){
@@ -1263,25 +1308,42 @@ class ClockRenderer {
       const ph12 = h24%12 || 12, pAmpm = h24 < 12 ? 'ص' : 'م';
       glancePrayerEl.textContent = prayerNames[nextId]+' الساعة '+AstroMath.pad(ph12)+':'+AstroMath.pad(mn)+' '+pAmpm;
     }
-    set('glancePrayerCountdown', 'باقي '+(remH>0? remH+' س ':'')+remM+' د');
+    // شريط تايمر مرئي زي تطبيقات مواقيت الصلاة — بيتملى كل ما اقتربنا من الأذان، وبيلمع 10 ثواني أول ما الوقت يدخل
+    const remainSec = Math.round(remainMin*60);
+    const remH2 = Math.floor(remainSec/3600), remM2 = Math.floor((remainSec%3600)/60), remS2 = remainSec%60;
+    set('glancePrayerCountdown', AstroMath.pad(remH2)+':'+AstroMath.pad(remM2)+':'+AstroMath.pad(remS2));
+    const totalInterval = (nowMinOfDay + remainMin) - prevPrayerMin; // نهاية الفترة = دلوقتي + الباقي (بيعالج تلقائيًا لف اليوم للفجر)
+    const elapsed = nowMinOfDay - prevPrayerMin;
+    const progressPct = Math.max(0, Math.min(100, (elapsed/totalInterval)*100));
+    const barEl = document.getElementById('glancePrayerBar');
+    if (barEl) barEl.style.width = progressPct+'%';
+    // لما ندخل وقت صلاة جديدة (الصلاة الجاية اتغيرت)، نلمع الشريط 10 ثواني تنبيهًا
+    if (this._lastGlanceNextId && this._lastGlanceNextId !== nextId){
+      const wrapEl = document.getElementById('glancePrayerBarWrap');
+      if (wrapEl){
+        wrapEl.classList.add('prayer-flash');
+        setTimeout(()=>wrapEl.classList.remove('prayer-flash'), 10000);
+      }
+    }
+    this._lastGlanceNextId = nextId;
     const glanceQ = document.getElementById('dataQibla');
     if (glanceQ) set('glanceQibla', glanceQ.textContent);
     const glanceCond = document.getElementById('dataWeatherCondition');
     const glanceTemp = document.getElementById('dataTemp');
     if (glanceCond && glanceTemp && glanceCond.textContent !== '—' && !glanceCond.textContent.includes('جارٍ') && !glanceCond.textContent.includes('تعذر')){
       const condShort = glanceCond.textContent.split(' ')[0]; // بس الإيموجي والكلمة الأولى، مش النص الطويل
-      const tempShort = glanceTemp.textContent.split('/')[0].trim(); // بس المئوي، مش الفهرنهايت كمان هنا
+      const tempShort = glanceTemp.textContent.split('|')[0].trim(); // بس المئوي، مش الفهرنهايت كمان هنا
       set('glanceWeather', condShort+' '+tempShort);
     }
-    // مربع الشمس — الشروق والغروب الحقيقيين
+    // مربع الشمس — الشروق والغروب الحقيقيين، كل واحد بأيقونة مستقلة
     const glanceSunTimes = this.observer.sunTimes(now);
     const arTime = m => AstroMath.minToHHMM(m).replace('AM','ص').replace('PM','م');
-    const glanceSunEl = document.getElementById('glanceSun');
-    if (glanceSunEl) glanceSunEl.innerHTML = '🌅 '+arTime(glanceSunTimes.sunrise)+'<br>🌇 '+arTime(glanceSunTimes.sunset);
+    set('glanceSunrise', arTime(glanceSunTimes.sunrise));
+    set('glanceSunset', arTime(glanceSunTimes.sunset));
     set('dataDayLength', this.observer.dayLengthText(now));
     set('dataZodiac', AstroMath.zodiacSignOf(now));
     const mansionNames = ["الشرطين","البطين","الثريا","الدبران","الهقعة","الهنعة","الذراع","النثرة","الطرف","الجبهة","الزبرة","الصرفة","العواء","السماك","الغفر","الزبانا","الإكليل","القلب","الشولة","النعائم","البلدة","سعد الذابح","سعد بلع","سعد السعود","سعد الأخبية","الفرغ المقدم","الفرغ المؤخر","الرشاء"];
-    set('dataMansion', mansionNames[this.trueSky.moonMansionIndex(now)]);
+    set('dataMansion', (this.trueSky.moonMansionIndex(now)+1).toLocaleString('ar-EG')+' - '+mansionNames[this.trueSky.moonMansionIndex(now)]);
     const tw = this.observer.twilightTimes(now);
     set('dataTwilight', 'مدني: '+AstroMath.minToHHMM(tw.civilDawn)+' - '+AstroMath.minToHHMM(tw.civilDusk)+' • فلكي: '+AstroMath.minToHHMM(tw.astroDawn)+' - '+AstroMath.minToHHMM(tw.astroDusk));
     // شروق/غروب القمر الرقمي — حساب أثقل شوية فبنعمله مرة كل دقيقة بس مش كل ثانية
@@ -1635,6 +1697,22 @@ class CompassController {
     };
 
     const requestLocationAndStart = () => {
+      // لو الموقع مقفول، منجيبش GPS جديد خالص — نستخدم الموقع المحفوظ المؤكد ونروح مباشرة لإذن حساس الاتجاه
+      try{
+        if (localStorage.getItem('zijLocationLocked') === 'true'){
+          const saved = JSON.parse(localStorage.getItem('zijLastLocation'));
+          if (saved){
+            // نزامن observer نفسه بالموقع المقفول صراحةً — عشان الميزان ولوحة البيانات كلهم يفضلوا متطابقين مع القفل، مش بس القبلة
+            this.observer.set(saved.lat, saved.lon, -(new Date().getTimezoneOffset()/60), this.observer.name || 'الموقع المثبّت');
+            this.observer.updateCityName(saved.lat, saved.lon);
+            this.qiblaBearing = this.observer.computeQiblaBearing(saved.lat, saved.lon);
+            this.renderer.qiblaBearingOverride = this.qiblaBearing;
+            statusEl.textContent = '🔒 مستخدم الموقع المقفول — اتجاه القبلة: '+Math.round(this.qiblaBearing)+'° من الشمال.';
+            afterPermission();
+            return;
+          }
+        }
+      }catch(e){}
       statusEl.textContent = 'جارٍ تحديد موقعك...';
       if (!navigator.geolocation){
         statusEl.textContent = 'المتصفح ده مش بيدعم تحديد الموقع.';
@@ -1645,12 +1723,19 @@ class CompassController {
         this.renderer.qiblaBearingOverride = this.qiblaBearing;
         this.observer.set(pos.coords.latitude, pos.coords.longitude, -(new Date().getTimezoneOffset()/60), "موقعك الحالي");
         this.observer.updateCityName(this.observer.lat, this.observer.lon);
-        try{ localStorage.setItem('zijLastLocation', JSON.stringify({lat:pos.coords.latitude, lon:pos.coords.longitude})); }catch(e){}
-        statusEl.textContent = 'اتجاه القبلة من موقعك: '+Math.round(this.qiblaBearing)+'° من الشمال.';
+        // لو الموقع مقفول (المستخدم أكد إنه صح قبل كده)، منكتبش فوقه بقراءة GPS جديدة ممكن تكون غلط
+        try{
+          const isLocked = localStorage.getItem('zijLocationLocked') === 'true';
+          if (!isLocked) localStorage.setItem('zijLastLocation', JSON.stringify({lat:pos.coords.latitude, lon:pos.coords.longitude}));
+        }catch(e){}
+        // لو دقة الموقع ضعيفة (أكبر من 10 كم)، نوضح للمستخدم إن المصدر مش شريحة GPS حقيقية غالبًا
+        const accKm = pos.coords.accuracy ? (pos.coords.accuracy/1000).toFixed(1) : null;
+        const accWarning = (accKm && pos.coords.accuracy > 10000) ? ' ⚠️ دقة الموقع ضعيفة (±'+accKm+' كم) — جرب تفتح GPS من إعدادات الموبايل وتأكد إنه "دقة عالية"، أو اطلع في مكان مفتوح بعيد عن المباني.' : '';
+        statusEl.textContent = 'اتجاه القبلة من موقعك: '+Math.round(this.qiblaBearing)+'° من الشمال.'+accWarning;
         afterPermission();
       }, (err)=>{
         statusEl.textContent = 'تعذر تحديد الموقع: '+err.message+' — جرب تسمح بإذن الموقع من إعدادات المتصفح.';
-      });
+      }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
     };
 
     // لازم نطلب إذن حساس الاتجاه فورًا هنا، كأول حاجة بعد الضغطة مباشرة —
@@ -1974,6 +2059,58 @@ function shareQibla(){
     navigator.clipboard.writeText(text).then(()=>alert('اتنسخ اتجاه القبلة! الصقه في أي مكان.')).catch(()=>alert(text));
   }
 }
+// ===== وضع "شاشة ويندوز" — الساعة تاخد الشاشة كلها بأقصى حجم ممكن، لعرضها على شاشة كمبيوتر كساعة حائط رقمية =====
+function toggleWindowScreen(){
+  const isActive = document.body.classList.contains('window-screen-mode');
+  if (!isActive){
+    // نحفظ وضع العرض الحالي عشان نرجّعه لما نخرج، ونجبر العرض الكامل — الهدف من شاشة الويندوز هو عرض كل التفاصيل
+    window._wasSimpleViewBeforeFullscreen = document.body.classList.contains('simple-view');
+    document.body.classList.remove('simple-view');
+    document.body.classList.add('window-screen-mode');
+    const el = document.documentElement;
+    if (el.requestFullscreen) el.requestFullscreen().catch(()=>{});
+    else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+  } else {
+    document.body.classList.remove('window-screen-mode');
+    if (window._wasSimpleViewBeforeFullscreen) document.body.classList.add('simple-view');
+    if (document.fullscreenElement){
+      if (document.exitFullscreen) document.exitFullscreen().catch(()=>{});
+      else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+    }
+  }
+}
+// لو المستخدم خرج من وضع ملء الشاشة بزرار Esc أو زرار المتصفح نفسه، نرجع الواجهة العادية تلقائيًا
+document.addEventListener('fullscreenchange', ()=>{
+  if (!document.fullscreenElement){
+    document.body.classList.remove('window-screen-mode');
+    if (window._wasSimpleViewBeforeFullscreen) document.body.classList.add('simple-view');
+  }
+});
+// ===== تثبيت الموقع — لو المستخدم أكد إن الموقع صح، منسيبش أي قراءة GPS تانية (حتى لو غلط) تكتب فوقه =====
+function toggleLocationLock(){
+  const btn = document.getElementById('lockLocationBtn');
+  const statusEl = document.getElementById('locationLockStatus');
+  try{
+    const isLocked = localStorage.getItem('zijLocationLocked') === 'true';
+    if (!isLocked){
+      localStorage.setItem('zijLocationLocked', 'true');
+      localStorage.setItem('zijLastLocation', JSON.stringify({lat: observer.lat, lon: observer.lon}));
+      if (btn) btn.textContent = '🔒 الموقع مثبّت (دوس تاني للفتح)';
+      if (statusEl) statusEl.textContent = 'مش هيتغيّر تلقائيًا تاني حتى لو الـGPS جاب قراءة مختلفة.';
+    } else {
+      localStorage.setItem('zijLocationLocked', 'false');
+      if (btn) btn.textContent = '🔓 ثبّت هذا الموقع (لو صح)';
+      if (statusEl) statusEl.textContent = 'الموقع هيتحدّث تلقائيًا تاني من الـGPS.';
+    }
+  }catch(e){}
+}
+(function initLocationLockUI(){
+  try{
+    const isLocked = localStorage.getItem('zijLocationLocked') === 'true';
+    const btn = document.getElementById('lockLocationBtn');
+    if (btn && isLocked) btn.textContent = '🔒 الموقع مثبّت (دوس تاني للفتح)';
+  }catch(e){}
+})();
 function toggleTrueSky(){
   renderer.trueSkyMode = !renderer.trueSkyMode;
   const btn = document.getElementById('trueSkyBtn');
@@ -1989,34 +2126,64 @@ function toggleTrueSky(){
 function verifyAgainstInternet(){
   const statusEl = document.getElementById('verifyStatus');
   if (!statusEl) return;
-  statusEl.textContent = '⚖️ جارٍ التحقق من مصدر خارجي مستقل...';
+  statusEl.textContent = '⚖️ جارٍ التحقق من مصدرين مستقلين (الشمس + مواقيت الصلاة)...';
   const now = new Date();
   const dateStr = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
-  const url = 'https://api.sunrise-sunset.org/json?lat='+observer.lat+'&lng='+observer.lon+'&date='+dateStr+'&formatted=0';
-  fetch(url).then(r=>r.json()).then(data=>{
-    if (data.status !== 'OK') throw new Error('API status: '+data.status);
-    const extSunriseUTC = new Date(data.results.sunrise);
-    const extSunsetUTC = new Date(data.results.sunset);
-    // تحويل لدقائق محلية بنفس تفريغ observer.tz عشان تنقارن مباشرة بمخرجات sunTimes()
-    const toLocalMin = (utcDate) => {
-      const localMs = utcDate.getTime() + observer.tz*3600000;
-      const localDate = new Date(localMs);
-      return localDate.getUTCHours()*60 + localDate.getUTCMinutes() + localDate.getUTCSeconds()/60;
-    };
-    const extSunriseMin = toLocalMin(extSunriseUTC);
-    const extSunsetMin = toLocalMin(extSunsetUTC);
+  const fmt = m => AstroMath.minToHHMM(m);
+  // نفس الطريقة الحسابية بالظبط بنستخدمها إحنا (فجر/عشاء) — مطابقة الرمز في Aladhan API عشان المقارنة تبقى عادلة
+  const methodMap = { EGYPT: 5, UMM_AL_QURA: 4, MWL: 3, ISNA: 2 };
+  const aladhanMethod = methodMap[observer.calcMethod] || 5;
+
+  const sunUrl = 'https://api.sunrise-sunset.org/json?lat='+observer.lat+'&lng='+observer.lon+'&date='+dateStr+'&formatted=0';
+  const prayerUrl = 'https://api.aladhan.com/v1/timings/'+Math.floor(now.getTime()/1000)+'?latitude='+observer.lat+'&longitude='+observer.lon+'&method='+aladhanMethod;
+
+  const toLocalMin = (utcDate) => {
+    const localMs = utcDate.getTime() + observer.tz*3600000;
+    const localDate = new Date(localMs);
+    return localDate.getUTCHours()*60 + localDate.getUTCMinutes() + localDate.getUTCSeconds()/60;
+  };
+  const parseAladhanTime = (hhmm) => { // "04:56" (UTC-relative بتوقيت الموقع أصلاً من الـAPI) -> دقايق
+    const [hh,mm] = hhmm.split(' ')[0].split(':').map(Number);
+    return hh*60+mm;
+  };
+
+  Promise.all([
+    fetch(sunUrl).then(r=>r.json()),
+    fetch(prayerUrl).then(r=>r.json())
+  ]).then(([sunData, prayerData])=>{
+    if (sunData.status !== 'OK') throw new Error('sunrise-sunset API: '+sunData.status);
+    if (prayerData.code !== 200) throw new Error('Aladhan API error');
+
+    const extSunriseMin = toLocalMin(new Date(sunData.results.sunrise));
+    const extSunsetMin = toLocalMin(new Date(sunData.results.sunset));
     const ours = observer.sunTimes(now);
-    const diffSunrise = Math.abs(ours.sunrise - extSunriseMin);
-    const diffSunset = Math.abs(ours.sunset - extSunsetMin);
-    const maxDiff = Math.max(diffSunrise, diffSunset);
-    const fmt = m => AstroMath.minToHHMM(m);
-    if (maxDiff <= 3){
-      statusEl.style.color = '#7fb3a8';
-      statusEl.textContent = '✅ الحسابات دقيقة — الفارق عن sunrise-sunset.org أقل من '+Math.ceil(maxDiff)+' دقيقة (شروقنا '+fmt(ours.sunrise)+' مقابل '+fmt(extSunriseMin)+')';
-    } else {
-      statusEl.style.color = '#f0938a';
-      statusEl.textContent = '⚠️ فيه فارق '+Math.round(maxDiff)+' دقيقة عن المصدر الخارجي — شروقنا '+fmt(ours.sunrise)+' مقابل '+fmt(extSunriseMin)+' (يستاهل مراجعة)';
-    }
+    const h = hijriCal.fromGregorian(now);
+    const ourPrayers = observer.realPrayerTimes(now, h);
+
+    const t = prayerData.data.timings;
+    const checks = [
+      ['الشروق', ours.sunrise, extSunriseMin],
+      ['الغروب', ours.sunset, extSunsetMin],
+      ['الفجر', ourPrayers.fajr, parseAladhanTime(t.Fajr)],
+      ['الظهر', ourPrayers.dhuhr, parseAladhanTime(t.Dhuhr)],
+      ['العصر', ourPrayers.asr, parseAladhanTime(t.Asr)],
+      ['المغرب', ourPrayers.maghrib, parseAladhanTime(t.Maghrib)],
+      ['العشاء', ourPrayers.isha, parseAladhanTime(t.Isha)]
+    ];
+
+    let maxDiff = 0, worstLabel = '';
+    const lines = checks.map(([label, ourMin, extMin])=>{
+      const diff = Math.abs(ourMin - extMin);
+      if (diff > maxDiff){ maxDiff = diff; worstLabel = label; }
+      const icon = diff <= 3 ? '✅' : '⚠️';
+      return icon+' '+label+': '+fmt(ourMin)+' (المصدر: '+fmt(extMin)+', فارق '+Math.round(diff)+'د)';
+    });
+
+    statusEl.style.color = maxDiff <= 3 ? '#7fb3a8' : '#f0938a';
+    const header = maxDiff <= 3
+      ? '✅ كل الحسابات مطابقة (فارق أقصى '+Math.round(maxDiff)+' دقيقة) — الشمس من sunrise-sunset.org، والصلاة من Aladhan API بنفس طريقة الحساب ('+observer.calcMethod+')'
+      : '⚠️ فيه فارق '+Math.round(maxDiff)+' دقيقة في «'+worstLabel+'» يستاهل مراجعة — الباقي متطابق';
+    statusEl.innerHTML = header+'<br><span style="font-size:11px;line-height:1.9;">'+lines.join('<br>')+'</span>';
   }).catch(err=>{
     statusEl.style.color = '#f0938a';
     statusEl.textContent = '⚠️ تعذر الاتصال بمصدر التحقق: '+err.message;
