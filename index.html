@@ -81,6 +81,17 @@ section.philosophy p{font-size:17px;line-height:1.85;color:var(--ink);margin:0 0
 .simple-view .detail-only{display:none;}
 @keyframes prayerFlash{0%,100%{background:linear-gradient(90deg,#c0453a,#e8574a);}50%{background:#ffffff;}}
 .prayer-flash{animation:prayerFlash 0.5s ease-in-out 20;}
+/* ===== مسجّل لحظة الأذان ===== */
+.al-sel{background:#0b0f17;color:var(--brass-light);border:1px solid var(--brass-dark);border-radius:8px;padding:6px 8px;font-family:'Amiri',serif;font-size:13px;}
+.al-lbl{display:flex;flex-direction:column;gap:3px;font-family:'Amiri',serif;font-size:12px;color:var(--ink-dim);min-width:120px;}
+.al-tap{display:block;width:100%;padding:24px 10px;margin-top:10px;background:linear-gradient(180deg,#b23a2e,#8a2a20);color:#fff;border:2px solid #e8a49c;border-radius:16px;font-family:'Amiri',serif;font-size:19px;font-weight:bold;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.al-tap:active{transform:scale(0.98);background:#d24a3c;}
+.al-mini{background:var(--bg-panel);color:var(--brass-light);border:1px solid var(--brass-dark);border-radius:14px;padding:6px 12px;font-family:'Amiri',serif;font-size:12.5px;cursor:pointer;margin:4px;}
+.al-tbl{width:100%;border-collapse:collapse;font-size:12.5px;}
+.al-tbl th{color:var(--verdigris-light);font-family:'Amiri',serif;font-weight:normal;border-bottom:1px solid rgba(201,163,93,0.25);padding:4px 3px;text-align:center;}
+.al-tbl td{color:var(--brass-light);padding:5px 3px;text-align:center;border-bottom:1px dashed rgba(201,163,93,0.10);}
+.al-alt{color:var(--ink-dim);font-size:11px;text-align:right;padding:0 6px 6px !important;}
+
 /* ===== لوحة الأجسام الثلاثة (الأرض • الشمس • القمر) ===== */
 body.three-body-mode .stage, body.three-body-mode #glanceCard, body.three-body-mode #dataPanelMain{display:none !important;}
 .tb-card{background:var(--bg-panel);border:1px solid rgba(201,163,93,0.22);border-radius:12px;padding:14px;margin-bottom:14px;}
@@ -701,10 +712,43 @@ body.three-body-mode .stage, body.three-body-mode #glanceCard, body.three-body-m
     <button id="trueSkyBtn" onclick="toggleTrueSky()" style="background:var(--bg-panel);color:var(--verdigris-light);border:1px solid var(--verdigris);padding:9px 18px;border-radius:20px;font-family:'Amiri',serif;font-size:13px;cursor:pointer;white-space:nowrap;margin:0 4px;">🌌 حقيقة السماء</button>
     <button id="verifyBtn" onclick="verifyAgainstInternet()" style="background:var(--bg-panel);color:#f0938a;border:1px solid var(--red);padding:9px 18px;border-radius:20px;font-family:'Amiri',serif;font-size:13px;cursor:pointer;white-space:nowrap;margin:0 4px;">⚖️ الميزان (تحقق)</button>
     <button id="windowScreenBtn" onclick="toggleWindowScreen()" style="background:var(--bg-panel);color:var(--brass-light);border:1px solid var(--brass-dark);padding:9px 18px;border-radius:20px;font-family:'Amiri',serif;font-size:13px;cursor:pointer;white-space:nowrap;margin:0 4px;">🖥️ شاشة ويندوز</button>
+    <button id="adhanLogBtn" onclick="toggleAdhanLog()" style="background:var(--bg-panel);color:var(--brass-light);border:1px solid var(--brass);padding:9px 18px;border-radius:20px;font-family:'Amiri',serif;font-size:13px;cursor:pointer;white-space:nowrap;margin:0 4px;">⏱️ سجّل لحظة الأذان</button>
     <button id="threeBodyBtn" onclick="toggleThreeBody()" style="background:var(--bg-panel);color:var(--brass-light);border:1px solid var(--brass);padding:9px 18px;border-radius:20px;font-family:'Amiri',serif;font-size:13px;cursor:pointer;white-space:nowrap;margin:0 4px;">🌍 الأجسام الثلاثة</button>
     <button id="adhanToggleBtn" onclick="toggleAdhanAlerts()" style="background:var(--bg-panel);color:#f0938a;border:1px solid var(--red);padding:9px 18px;border-radius:20px;font-family:'Amiri',serif;font-size:13px;cursor:pointer;white-space:nowrap;margin:0 4px;">🔔 تفعيل تنبيه الأذان والإقامة</button>
   </div>
   <p id="adhanStatus" style="text-align:center;color:var(--ink-dim);font-size:11.5px;margin:0 0 4px;min-height:14px;max-width:480px;margin-left:auto;margin-right:auto;"></p>
+
+  <!-- ===== مسجّل لحظة الأذان: تسجيل بالثانية ومقارنة بأم القرى وبدائل الفجر والعشاء ===== -->
+  <div id="adhanLogPanel" style="display:none;max-width:760px;margin:0 auto 24px;padding:0 4px;">
+    <div class="tb-card">
+      <h3 class="tb-title">⏱️ سجّل لحظة الأذان</h3>
+      <p class="tb-note">افتح اللوحة قبل الأذان بدقيقتين، ودوس الزرار الكبير <b>أول ما تسمع أول «الله أكبر»</b>. بيتسجل الوقت بالثانية من ساعة جهازك ويتقارن بحساب أم القرى (فجر 18.5°، عشاء بعد المغرب بـ90 دقيقة، و120 في رمضان) وبدائل الفجر والعشاء.</p>
+      <div id="alNext" style="text-align:center;margin:10px 0 4px;color:var(--brass-light);font-family:'Amiri',serif;font-size:14px;line-height:1.8;">—</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:8px 0;">
+        <label class="al-lbl">الصلاة<select id="alPrayerSel" class="al-sel" onchange="alSaveControls()"><option value="auto">تلقائي (الأقرب)</option><option value="fajr">الفجر</option><option value="dhuhr">الظهر</option><option value="asr">العصر</option><option value="maghrib">المغرب</option><option value="isha">العشاء</option></select></label>
+        <label class="al-lbl">مصدر الأذان<select id="alSourceSel" class="al-sel" onchange="alSaveControls()"><option value="haram">الحرم المكي (بث/تلفزيون)</option><option value="clock">ساعة الحرمين (مكة)</option><option value="mosque">مسجد الحي</option><option value="other">مصدر آخر</option></select></label>
+        <label class="al-lbl">خصم زمن رد فعلك (ثانية)<input id="alReact" type="number" step="0.1" min="0" max="2" value="0" class="al-sel" style="width:100px;" onchange="alSaveControls()"></label>
+      </div>
+      <button id="alTapBtn" class="al-tap" onclick="alRecord()">🕌 سمعت «الله أكبر» — سجّل الآن</button>
+      <p id="alLastMsg" style="text-align:center;font-family:'Amiri',serif;font-size:13px;color:var(--brass-light);margin:10px 0 0;min-height:18px;line-height:1.8;"></p>
+    </div>
+    <div class="tb-card">
+      <h4 style="font-family:'Amiri',serif;color:var(--brass-light);margin:0 0 8px;text-align:center;">آخر التسجيلات</h4>
+      <div id="alTable" style="overflow-x:auto;"></div>
+      <div style="text-align:center;margin-top:8px;">
+        <button class="al-mini" onclick="alCopy()">📋 انسخ السجل (وابعتهولي)</button>
+        <button class="al-mini" onclick="alUndo()">↩️ حذف آخر تسجيل</button>
+        <button class="al-mini" onclick="alClear()">🗑️ مسح الكل</button>
+      </div>
+      <p id="alCopyMsg" style="text-align:center;font-size:11.5px;color:var(--ink-dim);min-height:14px;margin:4px 0 0;"></p>
+    </div>
+    <div class="tb-card">
+      <h4 style="font-family:'Amiri',serif;color:var(--brass-light);margin:0 0 8px;text-align:center;">ملخص الفروق (ثانية)</h4>
+      <div id="alStats" style="overflow-x:auto;"></div>
+      <p class="tb-note">الفرق = لحظة ضغطك − وقت المرجع. <b>موجب</b> = المؤذن بدأ بعد الحساب، و<b>سالب</b> = قبله. الفرق بيشمل زمن رد فعلك (حوالي نص ثانية) لو ما خصمتوش. لو المصدر الحرم أو ساعة الحرمين، المرجع محسوب لمكة، ولو مسجد الحي فلموقعك المثبّت.</p>
+    </div>
+  </div>
+
   <!-- ===== لوحة الأجسام الثلاثة: الأرض والشمس والقمر — كل الأرقام من Ephemeris الموحّد ومن موقعك ===== -->
   <div id="threeBodyPanel" style="display:none;max-width:760px;margin:0 auto 24px;padding:0 4px;">
     <div class="tb-card">
@@ -839,6 +883,10 @@ body.three-body-mode .stage, body.three-body-mode #glanceCard, body.three-body-m
       <button id="lockLocationBtn" onclick="toggleLocationLock()" style="background:var(--bg-panel);color:var(--verdigris-light);border:1px solid var(--verdigris);padding:7px 16px;border-radius:16px;font-family:'Amiri',serif;font-size:12.5px;cursor:pointer;">🔓 ثبّت هذا الموقع (لو صح)</button>
     </div>
     <p id="locationLockStatus" style="font-size:11.5px;color:var(--ink-dim);margin-top:6px;min-height:14px;"></p>
+    <div style="margin-top:8px;">
+      <button id="gpsCheckBtn" onclick="checkGpsAgainstPinned()" style="background:var(--bg-panel);color:var(--ink-dim);border:1px solid rgba(201,163,93,0.35);padding:6px 14px;border-radius:16px;font-family:'Amiri',serif;font-size:12px;cursor:pointer;">🛰️ افحص الـGPS (مقارنة فقط — مش بيغيّر موقعك)</button>
+    </div>
+    <p id="gpsCheckStatus" style="font-size:11.5px;color:var(--ink-dim);margin-top:6px;min-height:14px;line-height:1.7;"></p>
     <div style="margin-top:10px;">
       <button id="manualLocBtn" onclick="toggleManualLocation()" style="background:var(--bg-panel);color:var(--brass-light);border:1px solid var(--brass-dark);padding:7px 16px;border-radius:16px;font-family:'Amiri',serif;font-size:12.5px;cursor:pointer;">✏️ حدد الموقع يدويًا (بدون GPS)</button>
     </div>
@@ -1162,8 +1210,9 @@ class HijriCalendar {
     this.arDays = ["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
     this.hijriMonths = ["محرم","صفر","ربيع الأول","ربيع الآخر","جمادى الأولى","جمادى الآخرة","رجب","شعبان","رمضان","شوال","ذو القعدة","ذو الحجة"];
     this.offset = 0;
+    this._fmt = null; this._useIntl = null; this._cache = new Map();
   }
-  adjust(val){ this.offset += val; }
+  adjust(val){ this.offset += val; this._cache.clear(); }
   // بيدور على أقرب تاريخ هجري جاي (شهر/يوم معينين) بداية من النهاردة، وبيرجع عدد الأيام المتبقية
   daysUntilHijri(targetMonth, targetDay){
     const today = new Date();
@@ -1181,9 +1230,32 @@ class HijriCalendar {
     if (months <= 0) return totalDays+' يوم';
     return months+' شهر و'+days+' يوم ('+totalDays+' يوم إجمالاً)';
   }
+  // التاريخ الهجري بتقويم أم القرى الرسمي (من Intl في المتصفح) — لو المتصفح ما دعمش، نرجع للخوارزمية الحسابية القديمة
+  _initIntl(){
+    if (this._useIntl !== null) return;
+    try{
+      this._fmt = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura-nu-latn', { day:'numeric', month:'numeric', year:'numeric' });
+      const t = this._intlParts(new Date(Date.UTC(2023,2,23,10)));   // 1 رمضان 1444 = 23 مارس 2023 (رسمي) — نتأكد إن المتصفح فعلًا بيطبّق أم القرى
+      this._useIntl = !!(t && t.year===1444 && t.month===9 && t.day===1);
+    }catch(e){ this._useIntl = false; }
+  }
+  _intlParts(date){
+    const p = this._fmt.formatToParts(date), g = t => +p.find(x=>x.type===t).value;
+    return { day: g('day'), month: g('month'), year: g('year') };
+  }
   fromGregorian(inputDate){
     const date = new Date(inputDate);
     date.setDate(date.getDate() + this.offset);
+    this._initIntl();
+    const key = date.getFullYear()+'-'+date.getMonth()+'-'+date.getDate();
+    const hit = this._cache.get(key);
+    if (hit) return { day: hit.day, month: hit.month, year: hit.year };
+    const r = this._useIntl ? this._intlParts(date) : this._arith(date);
+    if (this._cache.size > 900) this._cache.clear();
+    this._cache.set(key, r);
+    return { day: r.day, month: r.month, year: r.year };
+  }
+  _arith(date){
     const day = date.getDate(), month = date.getMonth()+1, year = date.getFullYear();
     let jd = Math.floor((1461*(year + 4800 + Math.floor((month-14)/12)))/4) +
              Math.floor((367*(month-2-12*Math.floor((month-14)/12)))/12) -
@@ -1206,8 +1278,8 @@ class HijriCalendar {
 // ============================================================
 class Observer {
   constructor(){
-    this.lat = 21.4225; this.lon = 39.8262; this.tz = 3;
-    this.name = "مكة المكرمة (افتراضي)"; // Mecca default; overwritten by real GPS if the person uses the compass button
+    this.lat = 21.5433; this.lon = 39.1728; this.tz = 3;
+    this.name = "جدة (موقع مثبّت)"; // جدة افتراضيًا ومثبّتة: الـGPS في المنطقة معرّض لتشويش/تضليل موثّق، فمنعتمدش عليه تلقائيًا
     this.calcMethod = "EGYPT";
     this.KAABA_LAT = 21.4225; this.KAABA_LON = 39.8262;
     this.lastGeocodedKey = null;
@@ -1234,6 +1306,7 @@ class Observer {
     const key = lat.toFixed(2)+','+lon.toFixed(2);
     if (key === this.lastGeocodedKey) return;
     this.lastGeocodedKey = key;
+    const prevLabel = el.textContent;
     el.textContent = 'جارٍ التحديد...';
     fetch('https://api.bigdatacloud.net/data/reverse-geocode-client?latitude='+lat+'&longitude='+lon+'&localityLanguage=ar')
       .then(r => r.json())
@@ -1241,7 +1314,7 @@ class Observer {
         const name = d.city || d.locality || d.principalSubdivision || 'غير معروف';
         el.textContent = name;
       })
-      .catch(() => { el.textContent = lat.toFixed(2)+'°, '+lon.toFixed(2)+'°'; });
+      .catch(() => { el.textContent = (prevLabel && prevLabel !== '—' && prevLabel !== 'جارٍ التحديد...') ? prevLabel : lat.toFixed(2)+'°, '+lon.toFixed(2)+'°'; });
   }
   updateKaabaDistanceBox(){
     const txt = Math.round(this.kaabaDistanceKm(this.lat, this.lon)).toLocaleString('ar-EG')+' كم';
@@ -1672,6 +1745,7 @@ class ClockRenderer {
       this.updateDayNightAndPrayers(now);
       this.updateDataPanel(now, h);
       if (document.body.classList.contains('three-body-mode')) updateThreeBody(now);
+      { const alp = document.getElementById('adhanLogPanel'); if (alp && alp.style.display === 'block') alTick(now); }
 
       // الوضع الافتراضي (بدون بوصلة حية): الشمال ثابت لفوق، والقبلة بتوري زاويتها المحسوبة من موقع المراقب الحالي
       if (!this.isCompassListening){
@@ -2065,6 +2139,13 @@ class NavTool {
     }
   }
   initGPS(){
+    try{
+      if (localStorage.getItem('zijLocationLocked') === 'true'){
+        this.lat = observer.lat; this.lon = observer.lon; this.calculateQibla();
+        document.getElementById('navLocationInfo').innerText = 'الموقع المثبّت: '+this.lat.toFixed(4)+'°, '+this.lon.toFixed(4)+'° (بدون GPS)';
+        return;
+      }
+    }catch(e){}
     if ('geolocation' in navigator){
       navigator.geolocation.watchPosition(
         (pos)=>{
@@ -2181,18 +2262,22 @@ const viewMode = new ViewModeController();
 const navTool = new NavTool();
 
 starField.init();
-// استرجاع آخر موقع محفوظ محليًا (لو موجود) بدل ما نفضل نرجع لمكة الافتراضية كل مرة
+// استرجاع آخر موقع محفوظ محليًا. أول فتح (مفيش موقع محفوظ): نثبّت جدة ونقفلها — القراءة التلقائية من GPS ممكن تتشوّش (تضليل الإشارة موثّق في المنطقة)
 try{
   const saved = localStorage.getItem('zijLastLocation');
   if (saved){
     const loc = JSON.parse(saved);
     observer.set(loc.lat, loc.lon, -(new Date().getTimezoneOffset()/60), 'آخر موقع محفوظ');
     observer.updateCityName(loc.lat, loc.lon);
-  } else if (document.getElementById('dataCityName')) {
-    document.getElementById('dataCityName').textContent = 'مكة المكرمة (افتراضي)';
+  } else {
+    observer.set(21.5433, 39.1728, -(new Date().getTimezoneOffset()/60), 'جدة (موقع مثبّت)');
+    localStorage.setItem('zijLastLocation', JSON.stringify({lat:21.5433, lon:39.1728}));
+    localStorage.setItem('zijLocationLocked', 'true');
+    if (document.getElementById('dataCityName')) document.getElementById('dataCityName').textContent = 'جدة (موقع مثبّت)';
+    observer.updateCityName(21.5433, 39.1728);
   }
 }catch(e){
-  if (document.getElementById('dataCityName')) document.getElementById('dataCityName').textContent = 'مكة المكرمة (افتراضي)';
+  if (document.getElementById('dataCityName')) document.getElementById('dataCityName').textContent = 'جدة (موقع مثبّت)';
 }
 viewMode.initDefault();
 
@@ -2281,11 +2366,28 @@ function toggleLocationLock(){
     }
   }catch(e){}
 }
+// فحص الـGPS مقابل الموقع المثبّت: بيقارن بس ويحذّر لو القراءة بعيدة (تشويش/تضليل) — ومش بيكتب فوق الموقع المثبّت أبدًا
+function checkGpsAgainstPinned(){
+  const el = document.getElementById('gpsCheckStatus'); if (!el) return;
+  if (!navigator.geolocation){ el.textContent = 'المتصفح ده مش بيدعم تحديد الموقع.'; return; }
+  el.textContent = '🛰️ جارٍ قراءة الـGPS للمقارنة فقط...';
+  navigator.geolocation.getCurrentPosition(pos=>{
+    const km = tbAngDist(observer.lat, observer.lon, pos.coords.latitude, pos.coords.longitude)*111.195;
+    const acc = pos.coords.accuracy ? '±'+Math.round(pos.coords.accuracy)+' م' : 'غير معروفة';
+    let msg;
+    if (km < 25) msg = '✅ الـGPS داخل نطاق موقعك المثبّت (فرق '+km.toFixed(1)+' كم — طبيعي داخل نفس المدينة، الدقة '+acc+').';
+    else if (km < 80) msg = '⚠️ فرق '+km.toFixed(1)+' كم عن موقعك المثبّت (الدقة '+acc+') — مشبوه. اتجاهلت القراءة.';
+    else msg = '🛑 الـGPS بيقول إنك على بعد '+Math.round(km)+' كم من موقعك المثبّت (الدقة '+acc+') — على الأغلب تشويش أو تضليل للإشارة. اتجاهلت القراءة وموقعك المثبّت زي ما هو.';
+    el.textContent = msg+' [القراءة: '+pos.coords.latitude.toFixed(3)+'°, '+pos.coords.longitude.toFixed(3)+'°]';
+  }, err=>{ el.textContent = 'تعذر قراءة الـGPS: '+err.message; }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
+}
 (function initLocationLockUI(){
   try{
     const isLocked = localStorage.getItem('zijLocationLocked') === 'true';
     const btn = document.getElementById('lockLocationBtn');
     if (btn && isLocked) btn.textContent = '🔒 الموقع مثبّت (دوس تاني للفتح)';
+    const st = document.getElementById('locationLockStatus');
+    if (st && isLocked) st.textContent = '📌 الموقع مثبّت — مش هيتغيّر تلقائيًا (الـGPS في المنطقة معرّض للتشويش).';
   }catch(e){}
 })();
 // ===== تحديد الموقع يدويًا — حل نهائي لمشاكل تشويش GPS، مفيش اعتماد على أي حساس خالص =====
@@ -2509,6 +2611,140 @@ function updateThreeBody(now){
     R('المحاق الفلكي (اقتران)', tbFmt.when(H.newMoon)) + R('بعد', H.newMoon ? tbFmt.span(H.newMoon - now) : '—') +
     R('البدر (استقبال)', tbFmt.when(H.fullMoon)) + R('بعد', H.fullMoon ? tbFmt.span(H.fullMoon - now) : '—');
 }
+// ===== مسجّل لحظة الأذان — تسجيل بالثانية + مقارنة بمراجع محسوبة (أم القرى وبدائل الفجر والعشاء) =====
+const AL_KEY = 'zijAdhanLog', AL_CTRL_KEY = 'zijAdhanCtrl';
+const AL_PRAYERS = [['fajr','الفجر'],['dhuhr','الظهر'],['asr','العصر'],['maghrib','المغرب'],['isha','العشاء']];
+const AL_SOURCES = { haram:['الحرم المكي (بث)','makkah'], clock:['ساعة الحرمين (مكة)','makkah'], mosque:['مسجد الحي','me'], other:['مصدر آخر','me'] };
+let _alMakkahObs = null;
+function alObserverFor(src){
+  if ((AL_SOURCES[src]||[])[1] === 'makkah'){
+    if (!_alMakkahObs) _alMakkahObs = new Observer();
+    _alMakkahObs.set(21.4225, 39.8262, observer.tz, 'مكة المكرمة');
+    return _alMakkahObs;
+  }
+  return observer;
+}
+function alLoad(){ try{ const a = JSON.parse(localStorage.getItem(AL_KEY)||'[]'); return Array.isArray(a)?a:[]; }catch(e){ return []; } }
+function alSave(a){ try{ localStorage.setItem(AL_KEY, JSON.stringify(a.slice(-300))); }catch(e){} }
+// مراجع اليوم (بالميلي ثانية) لكل صلاة + بدائل الفجر والعشاء، لمراقب معيّن
+function alRefTimes(ts, obs){
+  const ld = new Date(ts + obs.tz*3600000);
+  const dayStart = Date.UTC(ld.getUTCFullYear(), ld.getUTCMonth(), ld.getUTCDate()) - obs.tz*3600000;
+  const d = new Date(ts), M = m => dayStart + m*60000, K = AstroMath.DEGR;
+  const noon = obs._noonMin(d), sunset = obs._eventMin(d,'ss',()=>-0.833,+1);
+  const h = hijriCal.fromGregorian(d);
+  const asrAlt = dec => Math.atan(1/(1+Math.abs(Math.tan(obs.lat*K - dec))))*AstroMath.RADD;
+  const ref = {
+    fajr: M(obs._eventMin(d,'fj-18.5',()=>-18.5,-1)), dhuhr: M(noon), asr: M(obs._eventMin(d,'asr',asrAlt,+1)),
+    maghrib: M(sunset), isha: M(sunset + (h.month===9 ? 120 : 90))
+  };
+  const alts = {
+    'فجر 19°': M(obs._eventMin(d,'fj-19',()=>-19,-1)), 'فجر 19.5°': M(obs._eventMin(d,'fj-19.5',()=>-19.5,-1)), 'فجر 18°': M(obs._eventMin(d,'fj-18',()=>-18,-1)),
+    'عشاء 17°': M(obs._eventMin(d,'is-17',()=>-17,+1)), 'عشاء 17.5°': M(obs._eventMin(d,'is-17.5',()=>-17.5,+1))
+  };
+  return { ref, alts };
+}
+function alCtrl(){ try{ return JSON.parse(localStorage.getItem(AL_CTRL_KEY)||'{}'); }catch(e){ return {}; } }
+function alSaveControls(){
+  const v = { prayer: document.getElementById('alPrayerSel').value, src: document.getElementById('alSourceSel').value, react: document.getElementById('alReact').value };
+  try{ localStorage.setItem(AL_CTRL_KEY, JSON.stringify(v)); }catch(e){}
+}
+function alInitControls(){
+  const v = alCtrl();
+  if (v.prayer) document.getElementById('alPrayerSel').value = v.prayer;
+  if (v.src) document.getElementById('alSourceSel').value = v.src;
+  if (v.react !== undefined) document.getElementById('alReact').value = v.react;
+}
+const alPad = n => AstroMath.pad(n);
+function alTimeStr(ts){ const d = new Date(ts); let h = d.getHours(); const ap = h<12?'ص':'م'; h = h%12||12; return '<bdi dir="ltr">'+alPad(h)+':'+alPad(d.getMinutes())+':'+alPad(d.getSeconds())+'.'+Math.floor(d.getMilliseconds()/100)+' '+ap+'</bdi>'; }
+function alDateStr(ts){ const d = new Date(ts); return d.getFullYear()+'-'+alPad(d.getMonth()+1)+'-'+alPad(d.getDate()); }
+const alSigned = s => '<bdi dir="ltr">'+(s>=0?'+':'−')+Math.abs(s).toFixed(1)+'</bdi>';
+const alPName = k => (AL_PRAYERS.find(p=>p[0]===k)||[k,k])[1];
+function alRecord(tsOverride){
+  const react = Math.max(0, Math.min(2, parseFloat(document.getElementById('alReact').value)||0));
+  const raw = tsOverride || Date.now();
+  const ts = raw - Math.round(react*1000);
+  const src = document.getElementById('alSourceSel').value, sel = document.getElementById('alPrayerSel').value;
+  const obs = alObserverFor(src), { ref, alts } = alRefTimes(ts, obs);
+  let prayer = sel;
+  if (sel === 'auto'){
+    let best = null, bd = Infinity;
+    AL_PRAYERS.forEach(([k])=>{ const dd = Math.abs(ts - ref[k]); if (dd < bd){ bd = dd; best = k; } });
+    prayer = bd < 45*60000 ? best : null;
+  }
+  const msg = document.getElementById('alLastMsg');
+  if (!prayer){ if (msg) msg.textContent = '⚠️ مش قادر أحدد الصلاة (لحظة الضغط بعيدة أكتر من 45 دقيقة عن أي صلاة). اختار الصلاة من القايمة وجرب تاني.'; return null; }
+  const entry = { ts, prayer, src, city: obs === observer ? 'me' : 'makkah', lat: +obs.lat.toFixed(4), lon: +obs.lon.toFixed(4), react, diff: +((ts - ref[prayer])/1000).toFixed(1), alts: {} };
+  (prayer==='fajr' ? ['فجر 19°','فجر 19.5°','فجر 18°'] : prayer==='isha' ? ['عشاء 17°','عشاء 17.5°'] : []).forEach(k=>{ entry.alts[k] = +((ts - alts[k])/1000).toFixed(1); });
+  const log = alLoad(); log.push(entry); alSave(log);
+  if (msg) msg.innerHTML = '✅ اتسجّل: <b>'+alPName(prayer)+'</b> عند '+alTimeStr(ts)+' — الفرق عن المرجع '+alSigned(entry.diff)+' ثانية';
+  const btn = document.getElementById('alTapBtn'); if (btn){ const old = btn.textContent; btn.textContent = '✅ اتسجّل'; setTimeout(()=>{ btn.textContent = old; }, 900); }
+  try{ if (navigator.vibrate) navigator.vibrate(40); }catch(e){}
+  alRender();
+  return entry;
+}
+function alUndo(){ const log = alLoad(); if (!log.length) return; log.pop(); alSave(log); const m = document.getElementById('alLastMsg'); if (m) m.textContent = '↩️ اتحذف آخر تسجيل.'; alRender(); }
+function alClear(){ if (!alLoad().length) return; if (confirm('تمسح كل تسجيلات الأذان؟')){ alSave([]); alRender(); } }
+function alMedian(a){ const s = a.slice().sort((x,y)=>x-y), n = s.length; return n%2 ? s[(n-1)/2] : (s[n/2-1]+s[n/2])/2; }
+function alRender(){
+  const log = alLoad(), tbl = document.getElementById('alTable'), st = document.getElementById('alStats');
+  if (!tbl || !st) return;
+  if (!log.length){ tbl.innerHTML = '<p class="tb-note">لسه مفيش تسجيلات.</p>'; st.innerHTML = '<p class="tb-note">هيظهر الملخص بعد أول تسجيل.</p>'; return; }
+  let rows = '<table class="al-tbl"><tr><th>التاريخ</th><th>الصلاة</th><th>لحظة الضغط</th><th>الفرق (ث)</th><th>المصدر</th></tr>';
+  log.slice(-12).reverse().forEach(e=>{
+    rows += '<tr><td>'+alDateStr(e.ts)+'</td><td>'+alPName(e.prayer)+'</td><td>'+alTimeStr(e.ts)+'</td><td>'+alSigned(e.diff)+'</td><td>'+((AL_SOURCES[e.src]||[e.src])[0])+'</td></tr>';
+    const ak = Object.keys(e.alts||{});
+    if (ak.length) rows += '<tr><td colspan="5" class="al-alt">بدائل: '+ak.map(k=>k+': '+alSigned(e.alts[k])).join(' • ')+'</td></tr>';
+  });
+  tbl.innerHTML = rows + '</table>';
+  const g = {};
+  log.forEach(e=>{ const k = e.prayer+'|'+e.src; (g[k] = g[k]||[]).push(e.diff); });
+  let s = '<table class="al-tbl"><tr><th>الصلاة • المصدر</th><th>عدد</th><th>متوسط</th><th>وسيط</th><th>أقل</th><th>أكبر</th></tr>';
+  Object.keys(g).sort().forEach(k=>{
+    const [p, src] = k.split('|'), a = g[k], mean = a.reduce((x,y)=>x+y,0)/a.length;
+    s += '<tr><td>'+alPName(p)+' • '+((AL_SOURCES[src]||[src])[0])+'</td><td>'+a.length+'</td><td>'+alSigned(mean)+'</td><td>'+alSigned(alMedian(a))+'</td><td>'+alSigned(Math.min.apply(null,a))+'</td><td>'+alSigned(Math.max.apply(null,a))+'</td></tr>';
+  });
+  st.innerHTML = s + '</table>';
+}
+// نص جاهز للنسخ والإرسال للتحليل
+function alExportText(){
+  const log = alLoad();
+  const lines = ['سجل الأذان — الزيج | المرجع: أم القرى (فجر 18.5°، عشاء المغرب+90د و+120د في رمضان)', 'الصلاة | المصدر | التاريخ | لحظة الضغط | الفرق(ث) | بدائل | زمن_رد_الفعل | مرجع'];
+  log.forEach(e=>{
+    const d = new Date(e.ts);
+    lines.push([alPName(e.prayer), (AL_SOURCES[e.src]||[e.src])[0], alDateStr(e.ts), alPad(d.getHours())+':'+alPad(d.getMinutes())+':'+alPad(d.getSeconds())+'.'+Math.floor(d.getMilliseconds()/100),
+      (e.diff>=0?'+':'')+e.diff, Object.keys(e.alts||{}).map(k=>k+'='+e.alts[k]).join(';')||'-', e.react||0, (e.city==='makkah'?'مكة':'موقعي')+' '+e.lat+','+e.lon].join(' | '));
+  });
+  return lines.join('\n');
+}
+function alCopy(){
+  const t = alExportText(), m = document.getElementById('alCopyMsg');
+  const done = ok => { if (m) m.textContent = ok ? '✅ اتنسخ — الصقه في الشات.' : '⚠️ ما قدرتش أنسخ تلقائيًا، حدّد النص وانسخه يدويًا.'; };
+  try{
+    if (navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(t).then(()=>done(true), ()=>alCopyFallback(t, done)); return; }
+  }catch(e){}
+  alCopyFallback(t, done);
+}
+function alCopyFallback(t, done){
+  try{ const ta = document.createElement('textarea'); ta.value = t; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); const ok = document.execCommand('copy'); document.body.removeChild(ta); done(ok); }catch(e){ done(false); }
+}
+// عد تنازلي للأذان القادم بحسب المرجع (مع الثواني) — بيتحدّث كل ثانية والوحة مفتوحة
+function alTick(now){
+  const el = document.getElementById('alNext'); if (!el) return;
+  const src = document.getElementById('alSourceSel').value, obs = alObserverFor(src), t = now.getTime();
+  let { ref } = alRefTimes(t, obs), nxt = null;
+  for (const [k] of AL_PRAYERS){ if (ref[k] > t){ nxt = [k, ref[k]]; break; } }
+  if (!nxt){ const tm = alRefTimes(t + 86400000, obs).ref; nxt = ['fajr', tm.fajr]; }
+  const left = Math.max(0, Math.round((nxt[1]-t)/1000)), hh = Math.floor(left/3600), mm = Math.floor((left%3600)/60), ss = left%60;
+  el.innerHTML = 'الأذان القادم حسب المرجع ('+(obs===observer?'موقعك':'مكة')+'): <b>'+alPName(nxt[0])+'</b> عند '+alTimeStr(nxt[1])+'<br>باقي <bdi dir="ltr">'+alPad(hh)+':'+alPad(mm)+':'+alPad(ss)+'</bdi>';
+}
+function toggleAdhanLog(){
+  const panel = document.getElementById('adhanLogPanel'), btn = document.getElementById('adhanLogBtn');
+  const on = panel.style.display !== 'block';
+  panel.style.display = on ? 'block' : 'none';
+  if (btn){ btn.style.background = on ? 'var(--brass)' : 'var(--bg-panel)'; btn.style.color = on ? '#0a0c12' : 'var(--brass-light)'; btn.textContent = on ? '⏹ إغلاق التسجيل' : '⏱️ سجّل لحظة الأذان'; }
+  if (on){ alInitControls(); alRender(); alTick(new Date()); if (panel.scrollIntoView) panel.scrollIntoView({behavior:'smooth', block:'start'}); }
+}
 function toggleTrueSky(){
   renderer.trueSkyMode = !renderer.trueSkyMode;
   const btn = document.getElementById('trueSkyBtn');
@@ -2534,8 +2770,11 @@ function astroSelfTest(){
   const ms = [[59.9,3],[69.8,4],[113.2,7],[149.8,10],[203.8,14],[249.8,18]];
   const ay = Ephemeris.ayanamsa(new Date('2026-09-28T00:00:00Z'));
   const mansOk = ms.filter(([l,n])=> Math.floor(AstroMath.normDeg(l+0.36-ay)/(360/28))+1 === n).length;
-  const ok = maxMoon <= 0.2 && maxDec <= 0.05 && mansOk === ms.length;
-  return (ok?'✅':'⚠️')+' فحص داخلي للشمس والقمر: خط طول القمر ≤ '+maxMoon.toFixed(2)+'° على 6 أحداث محاق/بدر معروفة، وميل الشمس ≤ '+maxDec.toFixed(3)+'° عند الاعتدالين والانقلابين، وتقسيم المنازل مطابق لـ '+mansOk+'/'+ms.length+' نجوم معروفة';
+  // التاريخ الهجري: بدايات رمضان وعيد الأضحى الرسمية المعروفة في السعودية (لازم المتصفح يطبّق أم القرى فعلًا)
+  const hk = [[2023,2,23,1,9,1444],[2024,2,11,1,9,1445],[2025,2,1,1,9,1446],[2024,5,16,10,12,1445]];
+  const hjOk = hk.filter(([y,m,d,hd,hm,hy])=>{ const h = hijriCal.fromGregorian(new Date(y,m,d,12)); return h.day===hd && h.month===hm && h.year===hy; }).length;
+  const ok = maxMoon <= 0.2 && maxDec <= 0.05 && mansOk === ms.length && hjOk === hk.length;
+  return (ok?'✅':'⚠️')+' فحص داخلي للشمس والقمر: خط طول القمر ≤ '+maxMoon.toFixed(2)+'° على 6 أحداث محاق/بدر معروفة، وميل الشمس ≤ '+maxDec.toFixed(3)+'° عند الاعتدالين والانقلابين، وتقسيم المنازل مطابق لـ '+mansOk+'/'+ms.length+' نجوم معروفة، والتاريخ الهجري (أم القرى) مطابق لـ '+hjOk+'/'+hk.length+' مناسبات رسمية';
 }
 function verifyAgainstInternet(){
   const statusEl = document.getElementById('verifyStatus');
