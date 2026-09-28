@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>الزيج — النسخة الكاملة</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="الزّيج">
+<meta name="theme-color" content="#0d1119">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap');
 
@@ -74,9 +81,25 @@ section.philosophy p{font-size:17px;line-height:1.85;color:var(--ink);margin:0 0
 .simple-view .detail-only{display:none;}
 @keyframes prayerFlash{0%,100%{background:linear-gradient(90deg,#c0453a,#e8574a);}50%{background:#ffffff;}}
 .prayer-flash{animation:prayerFlash 0.5s ease-in-out 20;}
+/* ===== لوحة الأجسام الثلاثة (الأرض • الشمس • القمر) ===== */
+body.three-body-mode .stage, body.three-body-mode #glanceCard, body.three-body-mode #dataPanelMain{display:none !important;}
+.tb-card{background:var(--bg-panel);border:1px solid rgba(201,163,93,0.22);border-radius:12px;padding:14px;margin-bottom:14px;}
+.tb-title{font-family:'Amiri',serif;color:var(--brass-light);text-align:center;margin:0 0 6px;font-size:17px;}
+.tb-note{font-family:'Amiri',serif;color:var(--ink-dim);text-align:center;font-size:12px;margin:4px 0 0;line-height:1.7;}
+.tb-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin-bottom:14px;}
+.tb-body h4{font-family:'Amiri',serif;margin:0 0 4px;font-size:16px;text-align:center;}
+.tb-sec{font-family:'Amiri',serif;color:var(--verdigris-light);font-size:11.5px;margin:8px 0 2px;border-bottom:1px solid rgba(201,163,93,0.2);padding-bottom:2px;}
+.tb-row{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:4px 0;font-size:13px;border-bottom:1px dashed rgba(201,163,93,0.10);}
+.tb-row .k{color:var(--ink-dim);font-family:'Amiri',serif;flex:0 0 auto;}
+.tb-row .v{color:var(--brass-light);text-align:left;font-family:'EB Garamond',serif;font-size:14px;unicode-bidi:plaintext;}
+
 </style>
 </head>
 <body>
+<div id="adhanBanner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:linear-gradient(135deg,#1a3a2e,#0d1119);border-bottom:2px solid var(--brass);padding:16px;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,0.6);">
+  <div id="adhanBannerText" style="font-family:'Amiri',serif;color:var(--brass-light);font-size:20px;font-weight:700;">—</div>
+  <button onclick="dismissAdhanBanner()" style="margin-top:8px;background:none;border:1px solid var(--brass-dark);color:var(--ink-dim);padding:4px 14px;border-radius:14px;font-family:'Amiri',serif;font-size:12px;cursor:pointer;">إغلاق</button>
+</div>
 <div class="wrap">
   <!-- ===== بطاقة النظرة الأولى — أول حاجة يشوفها أي حد يفتح الصفحة، الـ5 معلومات اللي فعلاً بيتشافوا كل مرة، مفيش زيادة ولا تفاصيل استكشافية ===== -->
   <div id="glanceCard" style="max-width:420px;margin:12px auto 22px;background:linear-gradient(180deg,#161c2c,#0d1119);border:1px solid var(--brass-dark);border-radius:16px;padding:20px;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,0.5);">
@@ -123,7 +146,7 @@ section.philosophy p{font-size:17px;line-height:1.85;color:var(--ink);margin:0 0
       </div>
       <div style="background:rgba(0,0,0,0.2);border-radius:10px;padding:10px;">
         <div style="font-family:'Amiri',serif;color:var(--verdigris-light);font-size:12px;">القمر</div>
-        <svg id="glanceMoonIcon" viewBox="0 0 40 40" style="width:30px;height:30px;margin:4px auto 0;display:block;"><circle cx="20" cy="20" r="15" fill="#e9e2cf"/><clipPath id="glanceMoonClip"><circle cx="20" cy="20" r="15"/></clipPath><circle id="glanceMoonShadow" clip-path="url(#glanceMoonClip)" cx="5" cy="20" r="15" fill="#161c2c"/><circle cx="20" cy="20" r="15" fill="none" stroke="#8a8570" stroke-width="0.8"/></svg>
+        <svg id="glanceMoonIcon" viewBox="0 0 40 40" style="width:30px;height:30px;margin:4px auto 0;display:block;"><circle cx="20" cy="20" r="15" fill="#e9e2cf"/><clipPath id="glanceMoonClip"><circle cx="20" cy="20" r="15"/></clipPath><path id="glanceMoonShadow" d="" fill="#161c2c"/><circle cx="20" cy="20" r="15" fill="none" stroke="#8a8570" stroke-width="0.8"/></svg>
         <div id="glanceMoonName" style="font-family:'Amiri',serif;color:var(--brass-light);font-size:12px;margin-top:2px;">—</div>
       </div>
       <div style="background:rgba(0,0,0,0.2);border-radius:10px;padding:10px;">
@@ -184,7 +207,7 @@ section.philosophy p{font-size:17px;line-height:1.85;color:var(--ink);margin:0 0
         </defs>
 
         <!-- base plate -->
-        <circle cx="300" cy="300" r="290" fill="url(#plate)" stroke="#3a3020" stroke-width="2"/>
+        <circle cx="300" cy="300" r="336" fill="url(#plate)" stroke="#3a3020" stroke-width="2"/>
 
         <!-- world-time ring: fixed city names (schematic, ~3hr spacing eastward from Mecca) -->
         <!-- Patek Philippe World Time style: 24 مدينة موزعة بالتساوي كل 15°، كل اسم يتبع انحناء الدايرة تمامًا زي ساعات World Timer الحقيقية -->
@@ -336,8 +359,8 @@ section.philosophy p{font-size:17px;line-height:1.85;color:var(--ink);margin:0 0
         <circle cx="300" cy="300" r="278" fill="none" stroke="var(--brass-dark)" stroke-width="0.8" opacity="0.5"/>
         <circle cx="300" cy="300" r="262" fill="none" stroke="var(--brass-dark)" stroke-width="0.8" opacity="0.5"/>
         <!-- physical pointers replacing the old digital date readout — ألوان مختلفة تمامًا عن أسهم القبلة/الشمال/الظل، وشكلهم "معين" مش "مثلث" عشان محدش يلخبط بين النوعين -->
-        <g id="hijriMonthHand"><line x1="300" y1="300" x2="300" y2="26" stroke="#8fa8c9" stroke-width="1.4"/><polygon points="300,20 304,26 300,32 296,26" fill="#8fa8c9"/></g>
-        <g id="gregMonthHand"><line x1="300" y1="300" x2="300" y2="42" stroke="#ffd23f" stroke-width="1.8"/><polygon points="300,32 308,42 300,52 292,42" fill="#ffd23f" stroke="#0d1119" stroke-width="0.6"/></g>
+        <g id="hijriMonthHand"><line x1="300" y1="300" x2="300" y2="22" stroke="#8fa8c9" stroke-width="1.4"/><polygon points="300,16 304,22 300,28 296,22" fill="#8fa8c9"/></g>
+        <g id="gregMonthHand"><line x1="300" y1="300" x2="300" y2="38" stroke="#ffd23f" stroke-width="1.8"/><polygon points="300,28 308,38 300,48 292,38" fill="#ffd23f" stroke="#0d1119" stroke-width="0.6"/></g>
         <g font-family="Amiri, serif" font-size="11" fill="var(--brass-light)" text-anchor="middle">
           <text x="300" y="24">محرم</text>
           <text x="440" y="61">صفر</text>
@@ -370,7 +393,7 @@ section.philosophy p{font-size:17px;line-height:1.85;color:var(--ink);margin:0 0
         <!-- zodiac ring — بنفس أسلوب Patek World Time: كل رمز يتبع انحناء الدايرة، مسافات متساوية 30°، وعلامات فاصلة بينهم -->
         <g class="detail-only">
         <circle cx="300" cy="300" r="248" fill="none" stroke="var(--brass-dark)" stroke-width="0.8" opacity="0.55"/>
-        <g font-size="17" fill="var(--brass)" style="font-variant-emoji: text;">
+        <g font-size="14" fill="var(--brass)" style="font-variant-emoji: text;">
           <g transform="rotate(0 300 300)"><text x="300" y="52" text-anchor="middle" dominant-baseline="middle">♈︎</text></g>
           <g transform="rotate(30 300 300)"><text x="300" y="52" text-anchor="middle" dominant-baseline="middle">♉︎</text></g>
           <g transform="rotate(60 300 300)"><text x="300" y="52" text-anchor="middle" dominant-baseline="middle">♊︎</text></g>
@@ -405,19 +428,17 @@ section.philosophy p{font-size:17px;line-height:1.85;color:var(--ink);margin:0 0
         <g id="northPointerHand">
           <line x1="300" y1="300" x2="300" y2="90" stroke="var(--verdigris-light)" stroke-width="2.6" stroke-linecap="round"/>
           <polygon points="300,68 291,91 309,91" fill="var(--verdigris-light)"/>
-          <text x="330" y="86" font-family="Amiri, serif" font-size="13" fill="var(--verdigris-light)">الشمال</text>
         </g>
         <g id="qiblaArrow">
           <line x1="300" y1="300" x2="300" y2="95" stroke="var(--red)" stroke-width="2.6" stroke-linecap="round"/>
           <polygon points="300,72 291,95 309,95" fill="var(--red)"/>
-          <text x="330" y="90" font-family="Amiri, serif" font-size="13" fill="var(--red)">القبلة</text>
         </g>
 
         <!-- اتجاه الظل المتوقع: عكس اتجاه الشمس تمامًا — تحقق فيزيائي حقيقي بدون إنترنت، قارنه بظلك الحقيقي واقف تحت الشمس -->
+        <!-- التسميات (الشمال/القبلة/الظل) اتشالت من جوه المجموعات دي عمدًا — كانت بتدور مع السهم وتقع في أي مكان على القرص حسب زاوية القبلة/البوصلة، وده كان مصدر تداخل غير ثابت صعب تصويره. الألوان موضحة في مفتاح الألوان تحت الساعة بدل كده -->
         <g id="shadowHand">
-          <line x1="300" y1="300" x2="300" y2="100" stroke="#e8a94a" stroke-width="2.6" stroke-linecap="round"/>
-          <polygon points="300,78 291,101 309,101" fill="#e8a94a"/>
-          <text x="330" y="96" font-family="Amiri, serif" font-size="13" fill="#e8a94a">🌞 الظل</text>
+          <line x1="300" y1="300" x2="300" y2="100" stroke="#9b6bcc" stroke-width="2.6" stroke-linecap="round"/>
+          <polygon points="300,78 291,101 309,101" fill="#9b6bcc"/>
         </g>
 
         <!-- star ring: famous fixed stars, real RA/Dec → Alt/Az projection, not decorative rotation -->
@@ -428,65 +449,65 @@ section.philosophy p{font-size:17px;line-height:1.85;color:var(--ink);margin:0 0
 
         <!-- حلقة منازل القمر الـ28 (نظام فلكي عربي تقليدي، أدق من الأبراج الـ12) — نفس أسلوب Patek بتاع الأبراج والمدن: كل اسم يتبع انحناء الدايرة -->
         <g id="mansionsRing" class="detail-only">
-          <circle cx="300" cy="300" r="234" fill="none" stroke="var(--brass-dark)" stroke-width="0.6" opacity="0.4"/>
+          <circle cx="300" cy="300" r="236" fill="none" stroke="var(--brass-dark)" stroke-width="0.6" opacity="0.4"/>
           <g font-family="Amiri, serif" font-size="6.5" fill="var(--verdigris-light)">
-          <g transform="rotate(0.0 300 300)"><text x="300" y="66" text-anchor="middle">الشرطين</text></g>
-          <g transform="rotate(12.857 300 300)"><text x="300" y="66" text-anchor="middle">البطين</text></g>
-          <g transform="rotate(25.714 300 300)"><text x="300" y="66" text-anchor="middle">الثريا</text></g>
-          <g transform="rotate(38.571 300 300)"><text x="300" y="66" text-anchor="middle">الدبران</text></g>
-          <g transform="rotate(51.429 300 300)"><text x="300" y="66" text-anchor="middle">الهقعة</text></g>
-          <g transform="rotate(64.286 300 300)"><text x="300" y="66" text-anchor="middle">الهنعة</text></g>
-          <g transform="rotate(77.143 300 300)"><text x="300" y="66" text-anchor="middle">الذراع</text></g>
-          <g transform="rotate(90.0 300 300)"><text x="300" y="66" text-anchor="middle">النثرة</text></g>
-          <g transform="rotate(102.857 300 300)"><text x="300" y="66" text-anchor="middle">الطرف</text></g>
-          <g transform="rotate(115.714 300 300)"><text x="300" y="66" text-anchor="middle">الجبهة</text></g>
-          <g transform="rotate(128.571 300 300)"><text x="300" y="66" text-anchor="middle">الزبرة</text></g>
-          <g transform="rotate(141.429 300 300)"><text x="300" y="66" text-anchor="middle">الصرفة</text></g>
-          <g transform="rotate(154.286 300 300)"><text x="300" y="66" text-anchor="middle">العواء</text></g>
-          <g transform="rotate(167.143 300 300)"><text x="300" y="66" text-anchor="middle">السماك</text></g>
-          <g transform="rotate(180.0 300 300)"><text x="300" y="66" text-anchor="middle">الغفر</text></g>
-          <g transform="rotate(192.857 300 300)"><text x="300" y="66" text-anchor="middle">الزبانا</text></g>
-          <g transform="rotate(205.714 300 300)"><text x="300" y="66" text-anchor="middle">الإكليل</text></g>
-          <g transform="rotate(218.571 300 300)"><text x="300" y="66" text-anchor="middle">القلب</text></g>
-          <g transform="rotate(231.429 300 300)"><text x="300" y="66" text-anchor="middle">الشولة</text></g>
-          <g transform="rotate(244.286 300 300)"><text x="300" y="66" text-anchor="middle">النعائم</text></g>
-          <g transform="rotate(257.143 300 300)"><text x="300" y="66" text-anchor="middle">البلدة</text></g>
-          <g transform="rotate(270.0 300 300)"><text x="300" y="66" text-anchor="middle">سعد الذابح</text></g>
-          <g transform="rotate(282.857 300 300)"><text x="300" y="66" text-anchor="middle">سعد بلع</text></g>
-          <g transform="rotate(295.714 300 300)"><text x="300" y="66" text-anchor="middle">سعد السعود</text></g>
-          <g transform="rotate(308.571 300 300)"><text x="300" y="66" text-anchor="middle">سعد الأخبية</text></g>
-          <g transform="rotate(321.429 300 300)"><text x="300" y="66" text-anchor="middle">الفرغ المقدم</text></g>
-          <g transform="rotate(334.286 300 300)"><text x="300" y="66" text-anchor="middle">الفرغ المؤخر</text></g>
-          <g transform="rotate(347.143 300 300)"><text x="300" y="66" text-anchor="middle">الرشاء</text></g>
+          <g transform="rotate(0.0 300 300)"><text x="300" y="64" text-anchor="middle">الشرطين</text></g>
+          <g transform="rotate(12.857 300 300)"><text x="300" y="64" text-anchor="middle">البطين</text></g>
+          <g transform="rotate(25.714 300 300)"><text x="300" y="64" text-anchor="middle">الثريا</text></g>
+          <g transform="rotate(38.571 300 300)"><text x="300" y="64" text-anchor="middle">الدبران</text></g>
+          <g transform="rotate(51.429 300 300)"><text x="300" y="64" text-anchor="middle">الهقعة</text></g>
+          <g transform="rotate(64.286 300 300)"><text x="300" y="64" text-anchor="middle">الهنعة</text></g>
+          <g transform="rotate(77.143 300 300)"><text x="300" y="64" text-anchor="middle">الذراع</text></g>
+          <g transform="rotate(90.0 300 300)"><text x="300" y="64" text-anchor="middle">النثرة</text></g>
+          <g transform="rotate(102.857 300 300)"><text x="300" y="64" text-anchor="middle">الطرف</text></g>
+          <g transform="rotate(115.714 300 300)"><text x="300" y="64" text-anchor="middle">الجبهة</text></g>
+          <g transform="rotate(128.571 300 300)"><text x="300" y="64" text-anchor="middle">الزبرة</text></g>
+          <g transform="rotate(141.429 300 300)"><text x="300" y="64" text-anchor="middle">الصرفة</text></g>
+          <g transform="rotate(154.286 300 300)"><text x="300" y="64" text-anchor="middle">العواء</text></g>
+          <g transform="rotate(167.143 300 300)"><text x="300" y="64" text-anchor="middle">السماك</text></g>
+          <g transform="rotate(180.0 300 300)"><text x="300" y="64" text-anchor="middle">الغفر</text></g>
+          <g transform="rotate(192.857 300 300)"><text x="300" y="64" text-anchor="middle">الزبانا</text></g>
+          <g transform="rotate(205.714 300 300)"><text x="300" y="64" text-anchor="middle">الإكليل</text></g>
+          <g transform="rotate(218.571 300 300)"><text x="300" y="64" text-anchor="middle">القلب</text></g>
+          <g transform="rotate(231.429 300 300)"><text x="300" y="64" text-anchor="middle">الشولة</text></g>
+          <g transform="rotate(244.286 300 300)"><text x="300" y="64" text-anchor="middle">النعائم</text></g>
+          <g transform="rotate(257.143 300 300)"><text x="300" y="64" text-anchor="middle">البلدة</text></g>
+          <g transform="rotate(270.0 300 300)"><text x="300" y="64" text-anchor="middle">سعد الذابح</text></g>
+          <g transform="rotate(282.857 300 300)"><text x="300" y="64" text-anchor="middle">سعد بلع</text></g>
+          <g transform="rotate(295.714 300 300)"><text x="300" y="64" text-anchor="middle">سعد السعود</text></g>
+          <g transform="rotate(308.571 300 300)"><text x="300" y="64" text-anchor="middle">سعد الأخبية</text></g>
+          <g transform="rotate(321.429 300 300)"><text x="300" y="64" text-anchor="middle">الفرغ المقدم</text></g>
+          <g transform="rotate(334.286 300 300)"><text x="300" y="64" text-anchor="middle">الفرغ المؤخر</text></g>
+          <g transform="rotate(347.143 300 300)"><text x="300" y="64" text-anchor="middle">الرشاء</text></g>
           </g>
-          <g transform="rotate(-6.429 300 300)"><line x1="300" y1="71" x2="300" y2="61" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
-          <g transform="rotate(6.429 300 300)"><line x1="300" y1="71" x2="300" y2="61" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
-          <g transform="rotate(19.286 300 300)"><line x1="300" y1="71" x2="300" y2="61" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
-          <g transform="rotate(32.143 300 300)"><line x1="300" y1="71" x2="300" y2="61" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
-          <g transform="rotate(45.0 300 300)"><line x1="300" y1="71" x2="300" y2="61" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
-          <g transform="rotate(57.857 300 300)"><line x1="300" y1="71" x2="300" y2="61" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
-          <g transform="rotate(70.714 300 300)"><line x1="300" y1="71" x2="300" y2="61" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
-          <g transform="rotate(83.571 300 300)"><line x1="300" y1="71" x2="300" y2="61" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
-          <g transform="rotate(96.429 300 300)"><line x1="300" y1="71" x2="300" y2="61" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
-          <g transform="rotate(109.286 300 300)"><line x1="300" y1="71" x2="300" y2="61" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
-          <g transform="rotate(122.143 300 300)"><line x1="300" y1="71" x2="300" y2="61" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
-          <g transform="rotate(135.0 300 300)"><line x1="300" y1="71" x2="300" y2="61" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
-          <g transform="rotate(147.857 300 300)"><line x1="300" y1="71" x2="300" y2="61" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
-          <g transform="rotate(160.714 300 300)"><line x1="300" y1="71" x2="300" y2="61" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
-          <g transform="rotate(173.571 300 300)"><line x1="300" y1="71" x2="300" y2="61" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
-          <g transform="rotate(186.429 300 300)"><line x1="300" y1="71" x2="300" y2="61" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
-          <g transform="rotate(199.286 300 300)"><line x1="300" y1="71" x2="300" y2="61" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
-          <g transform="rotate(212.143 300 300)"><line x1="300" y1="71" x2="300" y2="61" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
-          <g transform="rotate(225.0 300 300)"><line x1="300" y1="71" x2="300" y2="61" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
-          <g transform="rotate(237.857 300 300)"><line x1="300" y1="71" x2="300" y2="61" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
-          <g transform="rotate(250.714 300 300)"><line x1="300" y1="71" x2="300" y2="61" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
-          <g transform="rotate(263.571 300 300)"><line x1="300" y1="71" x2="300" y2="61" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
-          <g transform="rotate(276.429 300 300)"><line x1="300" y1="71" x2="300" y2="61" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
-          <g transform="rotate(289.286 300 300)"><line x1="300" y1="71" x2="300" y2="61" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
-          <g transform="rotate(302.143 300 300)"><line x1="300" y1="71" x2="300" y2="61" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
-          <g transform="rotate(315.0 300 300)"><line x1="300" y1="71" x2="300" y2="61" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
-          <g transform="rotate(327.857 300 300)"><line x1="300" y1="71" x2="300" y2="61" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
-          <g transform="rotate(340.714 300 300)"><line x1="300" y1="71" x2="300" y2="61" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
+          <g transform="rotate(-6.429 300 300)"><line x1="300" y1="69" x2="300" y2="59" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
+          <g transform="rotate(6.429 300 300)"><line x1="300" y1="69" x2="300" y2="59" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
+          <g transform="rotate(19.286 300 300)"><line x1="300" y1="69" x2="300" y2="59" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
+          <g transform="rotate(32.143 300 300)"><line x1="300" y1="69" x2="300" y2="59" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
+          <g transform="rotate(45.0 300 300)"><line x1="300" y1="69" x2="300" y2="59" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
+          <g transform="rotate(57.857 300 300)"><line x1="300" y1="69" x2="300" y2="59" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
+          <g transform="rotate(70.714 300 300)"><line x1="300" y1="69" x2="300" y2="59" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
+          <g transform="rotate(83.571 300 300)"><line x1="300" y1="69" x2="300" y2="59" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
+          <g transform="rotate(96.429 300 300)"><line x1="300" y1="69" x2="300" y2="59" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
+          <g transform="rotate(109.286 300 300)"><line x1="300" y1="69" x2="300" y2="59" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
+          <g transform="rotate(122.143 300 300)"><line x1="300" y1="69" x2="300" y2="59" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
+          <g transform="rotate(135.0 300 300)"><line x1="300" y1="69" x2="300" y2="59" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
+          <g transform="rotate(147.857 300 300)"><line x1="300" y1="69" x2="300" y2="59" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
+          <g transform="rotate(160.714 300 300)"><line x1="300" y1="69" x2="300" y2="59" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
+          <g transform="rotate(173.571 300 300)"><line x1="300" y1="69" x2="300" y2="59" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
+          <g transform="rotate(186.429 300 300)"><line x1="300" y1="69" x2="300" y2="59" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
+          <g transform="rotate(199.286 300 300)"><line x1="300" y1="69" x2="300" y2="59" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
+          <g transform="rotate(212.143 300 300)"><line x1="300" y1="69" x2="300" y2="59" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
+          <g transform="rotate(225.0 300 300)"><line x1="300" y1="69" x2="300" y2="59" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
+          <g transform="rotate(237.857 300 300)"><line x1="300" y1="69" x2="300" y2="59" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
+          <g transform="rotate(250.714 300 300)"><line x1="300" y1="69" x2="300" y2="59" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
+          <g transform="rotate(263.571 300 300)"><line x1="300" y1="69" x2="300" y2="59" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
+          <g transform="rotate(276.429 300 300)"><line x1="300" y1="69" x2="300" y2="59" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
+          <g transform="rotate(289.286 300 300)"><line x1="300" y1="69" x2="300" y2="59" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
+          <g transform="rotate(302.143 300 300)"><line x1="300" y1="69" x2="300" y2="59" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
+          <g transform="rotate(315.0 300 300)"><line x1="300" y1="69" x2="300" y2="59" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
+          <g transform="rotate(327.857 300 300)"><line x1="300" y1="69" x2="300" y2="59" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
+          <g transform="rotate(340.714 300 300)"><line x1="300" y1="69" x2="300" y2="59" stroke="var(--brass-dark)" stroke-width="0.5"/></g>
           <!-- مؤشر منزلة القمر الحالية — بيدور حسب خط الطول الفلكي الحقيقي للقمر -->
           <g id="mansionPointer">
             <line x1="300" y1="300" x2="300" y2="240" stroke="#e9e2cf" stroke-width="1.2" opacity="0.85"/>
@@ -534,7 +555,7 @@ section.philosophy p{font-size:17px;line-height:1.85;color:var(--ink);margin:0 0
 
         <!-- moon: full phase cycle, in its own full orbit -->
         <g class="moon-orbit" id="moonOrbit">
-          <g transform="translate(300,100)">
+          <g id="moonBody" transform="translate(300,100)">
             <circle r="10" fill="#e9e2cf"/>
             <!-- نسيج فوهات كثيف وواقعي، مستوحى من قرص القمر في COSMOSIGN — الظل المنزلق (بدقة فلكية مستمرة) هو اللي بيوري أي جزء منه في أي لحظة -->
             <g fill="#c9bfa8" opacity="0.5">
@@ -562,7 +583,7 @@ section.philosophy p{font-size:17px;line-height:1.85;color:var(--ink);margin:0 0
             </g>
             <clipPath id="moonClip"><circle r="10"/></clipPath>
             <g clip-path="url(#moonClip)">
-              <circle class="moon-shadow" id="moonShadow" cx="-10" cy="0" r="10" fill="#12141c"/>
+              <path class="moon-shadow" id="moonShadow" d="" fill="#12141c"/>
             </g>
             <circle r="10" fill="none" stroke="#8a8570" stroke-width="0.6"/>
           </g>
@@ -660,8 +681,8 @@ section.philosophy p{font-size:17px;line-height:1.85;color:var(--ink);margin:0 0
 
         <!-- عقرب الساعة بس فوق الأرقام — عقرب الساعة أقصر أصلاً وبيوصل لمنتصف المسافة تقريبًا فمش بيتقاطع مع الأرقام غالبًا -->
         <g id="hourHand">
-          <polygon points="300,304 307,270 300,230 293,270" fill="#dfe6ec" stroke="#8a9aa5" stroke-width="0.8"/>
-          <line x1="300" y1="300" x2="300" y2="237" stroke="#1a3a4a" stroke-width="1.4"/>
+          <polygon points="300,304 308,245 300,195 292,245" fill="#dfe6ec" stroke="#8a9aa5" stroke-width="0.8"/>
+          <line x1="300" y1="300" x2="300" y2="200" stroke="#1a3a4a" stroke-width="1.6"/>
         </g>
         <circle cx="300" cy="300" r="6" fill="var(--brass-light)" stroke="var(--brass-dark)" stroke-width="1"/>
       </svg>
@@ -680,12 +701,67 @@ section.philosophy p{font-size:17px;line-height:1.85;color:var(--ink);margin:0 0
     <button id="trueSkyBtn" onclick="toggleTrueSky()" style="background:var(--bg-panel);color:var(--verdigris-light);border:1px solid var(--verdigris);padding:9px 18px;border-radius:20px;font-family:'Amiri',serif;font-size:13px;cursor:pointer;white-space:nowrap;margin:0 4px;">🌌 حقيقة السماء</button>
     <button id="verifyBtn" onclick="verifyAgainstInternet()" style="background:var(--bg-panel);color:#f0938a;border:1px solid var(--red);padding:9px 18px;border-radius:20px;font-family:'Amiri',serif;font-size:13px;cursor:pointer;white-space:nowrap;margin:0 4px;">⚖️ الميزان (تحقق)</button>
     <button id="windowScreenBtn" onclick="toggleWindowScreen()" style="background:var(--bg-panel);color:var(--brass-light);border:1px solid var(--brass-dark);padding:9px 18px;border-radius:20px;font-family:'Amiri',serif;font-size:13px;cursor:pointer;white-space:nowrap;margin:0 4px;">🖥️ شاشة ويندوز</button>
+    <button id="threeBodyBtn" onclick="toggleThreeBody()" style="background:var(--bg-panel);color:var(--brass-light);border:1px solid var(--brass);padding:9px 18px;border-radius:20px;font-family:'Amiri',serif;font-size:13px;cursor:pointer;white-space:nowrap;margin:0 4px;">🌍 الأجسام الثلاثة</button>
+    <button id="adhanToggleBtn" onclick="toggleAdhanAlerts()" style="background:var(--bg-panel);color:#f0938a;border:1px solid var(--red);padding:9px 18px;border-radius:20px;font-family:'Amiri',serif;font-size:13px;cursor:pointer;white-space:nowrap;margin:0 4px;">🔔 تفعيل تنبيه الأذان والإقامة</button>
   </div>
+  <p id="adhanStatus" style="text-align:center;color:var(--ink-dim);font-size:11.5px;margin:0 0 4px;min-height:14px;max-width:480px;margin-left:auto;margin-right:auto;"></p>
+  <!-- ===== لوحة الأجسام الثلاثة: الأرض والشمس والقمر — كل الأرقام من Ephemeris الموحّد ومن موقعك ===== -->
+  <div id="threeBodyPanel" style="display:none;max-width:760px;margin:0 auto 24px;padding:0 4px;">
+    <div class="tb-card">
+      <h3 class="tb-title">🌍 ☀️ 🌙 الأجسام الثلاثة</h3>
+      <p class="tb-note">كل رقم هنا بيتحسب لحظيًا من نفس المحرك الفلكي، ومن موقعك: <b id="tbLoc" style="color:var(--brass-light);">—</b></p>
+    </div>
+    <div class="tb-card">
+      <svg id="tbMap" viewBox="0 0 360 180" style="width:100%;height:auto;display:block;border-radius:8px;background:#0d1b2a;" preserveAspectRatio="xMidYMid meet">
+        <rect width="360" height="180" fill="#0d1b2a"/>
+        <g stroke="#1f3247" stroke-width="0.3"><line x1="0" y1="0" x2="0" y2="180"/><line x1="30" y1="0" x2="30" y2="180"/><line x1="60" y1="0" x2="60" y2="180"/><line x1="90" y1="0" x2="90" y2="180"/><line x1="120" y1="0" x2="120" y2="180"/><line x1="150" y1="0" x2="150" y2="180"/><line x1="180" y1="0" x2="180" y2="180"/><line x1="210" y1="0" x2="210" y2="180"/><line x1="240" y1="0" x2="240" y2="180"/><line x1="270" y1="0" x2="270" y2="180"/><line x1="300" y1="0" x2="300" y2="180"/><line x1="330" y1="0" x2="330" y2="180"/><line x1="360" y1="0" x2="360" y2="180"/><line x1="0" y1="0" x2="360" y2="0"/><line x1="0" y1="30" x2="360" y2="30"/><line x1="0" y1="60" x2="360" y2="60"/><line x1="0" y1="90" x2="360" y2="90"/><line x1="0" y1="120" x2="360" y2="120"/><line x1="0" y1="150" x2="360" y2="150"/><line x1="0" y1="180" x2="360" y2="180"/></g>
+        <path d="M12.0,24.4 L13.8,21.7 L23.2,18.7 L39.0,20.3 L47.0,20.6 L52.0,20.0 L64.5,22.0 L72.0,22.0 L82.0,22.0 L85.0,19.0 L90.0,21.0 L94.0,23.0 L92.0,25.8 L86.5,29.0 L85.8,31.2 L87.5,32.8 L92.0,33.7 L95.0,34.7 L97.7,34.9 L98.0,37.1 L100.4,38.5 L101.2,37.2 L101.0,35.5 L102.5,34.0 L102.2,31.5 L101.9,27.7 L105.0,27.7 L108.0,28.8 L110.5,30.0 L112.5,31.4 L115.6,29.6 L118.0,33.0 L120.0,34.5 L123.0,37.0 L124.0,38.5 L120.0,39.8 L114.0,39.8 L111.0,41.8 L115.8,41.2 L115.3,42.2 L114.0,43.0 L115.2,44.0 L118.8,44.3 L120.0,43.7 L116.5,45.4 L114.0,46.4 L113.0,45.2 L110.0,46.3 L109.2,47.4 L110.0,48.3 L108.5,48.6 L106.0,49.4 L106.0,50.6 L104.5,52.0 L104.0,53.0 L104.5,54.8 L102.1,56.1 L100.5,57.0 L99.0,58.2 L98.6,59.7 L99.7,63.0 L99.9,64.3 L99.0,64.8 L97.3,62.1 L97.0,61.0 L96.0,60.0 L94.6,60.3 L92.5,59.7 L90.6,60.0 L91.0,61.0 L89.5,60.8 L88.0,60.4 L86.2,60.3 L85.0,60.8 L82.8,62.4 L82.6,64.1 L82.2,67.5 L82.8,70.0 L83.9,70.8 L85.5,71.8 L88.0,71.4 L89.4,70.1 L89.6,69.0 L92.0,68.5 L93.0,68.5 L92.6,70.5 L91.8,72.5 L91.1,74.2 L92.5,74.1 L96.7,75.0 L96.3,78.0 L96.3,79.1 L97.4,80.5 L100.5,80.4 L102.5,81.4 L101.6,81.8 L100.5,81.1 L99.6,82.7 L97.2,81.8 L96.3,81.6 L94.3,80.0 L94.3,79.0 L92.5,77.1 L90.5,76.6 L87.8,75.5 L85.7,73.8 L83.5,74.2 L80.2,73.2 L78.0,72.1 L74.4,69.4 L74.7,68.5 L73.5,66.8 L70.5,64.5 L69.0,62.1 L67.2,59.0 L65.3,58.1 L65.2,60.0 L67.5,63.0 L69.7,65.8 L70.1,67.1 L68.0,65.2 L65.5,62.3 L64.2,59.7 L62.9,57.5 L61.5,56.0 L59.4,55.4 L58.1,53.4 L57.5,52.3 L56.2,50.6 L55.6,49.6 L55.9,47.2 L56.0,43.8 L55.3,41.6 L57.0,40.8 L53.0,39.0 L50.0,35.5 L47.0,33.5 L44.0,31.5 L40.0,30.2 L36.0,30.0 L32.0,29.5 L29.0,30.8 L26.5,31.0 L24.0,32.5 L20.0,34.5 L17.0,35.2 L21.5,33.5 L23.0,31.3 L19.0,31.3 L18.0,30.0 L15.0,28.5 L14.5,26.0 L19.0,25.6 L13.5,25.4Z M102.7,81.6 L104.5,79.6 L105.2,79.0 L108.0,77.6 L109.0,79.0 L110.0,77.8 L112.0,79.4 L116.0,79.5 L118.1,79.3 L120.0,81.5 L122.0,83.2 L126.0,84.2 L128.0,85.5 L130.0,88.5 L130.0,89.5 L131.5,91.0 L135.5,92.5 L139.0,92.8 L141.5,93.7 L144.8,95.2 L145.2,97.2 L144.5,99.5 L143.0,101.0 L141.5,103.0 L141.0,107.0 L139.7,110.3 L139.0,112.0 L136.8,113.0 L135.0,113.8 L131.5,116.0 L131.4,118.0 L129.5,120.0 L127.5,123.0 L126.5,124.0 L123.8,124.9 L121.6,124.6 L122.5,126.0 L122.5,128.0 L118.0,129.0 L117.8,128.8 L115.0,131.0 L116.3,132.5 L114.5,135.0 L112.5,136.0 L114.5,137.8 L112.0,140.0 L111.0,142.0 L111.5,142.4 L115.0,144.7 L112.0,145.9 L108.0,143.5 L105.5,142.0 L104.5,138.0 L104.5,136.5 L106.2,133.5 L106.6,129.8 L106.8,127.0 L108.4,123.0 L108.5,120.0 L109.6,113.6 L109.8,108.5 L108.5,107.0 L104.0,104.0 L102.9,102.0 L100.5,98.0 L98.7,94.6 L100.0,92.3 L99.5,90.4 L100.1,89.0 L101.3,88.2 L102.5,86.0 L102.7,83.5Z M212.6,60.0 L212.3,58.7 L209.9,58.8 L205.2,58.4 L203.0,57.4 L202.0,57.0 L200.1,58.0 L199.0,59.7 L196.6,58.8 L195.1,57.6 L192.5,57.1 L191.2,56.8 L190.3,56.0 L190.6,54.2 L191.1,53.0 L190.2,52.7 L188.5,53.1 L185.0,53.2 L183.0,53.2 L180.0,54.2 L178.0,54.9 L174.6,54.1 L174.1,54.2 L173.2,56.0 L172.4,56.4 L170.4,59.6 L169.5,61.5 L167.0,62.3 L165.5,63.8 L164.0,66.0 L163.0,69.2 L163.5,71.0 L162.5,75.3 L163.3,76.5 L164.0,78.5 L166.3,80.5 L167.5,82.5 L169.2,83.7 L172.5,85.6 L176.0,84.8 L178.0,85.2 L179.8,84.5 L181.2,83.9 L183.4,83.6 L185.5,85.0 L186.5,85.6 L188.5,85.5 L189.7,86.0 L189.5,87.5 L189.3,89.6 L188.8,90.7 L190.2,93.0 L191.8,94.8 L192.2,96.0 L193.2,98.8 L193.5,102.5 L192.0,106.0 L191.8,107.3 L194.5,112.9 L195.2,116.5 L196.5,118.6 L197.8,122.5 L198.5,124.4 L200.0,124.8 L202.0,124.0 L205.6,124.0 L207.0,123.5 L210.0,121.0 L212.5,118.5 L212.6,116.0 L215.5,114.0 L214.9,109.8 L217.0,108.0 L220.7,104.5 L220.5,101.0 L219.3,96.8 L219.0,95.0 L221.0,92.0 L222.0,90.8 L224.0,88.5 L225.3,88.0 L228.0,85.0 L229.0,82.0 L231.0,79.5 L231.3,78.2 L229.0,78.7 L227.0,78.8 L223.1,78.4 L223.3,77.4 L222.5,76.0 L221.0,75.1 L219.5,74.4 L218.5,72.0 L217.2,70.4 L216.0,68.0 L215.5,66.5 L214.0,64.0 L213.8,62.7 L212.7,60.1Z M174.4,54.0 L171.0,53.0 L171.1,51.3 L171.2,48.9 L170.7,47.0 L172.0,46.3 L178.2,46.6 L178.8,44.0 L175.2,41.6 L178.4,41.3 L178.4,40.3 L180.2,40.5 L181.6,39.1 L183.5,38.6 L184.5,37.6 L186.8,36.6 L188.6,36.1 L188.6,35.0 L188.2,33.2 L190.6,32.3 L190.4,33.6 L190.0,35.0 L190.9,36.0 L193.5,35.6 L194.3,36.1 L198.5,35.2 L201.0,34.7 L201.0,33.0 L204.3,32.7 L204.4,31.5 L203.5,30.8 L208.0,30.5 L209.8,30.0 L204.9,29.8 L202.9,30.2 L201.5,29.1 L201.4,27.0 L205.4,25.0 L205.4,24.5 L202.4,24.3 L201.0,26.0 L197.5,27.5 L197.2,29.3 L198.5,30.4 L196.5,33.0 L195.5,33.9 L192.9,34.5 L192.6,33.5 L191.9,32.3 L190.7,30.5 L190.0,31.0 L188.0,31.9 L185.5,31.1 L185.0,29.0 L186.0,27.5 L190.0,26.4 L192.5,24.0 L194.5,22.2 L196.0,21.4 L199.0,20.0 L204.0,19.0 L208.0,18.9 L211.0,19.6 L213.0,21.0 L221.0,22.5 L224.0,23.5 L223.3,21.4 L233.0,21.5 L240.0,21.0 L248.0,21.5 L250.5,17.0 L253.5,21.5 L260.0,17.5 L267.0,15.5 L280.0,14.0 L284.3,12.3 L293.0,16.3 L308.0,18.0 L320.0,17.5 L330.0,19.0 L340.0,20.5 L350.0,20.0 L360.0,21.1 L360.0,25.0 L357.0,25.5 L359.0,27.5 L353.0,28.5 L350.0,30.0 L343.5,30.0 L342.5,33.5 L340.0,37.0 L336.7,39.0 L336.0,37.0 L336.0,33.0 L340.0,29.5 L335.0,30.7 L323.0,30.8 L321.0,32.0 L317.0,35.5 L320.5,36.5 L321.3,37.0 L320.0,41.5 L315.0,46.5 L311.9,46.9 L309.7,49.0 L307.5,50.5 L309.4,53.0 L309.4,54.8 L306.5,55.5 L306.5,52.4 L305.0,52.0 L304.5,50.2 L301.6,51.1 L302.0,49.2 L299.0,50.8 L297.7,51.1 L298.9,52.5 L299.0,52.7 L302.6,52.6 L300.5,54.0 L299.3,55.0 L301.0,57.5 L302.0,59.2 L301.5,62.0 L299.6,64.5 L297.3,66.5 L294.2,67.7 L290.4,68.8 L288.5,68.4 L286.7,69.3 L285.8,71.0 L288.0,75.0 L289.4,78.0 L287.1,79.7 L284.8,81.4 L284.8,79.7 L283.5,79.4 L281.2,77.3 L280.5,76.7 L279.9,78.0 L279.2,79.5 L280.3,81.6 L281.3,83.1 L283.4,85.5 L283.9,88.7 L283.5,88.6 L281.3,87.3 L280.3,84.6 L280.3,83.5 L278.3,82.0 L278.5,79.5 L278.7,77.0 L277.6,73.5 L276.1,73.2 L274.5,74.0 L274.2,71.5 L272.0,69.0 L271.0,67.5 L269.0,68.3 L267.0,68.8 L266.5,70.0 L265.0,70.7 L263.0,72.5 L260.3,74.5 L260.2,76.9 L259.9,79.0 L259.2,80.7 L257.5,81.9 L256.5,81.0 L255.0,78.0 L254.0,75.0 L253.0,72.5 L252.8,70.9 L252.6,68.5 L252.0,69.2 L251.0,69.3 L249.0,67.7 L250.0,67.0 L248.5,66.5 L247.0,65.2 L246.5,64.6 L243.0,64.8 L241.5,64.9 L238.0,64.4 L237.3,64.2 L236.4,62.9 L234.0,63.4 L232.0,62.4 L230.8,61.1 L228.9,59.6 L228.0,60.1 L228.5,62.0 L229.5,63.0 L230.2,63.8 L230.0,64.7 L230.8,65.0 L231.2,63.9 L231.6,65.5 L232.5,65.8 L234.3,65.6 L235.3,64.7 L236.0,64.0 L236.3,63.6 L236.4,65.5 L238.5,66.4 L239.8,67.5 L238.9,69.5 L237.7,71.0 L235.0,72.8 L232.0,74.0 L229.5,75.3 L228.0,76.0 L225.0,77.2 L223.5,77.3 L223.2,76.2 L222.7,74.5 L222.5,73.1 L221.2,71.0 L219.7,69.0 L219.1,68.5 L218.5,67.0 L218.0,65.9 L216.0,63.5 L215.0,62.0 L214.9,60.5 L214.6,62.1 L214.2,62.3 L213.6,61.8 L213.0,61.0 L212.6,60.1 L212.3,58.7 L214.2,58.7 L214.8,57.9 L215.1,57.0 L215.5,56.0 L215.9,54.5 L216.2,53.4 L214.6,53.3 L212.5,53.9 L210.7,53.1 L209.0,53.4 L207.3,53.0 L207.1,51.6 L206.2,50.0 L206.5,49.4 L205.5,49.1 L203.8,50.0 L202.9,49.4 L202.6,50.5 L203.7,52.1 L202.5,53.6 L201.7,53.0 L201.3,51.7 L200.7,50.5 L199.5,48.7 L199.5,47.8 L198.5,47.5 L196.4,46.5 L194.5,44.8 L193.7,44.5 L192.3,44.6 L192.5,46.0 L193.6,46.5 L196.1,48.1 L198.5,49.9 L197.0,49.5 L197.1,51.0 L195.7,52.1 L195.7,50.5 L194.3,49.2 L192.5,48.4 L190.5,47.0 L188.9,45.6 L187.5,46.2 L185.4,46.8 L183.2,46.8 L183.1,48.0 L180.9,49.3 L179.7,50.6 L180.2,51.3 L179.4,51.9 L177.8,53.3 L175.6,53.3Z M0.0,21.1 L5.0,22.5 L10.3,23.9 L8.0,25.5 L0.0,25.0Z M294.0,111.8 L296.5,110.7 L299.0,110.0 L301.5,109.0 L302.2,108.0 L303.5,106.5 L306.0,104.0 L308.1,105.5 L309.5,104.9 L310.8,102.4 L312.5,101.5 L315.0,102.0 L316.8,102.2 L315.8,105.0 L317.5,106.0 L319.5,107.5 L321.5,107.0 L321.6,103.0 L322.5,100.7 L323.5,104.0 L325.0,105.0 L325.8,106.9 L328.5,110.0 L330.5,112.5 L333.0,115.5 L333.6,118.0 L333.0,121.0 L331.2,123.9 L330.0,127.0 L326.4,129.1 L324.0,128.5 L321.0,128.2 L319.5,126.0 L318.5,124.9 L317.5,124.0 L315.8,124.9 L314.0,122.8 L311.0,121.5 L309.0,121.6 L305.0,122.3 L301.9,123.9 L298.0,125.0 L295.1,124.4 L295.7,122.0 L294.9,119.5 L293.5,116.0 L294.1,114.0 L293.5,112.0Z M324.7,130.7 L328.3,130.9 L328.0,133.2 L326.0,133.6 L324.7,130.7Z M107.0,11.5 L118.0,8.0 L140.0,6.5 L160.0,8.0 L162.0,14.0 L158.0,19.5 L153.0,21.5 L140.0,25.0 L137.0,30.0 L130.0,28.0 L126.5,23.5 L125.0,20.0 L120.0,15.0Z M156.0,24.5 L158.0,23.6 L165.0,23.5 L166.5,25.0 L162.0,26.6 L158.0,26.2Z M174.3,40.0 L177.0,39.4 L181.3,38.9 L181.7,37.3 L180.0,36.5 L178.5,35.0 L178.0,34.0 L178.0,32.3 L176.5,31.4 L175.0,31.4 L174.0,32.5 L174.2,33.5 L175.0,35.0 L177.0,35.2 L177.0,36.6 L175.5,36.7 L175.8,37.5 L174.7,38.1 L177.0,38.5 L175.0,39.5Z M174.0,37.8 L173.8,36.0 L174.5,35.5 L173.5,34.8 L171.7,34.8 L170.0,35.8 L169.7,37.9 L170.5,38.5 L172.0,38.3Z M310.9,56.0 L312.5,54.5 L315.5,54.3 L316.8,52.7 L319.0,52.0 L320.0,49.5 L321.5,48.6 L322.0,50.5 L321.0,52.0 L320.9,54.0 L320.0,55.0 L319.5,54.7 L318.5,55.3 L317.0,55.4 L316.8,55.7 L315.8,56.5 L315.0,55.5 L313.0,55.7 L311.5,56.0Z M320.0,48.5 L321.0,44.7 L321.8,44.6 L325.5,46.7 L323.5,48.0 L321.0,47.6Z M309.7,56.7 L311.0,56.2 L312.0,57.0 L311.5,58.5 L310.5,59.0 L309.7,57.5Z M312.5,56.7 L314.5,55.8 L314.2,56.5 L313.0,57.2Z M322.0,44.0 L323.5,40.5 L323.0,36.5 L322.0,35.7 L321.7,40.0Z M300.2,67.0 L301.0,64.8 L301.9,66.0 L300.9,68.0Z M288.7,70.7 L290.5,70.0 L291.0,71.3 L289.5,71.8Z M259.8,80.5 L261.8,82.5 L261.2,84.0 L259.8,83.5Z M229.3,102.0 L230.4,105.5 L229.4,108.0 L227.5,114.8 L225.2,115.6 L224.0,114.0 L223.3,112.0 L224.5,109.5 L224.3,106.5 L226.3,105.7 L228.0,103.5Z M275.3,84.4 L277.5,84.8 L280.3,87.5 L283.5,90.5 L286.0,93.0 L285.8,95.8 L284.5,95.9 L282.3,94.0 L280.5,91.5 L278.5,88.2 L276.5,86.3Z M285.3,96.8 L288.0,96.3 L290.5,96.9 L294.4,97.7 L294.5,98.7 L290.0,98.2 L286.5,97.5Z M289.0,88.5 L291.0,88.2 L293.0,87.0 L294.5,85.5 L297.0,83.0 L299.0,85.0 L298.0,89.0 L297.5,91.0 L296.0,94.0 L294.5,93.7 L292.0,93.4 L290.2,92.8 L289.3,91.0Z M299.4,95.5 L298.9,92.8 L299.8,89.4 L304.9,88.4 L301.2,90.9 L303.0,94.8 L301.6,94.5 L300.3,92.5Z M311.0,91.0 L314.5,90.8 L318.0,91.7 L321.0,92.6 L325.0,94.5 L327.3,96.0 L330.5,100.4 L326.0,98.2 L323.0,99.2 L321.0,99.1 L318.5,98.2 L318.0,96.0 L315.0,94.5 L313.0,94.0Z M300.4,71.5 L302.2,71.6 L301.6,74.2 L304.0,77.0 L302.5,76.5 L300.7,76.0 L300.0,74.0Z M302.0,83.0 L306.5,80.5 L306.5,83.5 L305.3,84.3 L303.0,82.5Z M352.7,124.4 L354.5,126.5 L356.0,127.5 L358.5,127.7 L357.0,129.5 L355.0,131.5 L354.8,129.5 L353.8,129.2 L354.6,128.0Z M352.7,130.5 L354.3,131.7 L353.0,133.5 L351.2,134.5 L350.5,136.0 L349.0,136.6 L346.5,136.0 L348.0,134.0 L351.5,131.5Z M95.0,68.1 L97.5,66.9 L100.5,67.1 L103.0,68.2 L105.9,69.8 L102.5,70.1 L100.0,68.4 L96.5,68.0Z M105.6,71.6 L107.2,70.1 L110.0,70.2 L111.6,71.4 L110.0,71.8 L108.3,72.3Z M120.7,42.4 L124.0,38.4 L124.5,40.5 L127.3,42.4 L126.5,43.4Z M100.0,27.0 L106.5,25.5 L112.0,27.5 L118.0,23.5 L116.5,22.5 L108.0,18.5 L102.0,17.5 L90.0,16.5 L100.0,20.0 L95.0,23.5Z M89.5,13.5 L103.0,13.0 L118.5,7.5 L108.0,7.0 L90.0,9.0Z M62.0,20.0 L75.0,20.5 L79.0,19.0 L73.0,17.0 L62.0,18.0Z M192.4,52.2 L195.6,51.7 L195.1,53.3Z M188.2,49.0 L189.7,48.8 L189.5,50.8 L188.4,51.0Z M188.6,47.5 L189.4,47.0 L189.5,48.5 L188.8,48.6Z M203.5,54.4 L206.3,54.7 L204.0,55.0Z M212.3,55.0 L214.6,54.4 L213.9,55.4Z M231.5,18.5 L236.0,16.0 L240.0,14.0 L248.5,13.0 L245.0,15.0 L238.0,18.0Z M0.0,180.0 L0.0,169.0 L20.0,168.0 L40.0,165.0 L60.0,164.0 L80.0,163.0 L95.0,163.0 L105.0,162.0 L117.0,155.0 L120.0,154.0 L123.0,153.5 L118.0,156.0 L115.0,159.0 L120.0,163.0 L130.0,168.0 L145.0,167.0 L160.0,162.0 L180.0,160.0 L200.0,160.0 L220.0,158.0 L240.0,157.0 L250.0,158.0 L260.0,157.0 L280.0,156.0 L300.0,156.5 L320.0,156.5 L340.0,160.0 L350.0,162.0 L345.0,168.0 L360.0,168.0 L360.0,180.0Z" fill="#b9a878" stroke="#7c5f30" stroke-width="0.25" stroke-linejoin="round"/>
+        <path d="M209.1,48.8 L208.0,46.8 L208.6,46.0 L209.7,44.8 L210.7,43.5 L213.5,44.0 L215.0,44.7 L217.8,45.3 L219.8,46.6 L221.6,48.4 L219.7,49.0 L216.3,48.7 L215.2,48.0 L211.5,48.9Z M226.8,45.0 L229.0,43.4 L231.5,43.0 L233.0,43.5 L233.0,45.0 L233.0,48.5 L233.5,50.0 L233.0,53.0 L230.5,53.0 L229.0,52.5 L229.0,51.5 L229.5,49.7 L230.0,49.6 L228.5,48.5 L227.5,47.0Z" fill="#0d1b2a" stroke="#7c5f30" stroke-width="0.25"/>
+        <line x1="0" y1="66.56" x2="360" y2="66.56" stroke="#c9a35d" stroke-width="0.25" stroke-dasharray="2 2" opacity="0.6"/>
+        <line x1="0" y1="113.44" x2="360" y2="113.44" stroke="#c9a35d" stroke-width="0.25" stroke-dasharray="2 2" opacity="0.6"/>
+        <line x1="0" y1="90" x2="360" y2="90" stroke="#c9a35d" stroke-width="0.3" opacity="0.7"/>
+        <path id="tbMoonVis" d="" fill="#9fb4d6" opacity="0.13"/>
+        <path id="tbMoonVisLine" d="" fill="none" stroke="#cfd8ec" stroke-width="0.5" stroke-dasharray="2 1.5" opacity="0.85"/>
+        <path id="tbNight" d="" fill="#050a16" opacity="0.6"/>
+        <path id="tbTerm" d="" fill="none" stroke="#f0c85d" stroke-width="0.6"/>
+        <g id="tbKaaba" transform="translate(219.83,68.58) rotate(45)"><rect x="-1.6" y="-1.6" width="3.2" height="3.2" fill="#eddba0" stroke="#0d1119" stroke-width="0.4"/></g>
+        <g id="tbUserMark" transform="translate(0,0)"><circle r="3.2" fill="#ff5b4d" stroke="#ffffff" stroke-width="0.9"/><circle r="6" fill="none" stroke="#ff5b4d" stroke-width="0.5" opacity="0.7"/></g>
+        <g id="tbSunMark" transform="translate(0,0)"><g stroke="#f2c879" stroke-width="0.9">
+          <line x1="0" y1="-6.5" x2="0" y2="-9"/><line x1="0" y1="6.5" x2="0" y2="9"/><line x1="-6.5" y1="0" x2="-9" y2="0"/><line x1="6.5" y1="0" x2="9" y2="0"/>
+          <line x1="-4.6" y1="-4.6" x2="-6.4" y2="-6.4"/><line x1="4.6" y1="-4.6" x2="6.4" y2="-6.4"/><line x1="-4.6" y1="4.6" x2="-6.4" y2="6.4"/><line x1="4.6" y1="4.6" x2="6.4" y2="6.4"/></g>
+          <circle r="4.8" fill="#ffd96b" stroke="#a37a2c" stroke-width="0.6"/></g>
+        <g id="tbMoonMark" transform="translate(0,0)"><circle r="4.6" fill="#e9e2cf"/><path id="tbMoonShadow" d="" fill="#12141c"/><circle r="4.6" fill="none" stroke="#cfd8ec" stroke-width="0.6"/></g>
+      </svg>
+      <p class="tb-note">🔴 موقعك &nbsp;•&nbsp; ☀️ الشمس فوق الرأس &nbsp;•&nbsp; 🌙 القمر فوق الرأس &nbsp;•&nbsp; ◆ الكعبة &nbsp;•&nbsp; الظل = الليل &nbsp;•&nbsp; الخط المنقّط الأبيض = حد المناطق اللي القمر ظاهر فوق أفقها.<br>الخريطة نفسها مبسطة (سواحل تقريبية)، لكن خط الفصل ونقطتي الشمس والقمر محسوبين بدقة فلكية.</p>
+    </div>
+    <div class="tb-card">
+      <svg id="tbDiagram" viewBox="0 0 300 300" style="width:100%;max-width:340px;display:block;margin:0 auto;">
+        <circle cx="150" cy="150" r="132" fill="#0b101d" stroke="#5d4725" stroke-width="1"/>
+        <circle cx="150" cy="150" r="118" fill="none" stroke="#3c3020" stroke-width="0.6" stroke-dasharray="2 3"/>
+        <g transform="rotate(0 150 150)"><line x1="150" y1="18" x2="150" y2="30" stroke="#7c5f30" stroke-width="1"/></g><g transform="rotate(30 150 150)"><line x1="150" y1="18" x2="150" y2="30" stroke="#7c5f30" stroke-width="1"/></g><g transform="rotate(60 150 150)"><line x1="150" y1="18" x2="150" y2="30" stroke="#7c5f30" stroke-width="1"/></g><g transform="rotate(90 150 150)"><line x1="150" y1="18" x2="150" y2="30" stroke="#7c5f30" stroke-width="1"/></g><g transform="rotate(120 150 150)"><line x1="150" y1="18" x2="150" y2="30" stroke="#7c5f30" stroke-width="1"/></g><g transform="rotate(150 150 150)"><line x1="150" y1="18" x2="150" y2="30" stroke="#7c5f30" stroke-width="1"/></g><g transform="rotate(180 150 150)"><line x1="150" y1="18" x2="150" y2="30" stroke="#7c5f30" stroke-width="1"/></g><g transform="rotate(210 150 150)"><line x1="150" y1="18" x2="150" y2="30" stroke="#7c5f30" stroke-width="1"/></g><g transform="rotate(240 150 150)"><line x1="150" y1="18" x2="150" y2="30" stroke="#7c5f30" stroke-width="1"/></g><g transform="rotate(270 150 150)"><line x1="150" y1="18" x2="150" y2="30" stroke="#7c5f30" stroke-width="1"/></g><g transform="rotate(300 150 150)"><line x1="150" y1="18" x2="150" y2="30" stroke="#7c5f30" stroke-width="1"/></g><g transform="rotate(330 150 150)"><line x1="150" y1="18" x2="150" y2="30" stroke="#7c5f30" stroke-width="1"/></g><g transform="rotate(15 150 150)"><text x="150" y="13" text-anchor="middle" font-size="9" fill="#c9a35d" style="font-variant-emoji:text;">♈︎</text></g><g transform="rotate(45 150 150)"><text x="150" y="13" text-anchor="middle" font-size="9" fill="#c9a35d" style="font-variant-emoji:text;">♉︎</text></g><g transform="rotate(75 150 150)"><text x="150" y="13" text-anchor="middle" font-size="9" fill="#c9a35d" style="font-variant-emoji:text;">♊︎</text></g><g transform="rotate(105 150 150)"><text x="150" y="13" text-anchor="middle" font-size="9" fill="#c9a35d" style="font-variant-emoji:text;">♋︎</text></g><g transform="rotate(135 150 150)"><text x="150" y="13" text-anchor="middle" font-size="9" fill="#c9a35d" style="font-variant-emoji:text;">♌︎</text></g><g transform="rotate(165 150 150)"><text x="150" y="13" text-anchor="middle" font-size="9" fill="#c9a35d" style="font-variant-emoji:text;">♍︎</text></g><g transform="rotate(195 150 150)"><text x="150" y="13" text-anchor="middle" font-size="9" fill="#c9a35d" style="font-variant-emoji:text;">♎︎</text></g><g transform="rotate(225 150 150)"><text x="150" y="13" text-anchor="middle" font-size="9" fill="#c9a35d" style="font-variant-emoji:text;">♏︎</text></g><g transform="rotate(255 150 150)"><text x="150" y="13" text-anchor="middle" font-size="9" fill="#c9a35d" style="font-variant-emoji:text;">♐︎</text></g><g transform="rotate(285 150 150)"><text x="150" y="13" text-anchor="middle" font-size="9" fill="#c9a35d" style="font-variant-emoji:text;">♑︎</text></g><g transform="rotate(315 150 150)"><text x="150" y="13" text-anchor="middle" font-size="9" fill="#c9a35d" style="font-variant-emoji:text;">♒︎</text></g><g transform="rotate(345 150 150)"><text x="150" y="13" text-anchor="middle" font-size="9" fill="#c9a35d" style="font-variant-emoji:text;">♓︎</text></g>
+        <circle cx="150" cy="150" r="64" fill="none" stroke="#39485d" stroke-width="0.8" stroke-dasharray="3 3"/>
+        <g id="tbSunG"><line x1="150" y1="150" x2="150" y2="52" stroke="#c9a35d" stroke-width="0.8" stroke-dasharray="3 3" opacity="0.7"/>
+          <g transform="translate(150,52)"><g stroke="#f2c879" stroke-width="1.6"><line x1="0" y1="-13" x2="0" y2="-18"/><line x1="0" y1="13" x2="0" y2="18"/><line x1="-13" y1="0" x2="-18" y2="0"/><line x1="13" y1="0" x2="18" y2="0"/><line x1="-9.2" y1="-9.2" x2="-12.7" y2="-12.7"/><line x1="9.2" y1="-9.2" x2="12.7" y2="-12.7"/><line x1="-9.2" y1="9.2" x2="-12.7" y2="12.7"/><line x1="9.2" y1="9.2" x2="12.7" y2="12.7"/></g>
+          <circle r="10" fill="#ffd96b" stroke="#a37a2c" stroke-width="1"/></g></g>
+        <g id="tbMoonG"><g id="tbMoonIcon" transform="translate(150,86)"><circle r="9" fill="#e9e2cf"/><path id="tbDiagMoonShadow" d="" fill="#12141c"/><circle r="9" fill="none" stroke="#cfd8ec" stroke-width="0.8"/></g></g>
+        <circle cx="150" cy="150" r="15" fill="#1d4a5c" stroke="#9ab8ad" stroke-width="1"/>
+        <path d="M141 146q5-7 11-2l4-3 5 4-4 5-8-2-5 3z" fill="#39774a" opacity="0.9"/><path d="M145 156l7-3 7 3-2 6-9 1z" fill="#3b7d4e" opacity="0.9"/>
+        <g id="tbZenithG"><line x1="150" y1="135" x2="150" y2="118" stroke="#ff5b4d" stroke-width="1.6"/><circle cx="150" cy="133" r="3" fill="#ff5b4d" stroke="#fff" stroke-width="0.8"/></g>
+      </svg>
+      <p class="tb-note">مشهد من فوق: الأرض في المركز والأبراج على الحلقة (٠° = نقطة الاعتدال الربيعي). ☀️ الشمس و🌙 القمر في مواضعهم الفعلية، ووجه القمر المضاء بيبص ناحية الشمس. 🔴 اتجاه سمتك على الأرض (تقريبي): لما يبقى ناحية الشمس يبقى الظهر عندك.<br><b id="tbElongLine" style="color:var(--brass-light);">—</b></p>
+    </div>
+    <div class="tb-grid">
+      <div class="tb-card tb-body"><h4 style="color:#7fb3a8;">🌍 الأرض</h4><div id="tbEarth"></div></div>
+      <div class="tb-card tb-body"><h4 style="color:#f2c879;">☀️ الشمس</h4><div id="tbSun"></div></div>
+      <div class="tb-card tb-body"><h4 style="color:#cfd8ec;">🌙 القمر</h4><div id="tbMoon"></div></div>
+    </div>
+  </div>
+
   <p id="trueSkyStatus" style="text-align:center;color:var(--ink-dim);font-size:12px;margin:0 0 4px;min-height:16px;"></p>
   <p id="verifyStatus" style="text-align:center;color:var(--ink-dim);font-size:12px;margin:0 0 20px;min-height:16px;"></p>
 
   <!-- لوحة إلكترونية بكل معطيات الساعة — منظّمة في أقسام: الوقت، الإسلامي، الفلكي، الطقس -->
-  <div style="max-width:720px;margin:0 auto 30px;background:var(--bg-panel);border:1px solid var(--panel-border,rgba(201,163,93,0.22));border-radius:12px;padding:18px;">
+  <div id="dataPanelMain" style="max-width:720px;margin:0 auto 30px;background:var(--bg-panel);border:1px solid var(--panel-border,rgba(201,163,93,0.22));border-radius:12px;padding:18px;">
     <h3 style="font-family:'Amiri',serif;color:var(--brass-light);text-align:center;margin:0 0 14px;font-size:17px;">لوحة البيانات الإلكترونية</h3>
 
     <h4 style="font-family:'Amiri',serif;color:var(--verdigris-light);text-align:right;margin:0 0 8px;font-size:14px;border-bottom:1px solid rgba(201,163,93,0.2);padding-bottom:4px;">🕐 الوقت والتاريخ</h4>
@@ -729,13 +805,14 @@ section.philosophy p{font-size:17px;line-height:1.85;color:var(--ink);margin:0 0
 
     <h4 style="font-family:'Amiri',serif;color:var(--verdigris-light);text-align:right;margin:0 0 8px;font-size:14px;border-bottom:1px solid rgba(201,163,93,0.2);padding-bottom:4px;">🌙 فلكي</h4>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;font-family:'EB Garamond',serif;font-size:13.5px;margin-bottom:18px;">
-      <div style="background:rgba(0,0,0,0.2);padding:10px;border-radius:6px;text-align:center;"><div style="color:var(--verdigris-light);font-family:'Amiri',serif;font-size:12px;">طور القمر</div><svg id="moonPhaseIcon" viewBox="0 0 40 40" style="width:34px;height:34px;margin:4px auto 0;display:block;"><circle cx="20" cy="20" r="15" fill="#e9e2cf"/><clipPath id="moonPhaseClip"><circle cx="20" cy="20" r="15"/></clipPath><circle id="moonPhaseShadow" clip-path="url(#moonPhaseClip)" cx="5" cy="20" r="15" fill="#161c2c"/><circle cx="20" cy="20" r="15" fill="none" stroke="#8a8570" stroke-width="0.8"/></svg><div id="dataMoon" style="color:var(--brass-light);font-size:14px;margin-top:4px;">—</div></div>
+      <div style="background:rgba(0,0,0,0.2);padding:10px;border-radius:6px;text-align:center;"><div style="color:var(--verdigris-light);font-family:'Amiri',serif;font-size:12px;">طور القمر</div><svg id="moonPhaseIcon" viewBox="0 0 40 40" style="width:34px;height:34px;margin:4px auto 0;display:block;"><circle cx="20" cy="20" r="15" fill="#e9e2cf"/><clipPath id="moonPhaseClip"><circle cx="20" cy="20" r="15"/></clipPath><path id="moonPhaseShadow" d="" fill="#161c2c"/><circle cx="20" cy="20" r="15" fill="none" stroke="#8a8570" stroke-width="0.8"/></svg><div id="dataMoon" style="color:var(--brass-light);font-size:14px;margin-top:4px;">—</div></div>
       <div style="background:rgba(0,0,0,0.2);padding:10px;border-radius:6px;text-align:center;"><div style="color:var(--verdigris-light);font-family:'Amiri',serif;font-size:12px;">منزلة القمر</div><div id="dataMansion" style="color:var(--brass-light);font-size:14px;margin-top:4px;">—</div></div>
       <div style="background:rgba(0,0,0,0.2);padding:10px;border-radius:6px;text-align:center;"><div style="color:var(--verdigris-light);font-family:'Amiri',serif;font-size:12px;">شروق/غروب القمر</div><div id="dataMoonRiseSet" style="color:var(--brass-light);font-size:13px;margin-top:4px;">—</div></div>
       <div style="background:rgba(0,0,0,0.2);padding:10px;border-radius:6px;text-align:center;"><div style="color:var(--verdigris-light);font-family:'Amiri',serif;font-size:12px;">معادلة الزمن</div><div id="dataEot" style="color:var(--brass-light);font-size:14px;margin-top:4px;">—</div></div>
       <div style="background:rgba(0,0,0,0.2);padding:10px;border-radius:6px;text-align:center;"><div style="color:var(--verdigris-light);font-family:'Amiri',serif;font-size:12px;">البرج الشمسي</div><div id="dataZodiac" style="color:var(--brass-light);font-size:14px;margin-top:4px;">—</div></div>
       <div style="background:rgba(0,0,0,0.2);padding:10px;border-radius:6px;text-align:center;"><div style="color:var(--verdigris-light);font-family:'Amiri',serif;font-size:12px;">طول اليوم</div><div id="dataDayLength" style="color:var(--brass-light);font-size:14px;margin-top:4px;">—</div></div>
       <div style="grid-column:1/-1;background:rgba(0,0,0,0.2);padding:10px;border-radius:6px;text-align:center;"><div style="color:var(--verdigris-light);font-family:'Amiri',serif;font-size:12px;">الشفق (مدني • فلكي)</div><div id="dataTwilight" style="color:var(--brass-light);font-size:13px;margin-top:4px;">—</div></div>
+      <div style="background:rgba(0,0,0,0.2);padding:10px;border-radius:6px;text-align:center;"><div style="color:var(--verdigris-light);font-family:'Amiri',serif;font-size:12px;">التوربيون الزخرفي</div><div id="dataTourbillon" style="color:var(--brass-light);font-size:14px;margin-top:4px;">—</div></div>
     </div>
 
     <h4 style="font-family:'Amiri',serif;color:var(--verdigris-light);text-align:right;margin:0 0 8px;font-size:14px;border-bottom:1px solid rgba(201,163,93,0.2);padding-bottom:4px;">🌤️ الطقس</h4>
@@ -762,6 +839,30 @@ section.philosophy p{font-size:17px;line-height:1.85;color:var(--ink);margin:0 0
       <button id="lockLocationBtn" onclick="toggleLocationLock()" style="background:var(--bg-panel);color:var(--verdigris-light);border:1px solid var(--verdigris);padding:7px 16px;border-radius:16px;font-family:'Amiri',serif;font-size:12.5px;cursor:pointer;">🔓 ثبّت هذا الموقع (لو صح)</button>
     </div>
     <p id="locationLockStatus" style="font-size:11.5px;color:var(--ink-dim);margin-top:6px;min-height:14px;"></p>
+    <div style="margin-top:10px;">
+      <button id="manualLocBtn" onclick="toggleManualLocation()" style="background:var(--bg-panel);color:var(--brass-light);border:1px solid var(--brass-dark);padding:7px 16px;border-radius:16px;font-family:'Amiri',serif;font-size:12.5px;cursor:pointer;">✏️ حدد الموقع يدويًا (بدون GPS)</button>
+    </div>
+    <div id="manualLocPanel" style="display:none;margin-top:12px;text-align:right;">
+      <div style="font-family:'Amiri',serif;color:var(--brass-light);font-size:13px;margin-bottom:8px;">🔍 اكتب اسم مدينتك (أدق وأسهل طريقة):</div>
+      <div style="display:flex;gap:6px;">
+        <input id="manualLocSearchInput" type="text" placeholder="مثال: Jeddah, Riyadh, Muhayil..." style="flex:1;background:#0b0f17;border:1px solid var(--brass-dark);border-radius:8px;padding:8px 10px;color:var(--brass-light);font-family:'Amiri',serif;font-size:13px;">
+        <button onclick="searchCityForManualLocation()" style="background:var(--verdigris);color:#0a0c12;border:none;padding:8px 14px;border-radius:8px;font-family:'Amiri',serif;font-size:13px;cursor:pointer;">بحث</button>
+      </div>
+      <div id="manualLocResults" style="margin-top:8px;"></div>
+      <div style="margin-top:12px;text-align:center;">
+        <button onclick="toggleAdvancedCoords()" style="background:none;color:var(--ink-dim);border:none;font-family:'Amiri',serif;font-size:11.5px;cursor:pointer;text-decoration:underline;">خيارات متقدمة: إدخال إحداثيات مباشرة ▾</button>
+      </div>
+      <div id="advancedCoordsPanel" style="display:none;margin-top:10px;">
+        <div style="height:1px;background:rgba(201,163,93,0.2);margin:0 0 12px;"></div>
+        <div style="font-family:'Amiri',serif;color:var(--ink-dim);font-size:12px;margin-bottom:6px;">لو عندك إحداثيات دقيقة موثوقة (من خرائط جوجل مثلًا):</div>
+        <div style="display:flex;gap:6px;">
+          <input id="manualLatInput" type="number" step="0.0001" placeholder="خط العرض Lat" style="flex:1;background:#0b0f17;border:1px solid var(--brass-dark);border-radius:8px;padding:8px 10px;color:var(--brass-light);font-family:'EB Garamond',serif;font-size:13px;">
+          <input id="manualLonInput" type="number" step="0.0001" placeholder="خط الطول Lon" style="flex:1;background:#0b0f17;border:1px solid var(--brass-dark);border-radius:8px;padding:8px 10px;color:var(--brass-light);font-family:'EB Garamond',serif;font-size:13px;">
+          <button onclick="setManualCoordinates()" style="background:var(--brass);color:#0a0c12;border:none;padding:8px 14px;border-radius:8px;font-family:'Amiri',serif;font-size:13px;cursor:pointer;">تعيين</button>
+        </div>
+      </div>
+      <p id="manualLocStatus" style="font-size:11.5px;color:var(--verdigris-light);margin-top:8px;"></p>
+    </div>
   </div>
 
   <div style="text-align:center;margin:0 0 20px;">
@@ -803,7 +904,11 @@ section.philosophy p{font-size:17px;line-height:1.85;color:var(--ink);margin:0 0
   <div class="legend">
     <div class="legend-item">
       <h3><span class="mark" style="background:#a4453a"></span>مفتاح الأسهم الخمسة من المركز</h3>
-      <p><b style="color:#a4453a">أحمر</b> = القبلة · <b style="color:#7fb3a8">تركوازي</b> = الشمال (يتحرك مع البوصلة الحقيقية) · <b style="color:#e8a94a">برتقالي</b> = اتجاه الظل المتوقع (قارنه بظلك الحقيقي تحت الشمس) · <b style="color:#8fa8c9">أزرق فاتح</b> = مؤشر التاريخ الهجري · <b style="color:#ffd23f">أصفر واضح</b> = مؤشر التاريخ الميلادي (ثابت مع البوصلة عمدًا، لأنه بيتحرك مع التاريخ مش مع اتجاهك). كل سهم له شكل ولون ثابت لا يتكرر في أي عنصر تاني بالساعة.</p>
+      <p><b style="color:#a4453a">أحمر</b> = القبلة · <b style="color:#7fb3a8">تركوازي</b> = الشمال (يتحرك مع البوصلة الحقيقية) · <b style="color:#9b6bcc">بنفسجي</b> = اتجاه الظل المتوقع (قارنه بظلك الحقيقي تحت الشمس) · <b style="color:#8fa8c9">أزرق فاتح</b> = مؤشر التاريخ الهجري · <b style="color:#ffd23f">أصفر واضح</b> = مؤشر التاريخ الميلادي (ثابت مع البوصلة عمدًا، لأنه بيتحرك مع التاريخ مش مع اتجاهك). كل سهم له شكل ولون ثابت لا يتكرر في أي عنصر تاني بالساعة.</p>
+    </div>
+    <div class="legend-item">
+      <h3><span class="mark" style="background:#eddba0"></span>رموز مواقيت الصلاة على حزام النهار/الليل</h3>
+      <p><b style="color:#eddba0">▲ سهم صغير طالع من خط أفق</b> = الفجر · <b style="color:#f7d978">دائرة صفراء ممتلئة</b> = الظهر (الشمس في أعلى نقطة) · <b style="color:#e8a94a">دائرة برتقالية بظل مائل</b> = العصر · <b style="color:#c1613f">نص دائرة حمراء غاطسة</b> = المغرب (الشمس بتغيب) · <b style="color:#eddba0">✦ بريق نجمي رباعي</b> = العشاء. الرموز دي صغيرة عمدًا وموزعة على القوس الذهبي/الداكن حسب وقت كل صلاة الفعلي، مش زخرفة ثابتة.</p>
     </div>
     <div class="legend-item">
       <h3><span class="mark" style="background:#1d4a5c"></span>الأرض — المركز</h3>
@@ -895,29 +1000,14 @@ class AstroMath {
     const start = new Date(date.getFullYear(),0,0);
     return Math.floor((date - start)/86400000);
   }
-  // البرج الشمسي الحالي — بحدود التواريخ التقليدية المعروفة (Tropical zodiac)
+  // البرج الشمسي الحالي (الاستوائي) — من خط الطول الفلكي الفعلي للشمس، مش من حدود تواريخ ثابتة
   static zodiacSignOf(date){
-    const m = date.getMonth()+1, d = date.getDate();
-    const signs = [
-      [1,20,'الجدي'],[2,19,'الدلو'],[3,21,'الحوت'],[4,20,'الحمل'],[5,21,'الثور'],
-      [6,21,'الجوزاء'],[7,23,'السرطان'],[8,23,'الأسد'],[9,23,'العذراء'],[10,23,'الميزان'],
-      [11,22,'العقرب'],[12,22,'القوس'],[12,32,'الجدي']
-    ];
-    for (const [mm,dd,name] of signs){ if (m<mm || (m===mm && d<dd)) return name; }
-    return 'الجدي';
+    const names = ['الحمل','الثور','الجوزاء','السرطان','الأسد','العذراء','الميزان','العقرب','القوس','الجدي','الدلو','الحوت'];
+    return names[Math.floor(Ephemeris.sun(date).lon/30)%12];
   }
-  static equationOfTimeMinutes(date){
-    const N = AstroMath.dayOfYear(date);
-    const B = (2*Math.PI/365)*(N-81);
-    return 9.87*Math.sin(2*B) - 7.53*Math.cos(B) - 1.5*Math.sin(B);
-  }
-  static moonAgeDays(date){
-    const knownNewMoon = Date.UTC(2000,0,6,18,14,0);
-    let diff = (date.getTime() - knownNewMoon)/86400000;
-    let age = diff % AstroMath.SYNODIC;
-    if(age < 0) age += AstroMath.SYNODIC;
-    return age;
-  }
+  static equationOfTimeMinutes(date){ return Ephemeris.sun(date).eqMin; }
+  // عمر القمر مبني على الاستطالة الفعلية عن الشمس (اتساق كامل مع الهندسة الحقيقية)
+  static moonAgeDays(date){ return Ephemeris.moonPhase(date).age; }
   static dayArcAngle(dayIndex){
     return -80 + dayIndex*(160/6); // retrograde: Sunday=-80°, Saturday=+80°, snaps back
   }
@@ -941,6 +1031,127 @@ class AstroMath {
   static timeToAngle(minutes){
     return ((minutes % 1440) + 1440) % 1440 / 1440 * 360 - 180;
   }
+}
+
+// ============================================================
+// Ephemeris — المصدر الفلكي الموحّد (الشمس والقمر والأرض)
+// معادلات Schlyter المستمرة في الزمن (بدون خطوات يومية). اتفحصت على أحداث معروفة:
+// الشمس: ميل عند الاعتدالين/الانقلابين ≤ 0.005° — القمر: خط الطول ≤ 0.05° عند المحاق/البدر
+// ============================================================
+class Ephemeris {
+  static D(d){ return AstroMath.jdOf(d) - 2451543.5; }                 // أيام منذ 1999-12-31 00:00 UT
+  static obliquity(d){ return 23.4393 - 3.563E-7*Ephemeris.D(d); }    // ميل محور الأرض (درجة)
+  static gmst(d){
+    const jd = AstroMath.jdOf(d), T = (jd-2451545)/36525;
+    return AstroMath.normDeg(280.46061837 + 360.98564736629*(jd-2451545) + 0.000387933*T*T - T*T*T/38710000);
+  }
+  static kepler(Mdeg, e){
+    const Mr = Mdeg*AstroMath.DEGR;
+    let E = Mr + e*Math.sin(Mr)*(1+e*Math.cos(Mr));
+    for (let i=0;i<8;i++){ const dE = (E - e*Math.sin(E) - Mr)/(1 - e*Math.cos(E)); E -= dE; if (Math.abs(dE)<1e-10) break; }
+    return E;
+  }
+  // الشمس: خط الطول الفلكي، الصعود المستقيم والميل (درجة)، المسافة (وحدة فلكية)، معادلة الزمن (دقيقة)
+  static sun(d){
+    const D = Ephemeris.D(d), k = AstroMath.DEGR, n = AstroMath.normDeg;
+    const w = 282.9404 + 4.70935E-5*D, e = 0.016709 - 1.151E-9*D, M = n(356.0470 + 0.9856002585*D);
+    const E = Ephemeris.kepler(M, e);
+    const xv = Math.cos(E) - e, yv = Math.sqrt(1-e*e)*Math.sin(E);
+    const lon = n(Math.atan2(yv,xv)*AstroMath.RADD + w), dist = Math.hypot(xv,yv);
+    const eps = Ephemeris.obliquity(d)*k;
+    const ra = n(Math.atan2(Math.cos(eps)*Math.sin(lon*k), Math.cos(lon*k))*AstroMath.RADD);
+    const dec = Math.asin(Math.sin(eps)*Math.sin(lon*k))*AstroMath.RADD;
+    let eq = n(w + M - 0.0057183 - ra); if (eq > 180) eq -= 360;      // (خط الطول المتوسط − الصعود المستقيم)
+    return { lon, ra, dec, dist, eqMin: eq*4 };
+  }
+  // القمر: خط الطول/العرض الفلكي، الصعود المستقيم والميل (درجة)، المسافة (نصف قطر أرضي) — مع التصحيحات الدورية الصحيحة
+  static moon(d){
+    const D = Ephemeris.D(d), k = AstroMath.DEGR, n = AstroMath.normDeg;
+    const N = n(125.1228 - 0.0529538083*D), inc = 5.1454, w = n(318.0634 + 0.1643573223*D);
+    const a = 60.2666, e = 0.0549, M = n(115.3654 + 13.0649929509*D);
+    const E = Ephemeris.kepler(M, e);
+    const xv = a*(Math.cos(E)-e), yv = a*Math.sqrt(1-e*e)*Math.sin(E);
+    const v = Math.atan2(yv,xv), r0 = Math.hypot(xv,yv), vw = v + w*k;
+    const xh = r0*(Math.cos(N*k)*Math.cos(vw) - Math.sin(N*k)*Math.sin(vw)*Math.cos(inc*k));
+    const yh = r0*(Math.sin(N*k)*Math.cos(vw) + Math.cos(N*k)*Math.sin(vw)*Math.cos(inc*k));
+    const zh = r0*Math.sin(vw)*Math.sin(inc*k);
+    let lon = n(Math.atan2(yh,xh)/k), lat = Math.atan2(zh, Math.hypot(xh,yh))/k, dist = r0;
+    const Ms = n(356.0470 + 0.9856002585*D), ws = 282.9404 + 4.70935E-5*D;
+    const Ls = n(Ms + ws), Lm = n(M + w + N), Dm = Lm - Ls, F = Lm - N;
+    const s = x => Math.sin(x*k), c = x => Math.cos(x*k);
+    lon = n(lon - 1.274*s(M-2*Dm) + 0.658*s(2*Dm) - 0.186*s(Ms) - 0.059*s(2*M-2*Dm) - 0.057*s(M-2*Dm+Ms)
+              + 0.053*s(M+2*Dm) + 0.046*s(2*Dm-Ms) + 0.041*s(M-Ms) - 0.035*s(Dm) - 0.031*s(M+Ms)
+              - 0.015*s(2*F-2*Dm) + 0.011*s(M-4*Dm));
+    lat += -0.173*s(F-2*Dm) - 0.055*s(M-F-2*Dm) - 0.046*s(M+F-2*Dm) + 0.033*s(F+2*Dm) + 0.017*s(2*M+F);
+    dist += -0.58*c(M-2*Dm) - 0.46*c(2*Dm);
+    const eps = Ephemeris.obliquity(d)*k;
+    const x = Math.cos(lon*k)*Math.cos(lat*k), y = Math.sin(lon*k)*Math.cos(lat*k), z = Math.sin(lat*k);
+    const ye = y*Math.cos(eps) - z*Math.sin(eps), ze = y*Math.sin(eps) + z*Math.cos(eps);
+    return { lon, lat, dist, ra: n(Math.atan2(ye,x)/k), dec: Math.atan2(ze, Math.hypot(x,ye))/k };
+  }
+  // ارتفاع وسمت (هندسي، من مركز الأرض) لجرم معروف الصعود المستقيم والميل — السمت من الشمال باتجاه الشرق
+  static altAz(raDeg, decDeg, d, latDeg, lonDeg){
+    const k = AstroMath.DEGR;
+    const H = (Ephemeris.gmst(d) + lonDeg - raDeg)*k, ph = latDeg*k, de = decDeg*k;
+    const alt = Math.asin(Math.sin(ph)*Math.sin(de) + Math.cos(ph)*Math.cos(de)*Math.cos(H))*AstroMath.RADD;
+    const az = AstroMath.normDeg(Math.atan2(Math.sin(H), Math.cos(H)*Math.sin(ph) - Math.tan(de)*Math.cos(ph))*AstroMath.RADD + 180);
+    return { alt, az };
+  }
+  static normLon(x){ x = AstroMath.normDeg(x + 180) - 180; return x; }
+  // الأيانامسا (لاهيري تقريبًا): الفرق بين الفلك النجمي (اللي بتتحدد عليه المنازل بالنجوم) والفلك الاستوائي، بيزيد ~50″ في السنة
+  static ayanamsa(d){ const y = 2000 + (AstroMath.jdOf(d) - 2451545)/365.25; return 23.853 + 0.0139697*(y - 2000); }
+  // النقطة اللي الجرم فوق الرأس بالظبط عندها على الأرض (خط العرض = الميل، خط الطول = الصعود المستقيم − الزمن النجمي)
+  static subSolar(d){ const s = Ephemeris.sun(d); return { lat: s.dec, lon: Ephemeris.normLon(s.ra - Ephemeris.gmst(d)) }; }
+  static subLunar(d){ const m = Ephemeris.moon(d); return { lat: m.dec, lon: Ephemeris.normLon(m.ra - Ephemeris.gmst(d)) }; }
+  static PHASE_NAMES = ['محاق','هلال متزايد','تربيع أول','أحدب متزايد','بدر','أحدب متناقص','تربيع أخير','هلال متناقص'];
+  // طور القمر من الهندسة الفعلية (الاستطالة عن الشمس)، مش من عمر متوسط
+  static moonPhase(d){
+    const s = Ephemeris.sun(d), m = Ephemeris.moon(d), k = AstroMath.DEGR;
+    const elong = AstroMath.normDeg(m.lon - s.lon);
+    const psi = Math.acos(Math.max(-1, Math.min(1, Math.cos(m.lat*k)*Math.cos(elong*k))));   // الزاوية الفعلية بين الشمس والقمر في السماء
+    const R = s.dist*23454.78;                                                                // بعد الشمس بنصف القطر الأرضي
+    const inc = Math.atan2(R*Math.sin(psi), m.dist - R*Math.cos(psi));                        // زاوية الطور (شمس-قمر-أرض)
+    const illum = (1 + Math.cos(inc))/2;
+    const idx = Math.round(elong/45)%8;
+    return { illum, elong, psi: psi*AstroMath.RADD, waxing: elong < 180, age: elong/360*AstroMath.SYNODIC, idx, name: Ephemeris.PHASE_NAMES[idx] };
+  }
+  // مسار الجزء المظلم من قرص القمر (المركز 0,0 ونصف القطر R): نصف دايرة الحافة + نصف قطع ناقص حقيقي لخط الفصل
+  static moonDarkPath(R, illum, waxing){
+    const xt = R*(1 - 2*illum), rx = Math.abs(xt);
+    return { d: 'M 0 '+(-R)+' A '+R+' '+R+' 0 0 0 0 '+R+' A '+rx.toFixed(3)+' '+R+' 0 0 '+(xt>0?0:1)+' 0 '+(-R)+' Z', flip: !waxing };
+  }
+  // أقرب لحظة جاية فيها (خط طول القمر − خط طول الشمس) = target (0 اقتران/محاق، 180 استقبال/بدر)
+  static nextElongation(d, target){
+    const f = t => { let x = AstroMath.normDeg(Ephemeris.moon(t).lon - Ephemeris.sun(t).lon - target); return x > 180 ? x - 360 : x; };
+    let t0 = d.getTime(), f0 = f(new Date(t0)); const step = 3*3600000;
+    for (let i=0;i<270;i++){
+      const t1 = t0 + step, f1 = f(new Date(t1));
+      if (f0 < 0 && f1 >= 0){ let a=t0, b=t1; for (let j=0;j<32;j++){ const m=(a+b)/2; if (f(new Date(m))<0) a=m; else b=m; } return new Date((a+b)/2); }
+      t0 = t1; f0 = f1;
+    }
+    return null;
+  }
+  // الاعتدال/الانقلاب الجاي (عبور خط طول الشمس مضاعفات 90°)
+  static nextSeasonEvent(d){
+    const names = ['اعتدال الربيع (مارس)','انقلاب الصيف (يونيو)','اعتدال الخريف (سبتمبر)','انقلاب الشتاء (ديسمبر)'];
+    const idx = (Math.floor(Ephemeris.sun(d).lon/90)+1)%4, target = idx*90;
+    const f = t => { let x = AstroMath.normDeg(Ephemeris.sun(t).lon - target); return x > 180 ? x - 360 : x; };
+    let t0 = d.getTime(), f0 = f(new Date(t0)); const step = 6*3600000;
+    for (let i=0;i<400;i++){
+      const t1 = t0 + step, f1 = f(new Date(t1));
+      if (f0 < 0 && f1 >= 0){ let a=t0, b=t1; for (let j=0;j<32;j++){ const m=(a+b)/2; if (f(new Date(m))<0) a=m; else b=m; } return { name: names[idx], date: new Date((a+b)/2) }; }
+      t0 = t1; f0 = f1;
+    }
+    return null;
+  }
+}
+
+// تطبيق شكل الطور الحقيقي على أي أيقونة قمر (مسار المنطقة المظلمة، مش دايرة مزاحة)
+function applyMoonShadow(id, R, ph, cx, cy){
+  const el = document.getElementById(id); if (!el) return;
+  const p = Ephemeris.moonDarkPath(R, ph.illum, ph.waxing);
+  el.setAttribute('d', p.d);
+  el.setAttribute('transform', 'translate('+(cx||0)+' '+(cy||0)+')'+(p.flip?' scale(-1 1)':''));
 }
 
 // ============================================================
@@ -1114,20 +1325,8 @@ class Observer {
     const h = Math.floor(mins/60), m = Math.round(mins%60);
     return h+' س '+m+' د';
   }
-  // أوقات الشفق المدني (-6°) والفلكي (-18°) — امتداد طبيعي لنفس معادلة الفجر عندنا
-  twilightTimes(d){
-    return {
-      civilDawn: this.sunTimes(d).noon - 4*this.altHa(d,-6),
-      civilDusk: this.sunTimes(d).noon + 4*this.altHa(d,-6),
-      astroDawn: this.sunTimes(d).noon - 4*this.altHa(d,-18),
-      astroDusk: this.sunTimes(d).noon + 4*this.altHa(d,-18)
-    };
-  }
 
-  gmst(d){
-    const T = (AstroMath.jdOf(d)-2451545)/36525;
-    return AstroMath.normDeg(280.46061837 + 360.98564736629*(AstroMath.jdOf(d)-2451545) + 0.000387933*T*T - T*T*T/38710000);
-  }
+  gmst(d){ return Ephemeris.gmst(d); }
   localSidereal(d){ return AstroMath.normDeg(this.gmst(d) + this.lon); }
   raDecToAltAz(raH, dec, d){
     let H = AstroMath.normDeg(this.localSidereal(d) - raH*15); if (H>180) H -= 360;
@@ -1136,49 +1335,60 @@ class Observer {
     const az = AstroMath.normDeg(AstroMath.atan2d(AstroMath.sind(H), AstroMath.cosd(H)*AstroMath.sind(this.lat) - Math.tan(dec*AstroMath.DEGR)*AstroMath.cosd(this.lat)) + 180);
     return { alt, az };
   }
-  solarDeclinationEq(d){
-    const day = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), 12,0,0));
-    const N = Math.floor((day - Date.UTC(d.getUTCFullYear(),0,0))/86400000);
-    const g = 2*Math.PI/365*(N-1);
-    const eq = 229.18*(.000075+.001868*Math.cos(g)-.032077*Math.sin(g)-.014615*Math.cos(2*g)-.040849*Math.sin(2*g));
-    const dec = .006918-.399912*Math.cos(g)+.070257*Math.sin(g)-.006758*Math.cos(2*g)+.000907*Math.sin(2*g)-.002697*Math.cos(3*g)+.00148*Math.sin(3*g);
-    return { eq, dec };
+  // الشمس لحظيًا (مستمرة): ميل (راديان) ومعادلة الزمن (دقيقة) — من Ephemeris الموحّد
+  solarDeclinationEq(d){ const s = Ephemeris.sun(d); return { eq: s.eqMin, dec: s.dec*AstroMath.DEGR }; }
+  // الشمس عند دقيقة معينة من اليوم المحلي لتاريخ d — كل حدث بيتحسب بميل الشمس ومعادلة الزمن وقت حدوثه هو (زي المكتبات المرجعية)
+  _sunAtLocalMinute(d, minute){
+    const ld = new Date(d.getTime() + this.tz*3600000);
+    const utcMs = Date.UTC(ld.getUTCFullYear(), ld.getUTCMonth(), ld.getUTCDate()) + (minute - 60*this.tz)*60000;
+    return this.solarDeclinationEq(new Date(utcMs));
+  }
+  _dayKey(d, tag){
+    const ld = new Date(d.getTime() + this.tz*3600000);
+    return ld.getUTCFullYear()+'-'+ld.getUTCMonth()+'-'+ld.getUTCDate()+'|'+this.lat.toFixed(4)+'|'+this.lon.toFixed(4)+'|'+this.tz+'|'+tag;
+  }
+  _memo(key, fn){
+    if (!this._memoMap) this._memoMap = new Map();
+    if (this._memoMap.has(key)) return this._memoMap.get(key);
+    const v = fn(); if (this._memoMap.size > 300) this._memoMap.clear(); this._memoMap.set(key, v); return v;
+  }
+  _noonMin(d){
+    return this._memo(this._dayKey(d,'noon'), ()=>{
+      let noon = 720 - 4*this.lon + 60*this.tz - this._sunAtLocalMinute(d, 720).eq;
+      return 720 - 4*this.lon + 60*this.tz - this._sunAtLocalMinute(d, noon).eq;
+    });
+  }
+  // وقت الحدث (دقيقة محلية) عند ارتفاع للشمس = altFn(ميل الشمس) — sign=-1 قبل الظهر، +1 بعده — بتكرار على وقت الحدث نفسه
+  _eventMin(d, tag, altFn, sign){
+    return this._memo(this._dayKey(d, tag+'|'+sign), ()=>{
+      const noon = this._noonMin(d);
+      let t = noon + sign*360;
+      for (let i=0;i<5;i++){
+        const s = this._sunAtLocalMinute(d, t);
+        const alt = altFn(s.dec);
+        let cosH = (AstroMath.sind(alt) - AstroMath.sind(this.lat)*Math.sin(s.dec)) / (AstroMath.cosd(this.lat)*Math.cos(s.dec));
+        cosH = Math.max(-1, Math.min(1, cosH));
+        t = (720 - 4*this.lon + 60*this.tz - s.eq) + sign*4*Math.acos(cosH)*AstroMath.RADD;
+      }
+      return t;
+    });
   }
   sunTimes(d){
-    const { eq, dec } = this.solarDeclinationEq(d);
-    const zen = 90.833;
-    let cosHa = (AstroMath.cosd(zen)/(AstroMath.cosd(this.lat)*Math.cos(dec)) - Math.tan(this.lat*AstroMath.DEGR)*Math.tan(dec));
-    cosHa = Math.max(-1, Math.min(1, cosHa));
-    const ha = Math.acos(cosHa)*AstroMath.RADD;
-    const noon = 720 - 4*this.lon - eq + 60*this.tz;
-    return { sunrise: noon - 4*ha, sunset: noon + 4*ha, noon };
+    const ALT = -0.833; // الشروق/الغروب القياسي: انكسار الغلاف الجوي + نصف قطر القرص
+    return { sunrise: this._eventMin(d,'sr',()=>ALT,-1), sunset: this._eventMin(d,'ss',()=>ALT,+1), noon: this._noonMin(d) };
   }
-  // مصدر الحقيقة الوحيد لارتفاع الشمس — نفس معادلة solarDeclinationEq اللي بتحسب عليها مواقيت الصلاة وقوس النهار/الليل بالظبط
-  // أي جزء تاني في الساعة (زي وضع "حقيقة السماء") لازم يستخدم الدالة دي، مش يعمل حساب شمس منفصل، عشان الأرقام تفضل متطابقة في كل مكان
-  sunAltitudeNow(d){
-    const { eq, dec } = this.solarDeclinationEq(d);
-    const noon = 720 - 4*this.lon - eq + 60*this.tz;
-    const nowMin = d.getHours()*60 + d.getMinutes() + d.getSeconds()/60;
-    const haDeg = (nowMin - noon)/4;
-    const ph = this.lat*AstroMath.DEGR, haR = haDeg*AstroMath.DEGR;
-    return Math.asin(Math.sin(ph)*Math.sin(dec) + Math.cos(ph)*Math.cos(dec)*Math.cos(haR)) * AstroMath.RADD;
-  }
-  // اتجاه الشمس الحقيقي (سمت، من الشمال) — بنفس مصدر الحقيقة الموحّد، مطلوب لحساب اتجاه الظل
-  sunAzimuthNow(d){
-    const { eq, dec } = this.solarDeclinationEq(d);
-    const noon = 720 - 4*this.lon - eq + 60*this.tz;
-    const nowMin = d.getHours()*60 + d.getMinutes() + d.getSeconds()/60;
-    const haDeg = (nowMin - noon)/4;
-    const ph = this.lat*AstroMath.DEGR, haR = haDeg*AstroMath.DEGR;
-    return AstroMath.normDeg(AstroMath.atan2d(Math.sin(haR), Math.cos(haR)*Math.sin(ph) - Math.tan(dec)*Math.cos(ph)) + 180);
-  }
+  // ارتفاع وسمت الشمس اللحظيين من الإحداثيات الحقيقية (مش من توقيت اليوم) — مصدر واحد للصلاة والظل والحلقات
+  sunAltAzNow(d){ const s = Ephemeris.sun(d); return Ephemeris.altAz(s.ra, s.dec, d, this.lat, this.lon); }
+  sunAltitudeNow(d){ return this.sunAltAzNow(d).alt; }
+  sunAzimuthNow(d){ return this.sunAltAzNow(d).az; }
   // اتجاه الظل المتوقع = عكس اتجاه الشمس تمامًا (180°) — تحقق فيزيائي حقيقي بدون إنترنت
   shadowDirectionNow(d){ return AstroMath.normDeg(this.sunAzimuthNow(d) + 180); }
-  altHa(d, altDeg){
-    const { dec } = this.solarDeclinationEq(d);
-    let cosHa = (AstroMath.sind(altDeg) - AstroMath.sind(this.lat)*Math.sin(dec)) / (AstroMath.cosd(this.lat)*Math.cos(dec));
-    cosHa = Math.max(-1, Math.min(1, cosHa));
-    return Math.acos(cosHa)*AstroMath.RADD;
+  // أوقات الشفق المدني (-6°) والفلكي (-18°)
+  twilightTimes(d){
+    return {
+      civilDawn: this._eventMin(d,'cv',()=>-6,-1),  civilDusk: this._eventMin(d,'cv',()=>-6,+1),
+      astroDawn: this._eventMin(d,'as',()=>-18,-1), astroDusk: this._eventMin(d,'as',()=>-18,+1)
+    };
   }
   realPrayerTimes(d, hDate){
     const t = this.sunTimes(d);
@@ -1186,13 +1396,11 @@ class Observer {
     if (this.calcMethod==="UMM_AL_QURA"){ fajrAngle=-18.5; ishaFixed = (hDate.month===9) ? 120 : 90; }
     else if (this.calcMethod==="MWL"){ fajrAngle=-18; ishaAngle=-17; }
     else if (this.calcMethod==="ISNA"){ fajrAngle=-15; ishaAngle=-15; }
-    const fajr = t.noon - 4*this.altHa(d, fajrAngle);
-    const isha = ishaFixed ? t.sunset + ishaFixed : t.noon + 4*this.altHa(d, ishaAngle);
-    const { dec } = this.solarDeclinationEq(d);
-    const decDeg = dec*AstroMath.RADD;
-    // -0.566° يمثل انكسار الغلاف الجوي للضوء، تصحيح فلكي حقيقي مستخدم في مكتبات مواقيت الصلاة الاحترافية
-    const asrAlt = Math.atan(1/(1+Math.abs(Math.tan((this.lat-decDeg)*AstroMath.DEGR))))*AstroMath.RADD - 0.566;
-    return { fajr, sunrise:t.sunrise, dhuhr:t.noon, asr:t.noon+4*this.altHa(d,asrAlt), maghrib:t.sunset, isha, noon:t.noon };
+    const fajr = this._eventMin(d,'fj'+fajrAngle,()=>fajrAngle,-1);
+    const isha = ishaFixed ? t.sunset + ishaFixed : this._eventMin(d,'is'+ishaAngle,()=>ishaAngle,+1);
+    // العصر: ظل الجسم = طوله + ظل الزوال (مذهب الجمهور) — الارتفاع هندسي بدون خصم انكسار، زي المراجع القياسية
+    const asr = this._eventMin(d,'asr',dec=>Math.atan(1/(1+Math.abs(Math.tan(this.lat*AstroMath.DEGR - dec))))*AstroMath.RADD,+1);
+    return { fajr, sunrise:t.sunrise, dhuhr:t.noon, asr, maghrib:t.sunset, isha, noon:t.noon };
   }
 }
 
@@ -1219,7 +1427,7 @@ class StarField {
     this.starsData.forEach((s, i)=>{
       const el = document.createElementNS("http://www.w3.org/2000/svg","g");
       el.setAttribute('id', `star-elem-${i}`);
-      el.innerHTML = `<circle r="2.3"/><text x="6" y="3">${s[0]}</text>`;
+      el.innerHTML = `<circle r="2.3"/><text x="4" y="2">${s[0]}</text>`;
       g.appendChild(el);
     });
   }
@@ -1302,6 +1510,7 @@ class ClockRenderer {
     if (glanceLocEl) set('glanceLocation', glanceLocEl.textContent);
     // اسم الصلاة + وقتها الفعلي
     const prayerTimeMap = {boxFajr: pr.fajr, boxDhuhr: pr.dhuhr, boxAsr: pr.asr, boxMaghrib: pr.maghrib, boxIsha: pr.isha};
+    checkAdhanAndIqama(now, prayerTimeMap);
     const glancePrayerEl = document.getElementById('glancePrayer');
     if (glancePrayerEl){
       const h24 = Math.floor(prayerTimeMap[nextId]/60)%24, mn = Math.round(prayerTimeMap[nextId]%60);
@@ -1345,12 +1554,16 @@ class ClockRenderer {
     const mansionNames = ["الشرطين","البطين","الثريا","الدبران","الهقعة","الهنعة","الذراع","النثرة","الطرف","الجبهة","الزبرة","الصرفة","العواء","السماك","الغفر","الزبانا","الإكليل","القلب","الشولة","النعائم","البلدة","سعد الذابح","سعد بلع","سعد السعود","سعد الأخبية","الفرغ المقدم","الفرغ المؤخر","الرشاء"];
     set('dataMansion', (this.trueSky.moonMansionIndex(now)+1).toLocaleString('ar-EG')+' - '+mansionNames[this.trueSky.moonMansionIndex(now)]);
     const tw = this.observer.twilightTimes(now);
-    set('dataTwilight', 'مدني: '+AstroMath.minToHHMM(tw.civilDawn)+' - '+AstroMath.minToHHMM(tw.civilDusk)+' • فلكي: '+AstroMath.minToHHMM(tw.astroDawn)+' - '+AstroMath.minToHHMM(tw.astroDusk));
+    { const T = m => '<bdi dir="ltr">'+AstroMath.minToHHMM(m).replace('AM','ص').replace('PM','م')+'</bdi>'; const dtw = document.getElementById('dataTwilight');
+      if (dtw) dtw.innerHTML = 'مدني: '+T(tw.civilDawn)+' – '+T(tw.civilDusk)+' • فلكي: '+T(tw.astroDawn)+' – '+T(tw.astroDusk); }
+    const tourbillonDeg = Math.round((now.getSeconds()*1000 + now.getMilliseconds())/60000*360);
+    set('dataTourbillon', tourbillonDeg+'° • دورة كاملة كل 60 ثانية');
     // شروق/غروب القمر الرقمي — حساب أثقل شوية فبنعمله مرة كل دقيقة بس مش كل ثانية
     if (!this._lastMoonRiseSetMin || now.getMinutes() !== this._lastMoonRiseSetMin){
       this._lastMoonRiseSetMin = now.getMinutes();
       const mrs = this.trueSky.moonRiseSet(now);
-      set('dataMoonRiseSet', (mrs.riseMin!==null? AstroMath.minToHHMM(mrs.riseMin):'لا يشرق اليوم')+' / '+(mrs.setMin!==null? AstroMath.minToHHMM(mrs.setMin):'لا يغرب اليوم'));
+      { const a12m = m => AstroMath.minToHHMM(m).replace('AM','ص').replace('PM','م'); const dmr = document.getElementById('dataMoonRiseSet');
+        if (dmr) dmr.innerHTML = (mrs.riseMin!==null? '<bdi dir="ltr">'+a12m(mrs.riseMin)+'</bdi>':'لا يشرق اليوم')+' / '+(mrs.setMin!==null? '<bdi dir="ltr">'+a12m(mrs.setMin)+'</bdi>':'لا يغرب اليوم'); }
     }
     // الأيام البيض (13، 14، 15 هجري)
     const whiteEl = document.getElementById('dataWhiteDays');
@@ -1363,19 +1576,13 @@ class ClockRenderer {
       set('dataHajjCountdown', this.hijri.formatDaysAsMonthsDays(this.hijri.daysUntilHijri(12,8)));
       set('dataEidAdhaCountdown', this.hijri.formatDaysAsMonthsDays(this.hijri.daysUntilHijri(12,10)));
     }
-    const age = AstroMath.moonAgeDays(now);
-    set('dataMoon', (age/AstroMath.SYNODIC*100).toFixed(0)+'٪ ('+age.toFixed(1)+' يوم)');
-    // شكل القمر في المربع = نفس حساب الظل الحقيقي بتاع قمر الساعة بالظبط (نفس المصدر، نفس النسبة)
-    const halfSyn = AstroMath.SYNODIC/2;
-    const phaseShadowOffset = age <= halfSyn ? (age/halfSyn)*30 : ((AstroMath.SYNODIC-age)/halfSyn)*30;
-    const phaseShadowEl = document.getElementById('moonPhaseShadow');
-    if (phaseShadowEl) phaseShadowEl.setAttribute('cx', 5 + phaseShadowOffset);
-    // مربع القمر في بطاقة النظرة الأولى — نفس حساب الظل بالظبط (نفس المصدر، نفس النسبة)
-    const glancePhaseNames = ['محاق','هلال متزايد','تربيع أول','أحدب متزايد','بدر','أحدب متناقص','تربيع أخير','هلال متناقص'];
-    const glancePhaseIdx = Math.round(age/AstroMath.SYNODIC*8)%8;
-    set('glanceMoonName', glancePhaseNames[glancePhaseIdx]);
-    const glanceMoonShadowEl = document.getElementById('glanceMoonShadow');
-    if (glanceMoonShadowEl) glanceMoonShadowEl.setAttribute('cx', 5 + phaseShadowOffset);
+    // القمر: الطور من الهندسة الفعلية (استطالة عن الشمس) + شكل خط الفصل الحقيقي في كل الأيقونات
+    const moonPh = Ephemeris.moonPhase(now);
+    const dm = document.getElementById('dataMoon');
+    if (dm) dm.innerHTML = Math.round(moonPh.illum*100)+'٪ مضاء<br><span style="font-size:12px;color:var(--ink-dim);">'+moonPh.name+' • '+moonPh.age.toFixed(1)+' يوم</span>';
+    applyMoonShadow('moonPhaseShadow', 15, moonPh, 20, 20);
+    set('glanceMoonName', moonPh.name);
+    applyMoonShadow('glanceMoonShadow', 15, moonPh, 20, 20);
     set('dataEot', (AstroMath.equationOfTimeMinutes(now)>=0?'+':'')+AstroMath.equationOfTimeMinutes(now).toFixed(1)+' دقيقة');
   }
   updateDayNightAndPrayers(now){
@@ -1464,6 +1671,7 @@ class ClockRenderer {
       this.starField.update(now);
       this.updateDayNightAndPrayers(now);
       this.updateDataPanel(now, h);
+      if (document.body.classList.contains('three-body-mode')) updateThreeBody(now);
 
       // الوضع الافتراضي (بدون بوصلة حية): الشمال ثابت لفوق، والقبلة بتوري زاويتها المحسوبة من موقع المراقب الحالي
       if (!this.isCompassListening){
@@ -1475,9 +1683,13 @@ class ClockRenderer {
       // اتجاه الظل معناه فيزيائي بس لو الشمس فعليًا فوق الأفق دلوقتي — نفس مصدر الحقيقة الموحّد بتاع مواقيت الصلاة
       const shadowEl = document.getElementById('shadowHand');
       if (shadowEl) shadowEl.style.opacity = (this.observer.sunAltitudeNow(now) > 0) ? '1' : '0.12';
-      this.rot('moonOrbit', AstroMath.realAngle(now, 27.321661), 300, 300);
+      const moonLonNow = this.trueSky.moonEclipticLongitude(now);
+      this.rot('moonOrbit', moonLonNow, 300, 300);  // موضع القمر الفعلي على دائرة البروج (نفس زاوية مؤشر المنزلة)
+      const mb = document.getElementById('moonBody'); if (mb) mb.setAttribute('transform', 'translate(300,100) rotate('+(-moonLonNow)+')');  // الأيقونة تفضل معتدلة
       // مؤشر منزلة القمر — بيدور حسب خط الطول الفلكي الحقيقي للقمر (نفس مصدر الحقيقة بتاع TrueSkyEngine)، مش تقريب بالمدة المدارية بس
-      this.rot('mansionPointer', this.trueSky.moonEclipticLongitude(now), 300, 300);
+      const ayanNow = Ephemeris.ayanamsa(now);
+      const mRing = document.getElementById('mansionsRing'); if (mRing) mRing.setAttribute('transform', 'rotate('+ayanNow.toFixed(3)+' 300 300)');  // بداية المنازل على الفلك الاستوائي = الأيانامسا
+      this.rot('mansionPointer', moonLonNow - ayanNow, 300, 300);        // (الحلقة متدوّرة بالأيانامسا فالمؤشر بيتظبط عليها ويوصل لزاوية القمر الفعلية)
       this.rot('planetMercury', AstroMath.realAngle(now, 87.9691), 300, 300);
       this.rot('planetVenus', AstroMath.realAngle(now, 224.701, true), 300, 300);
       this.rot('planetMars', AstroMath.realAngle(now, 686.980), 300, 300);
@@ -1506,8 +1718,7 @@ class ClockRenderer {
       }
 
       // moon phase shadow, real synodic age (same triangular sweep, real speed)
-      const moonShadowOffset = age <= half ? (age/half)*20 : ((AstroMath.SYNODIC-age)/half)*20;
-      document.getElementById('moonShadow').setAttribute('cx', -10 + moonShadowOffset);
+      applyMoonShadow('moonShadow', 10, Ephemeris.moonPhase(now), 0, 0);
 
       // decorative tourbillon (bottom-right corner) — one rotation per minute
       // (الدوران السلس اتنقل لحلقة animateSmooth)
@@ -1524,55 +1735,16 @@ class ClockRenderer {
 class TrueSkyEngine {
   constructor(observer){ this.observer = observer; }
   daysSince2000(d){ return AstroMath.jdOf(d) - 2451543.5; }
-  // خط الطول الفلكي (الإكليبتيكي) للقمر وحده — نفس حسابات moonEquatorial بالظبط، لاستخدامه في تحديد منزلة القمر
-  moonEclipticLongitude(d){
-    const D = this.daysSince2000(d);
-    const N = AstroMath.normDeg(125.1228 - 0.0529538083*D) * AstroMath.DEGR;
-    const i = 5.1454 * AstroMath.DEGR;
-    const w = AstroMath.normDeg(318.0634 + 0.1643573223*D) * AstroMath.DEGR;
-    const a = 60.2666, e = 0.0549;
-    const M = AstroMath.normDeg(115.3654 + 13.0649929509*D) * AstroMath.DEGR;
-    let E = M + e*Math.sin(M)*(1+e*Math.cos(M));
-    for (let k=0;k<5;k++) E -= (E - e*Math.sin(E) - M)/(1 - e*Math.cos(E));
-    const xv = a*(Math.cos(E)-e), yv = a*Math.sqrt(1-e*e)*Math.sin(E);
-    const v = Math.atan2(yv,xv), r = Math.hypot(xv,yv), vw = v+w;
-    const xh = r*(Math.cos(N)*Math.cos(vw) - Math.sin(N)*Math.sin(vw)*Math.cos(i));
-    const yh = r*(Math.sin(N)*Math.cos(vw) + Math.cos(N)*Math.sin(vw)*Math.cos(i));
-    let lon = Math.atan2(yh,xh)*AstroMath.RADD;
-    const Ms = AstroMath.normDeg(356.0470 + 0.9856002585*D)*AstroMath.DEGR;
-    const Ae = 0.1858*Math.sin(Ms), A3 = 0.37*Math.sin(Ms);
-    const mprime = M*AstroMath.RADD - Ae - A3;
-    const Ec = 6.2886*Math.sin(mprime*AstroMath.DEGR);
-    return AstroMath.normDeg(lon + Ec);
-  }
-  moonMansionIndex(d){ return Math.floor(this.moonEclipticLongitude(d) / (360/28)); }
-  moonEquatorial(d){
-    const D = this.daysSince2000(d);
-    const N = AstroMath.normDeg(125.1228 - 0.0529538083*D) * AstroMath.DEGR;
-    const i = 5.1454 * AstroMath.DEGR;
-    const w = AstroMath.normDeg(318.0634 + 0.1643573223*D) * AstroMath.DEGR;
-    const a = 60.2666, e = 0.0549;
-    const M = AstroMath.normDeg(115.3654 + 13.0649929509*D) * AstroMath.DEGR;
-    let E = M + e*Math.sin(M)*(1+e*Math.cos(M));
-    for (let k=0;k<5;k++) E -= (E - e*Math.sin(E) - M)/(1 - e*Math.cos(E));
-    const xv = a*(Math.cos(E)-e), yv = a*Math.sqrt(1-e*e)*Math.sin(E);
-    const v = Math.atan2(yv,xv), r = Math.hypot(xv,yv), vw = v+w;
-    const xh = r*(Math.cos(N)*Math.cos(vw) - Math.sin(N)*Math.sin(vw)*Math.cos(i));
-    const yh = r*(Math.sin(N)*Math.cos(vw) + Math.cos(N)*Math.sin(vw)*Math.cos(i));
-    const zh = r*(Math.sin(vw)*Math.sin(i));
-    let lon = Math.atan2(yh,xh)*AstroMath.RADD;
-    let lat = Math.atan2(zh, Math.hypot(xh,yh))*AstroMath.RADD;
-    const Ms = AstroMath.normDeg(356.0470 + 0.9856002585*D)*AstroMath.DEGR;
-    const Ev = 1.2739*Math.sin((2*(lon - lon))*AstroMath.DEGR); // negligible first-order term kept simple
-    const Ae = 0.1858*Math.sin(Ms), A3 = 0.37*Math.sin(Ms);
-    const mprime = M*AstroMath.RADD + Ev - Ae - A3;
-    const Ec = 6.2886*Math.sin(mprime*AstroMath.DEGR);
-    lon = AstroMath.normDeg(lon + Ec);
-    const eps = (23.4393 - 3.563E-7*D) * AstroMath.DEGR;
-    const L2 = lon*AstroMath.DEGR, B2 = lat*AstroMath.DEGR;
-    const x = Math.cos(B2)*Math.cos(L2), y = Math.cos(B2)*Math.sin(L2), z = Math.sin(B2);
-    const ye = y*Math.cos(eps) - z*Math.sin(eps), ze = y*Math.sin(eps) + z*Math.cos(eps);
-    return { ra: AstroMath.normDeg(Math.atan2(ye,x)*AstroMath.RADD)/15, dec: Math.atan2(ze, Math.hypot(x,ye))*AstroMath.RADD };
+  // القمر من Ephemeris الموحّد (اتصلحت معادلة المركز المكررة اللي كانت بتغلّط الموضع لحد ~7°)
+  moonEclipticLongitude(d){ return Ephemeris.moon(d).lon; }
+  // المنازل الـ28 بتتقسم على الفلك النجمي (الثريا #3، الدبران #4، الجبهة #10، القلب #18...) — لازم نطرح الأيانامسا من خط الطول الاستوائي
+  moonMansionIndex(d){ return Math.floor(AstroMath.normDeg(this.moonEclipticLongitude(d) - Ephemeris.ayanamsa(d)) / (360/28)); }
+  moonEquatorial(d){ const m = Ephemeris.moon(d); return { ra: m.ra/15, dec: m.dec }; }
+  // ارتفاع القمر من منظور المراقب (بعد تصحيح اختلاف المنظر ~1°) وسمته
+  moonAltTopo(d){
+    const m = Ephemeris.moon(d), g = Ephemeris.altAz(m.ra, m.dec, d, this.observer.lat, this.observer.lon);
+    const par = Math.asin(1/m.dist)*AstroMath.RADD;
+    return { alt: g.alt - par*Math.cos(g.alt*AstroMath.DEGR), az: g.az, par, dist: m.dist };
   }
   planetXYZ(name, d, elements){
     const D = this.daysSince2000(d), q = elements[name];
@@ -1618,19 +1790,19 @@ class TrueSkyEngine {
     const ph = this.observer.lat*AstroMath.DEGR, de = dec*AstroMath.DEGR, hh = H*AstroMath.DEGR;
     return Math.asin(Math.sin(ph)*Math.sin(de) + Math.cos(ph)*Math.cos(de)*Math.cos(hh)) * AstroMath.RADD;
   }
-  // شروق وغروب القمر الرقمي — بحث عددي بسيط كل 6 دقايق عبر اليوم كله، بنفس دوال الموضع الحقيقي أعلاه
+  // شروق وغروب القمر (دقايق من منتصف اليوم المحلي): ارتفاع من منظور المراقب مقابل حد الشروق الظاهري (انكسار 0.567° + نصف القطر)، بتنصيف خطي بين عينات كل 10 دقايق
   moonRiseSet(d){
     const dayStart = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0, 0);
-    let prevAlt = null, rise = null, set = null;
-    for (let mins = 0; mins <= 1440; mins += 6){
-      const t = new Date(dayStart.getTime() + mins*60000);
-      const m = this.moonEquatorial(t);
-      const alt = this.altitudeOf(m.ra, m.dec, t);
-      if (prevAlt !== null){
-        if (prevAlt < 0 && alt >= 0 && rise === null) rise = mins;
-        if (prevAlt >= 0 && alt < 0 && set === null) set = mins;
+    const STEP = 10;
+    let prev = null, rise = null, set = null;
+    for (let mins = 0; mins <= 1440; mins += STEP){
+      const m = this.moonAltTopo(new Date(dayStart.getTime() + mins*60000));
+      const v = m.alt - (-0.5667 - 0.2725*m.par);
+      if (prev !== null){
+        if (prev < 0 && v >= 0 && rise === null) rise = (mins-STEP) + STEP*(-prev)/(v-prev);
+        if (prev >= 0 && v < 0 && set === null) set = (mins-STEP) + STEP*prev/(prev-v);
       }
-      prevAlt = alt;
+      prev = v;
     }
     return { riseMin: rise, setMin: set };
   }
@@ -1639,7 +1811,7 @@ class TrueSkyEngine {
     const map = {};
     // الشمس: بتستخدم observer.sunAltitudeNow — نفس المعادلة بالظبط اللي بتحسب عليها مواقيت الصلاة وقوس النهار/الليل، عشان مفيش تضارب أرقام
     map.sun = this.observer.sunAltitudeNow(d) < 0;
-    const m = this.moonEquatorial(d); map.moon = this.altitudeOf(m.ra, m.dec, d) < 0;
+    { const mt = this.moonAltTopo(d); map.moon = mt.alt < (-0.5667 - 0.2725*mt.par); }
     ['Mercury','Venus','Mars','Jupiter','Saturn'].forEach(name=>{
       const eq = this.planetEquatorial(name, d);
       map[name] = this.altitudeOf(eq.ra, eq.dec, d) < 0;
@@ -1999,6 +2171,10 @@ class NavTool {
 const observer = new Observer();
 const hijriCal = new HijriCalendar();
 const starField = new StarField(observer);
+let adhanAudioCtx = null;
+let adhanAlertsEnabled = false;
+let _adhanFiredToday = {}; // {prayerId: 'YYYY-MM-DD'} — يمنع تكرار نفس التنبيه أكتر من مرة في نفس اليوم
+let _iqamaFiredToday = {};
 const renderer = new ClockRenderer(observer, hijriCal, starField);
 const compass = new CompassController(observer, renderer);
 const viewMode = new ViewModeController();
@@ -2064,6 +2240,7 @@ function toggleWindowScreen(){
   const isActive = document.body.classList.contains('window-screen-mode');
   if (!isActive){
     // نحفظ وضع العرض الحالي عشان نرجّعه لما نخرج، ونجبر العرض الكامل — الهدف من شاشة الويندوز هو عرض كل التفاصيل
+    if (document.body.classList.contains('three-body-mode')) toggleThreeBody();
     window._wasSimpleViewBeforeFullscreen = document.body.classList.contains('simple-view');
     document.body.classList.remove('simple-view');
     document.body.classList.add('window-screen-mode');
@@ -2111,6 +2288,227 @@ function toggleLocationLock(){
     if (btn && isLocked) btn.textContent = '🔒 الموقع مثبّت (دوس تاني للفتح)';
   }catch(e){}
 })();
+// ===== تحديد الموقع يدويًا — حل نهائي لمشاكل تشويش GPS، مفيش اعتماد على أي حساس خالص =====
+function toggleManualLocation(){
+  const panel = document.getElementById('manualLocPanel');
+  if (panel) panel.style.display = (panel.style.display === 'none') ? 'block' : 'none';
+}
+function toggleAdvancedCoords(){
+  const panel = document.getElementById('advancedCoordsPanel');
+  if (panel) panel.style.display = (panel.style.display === 'none') ? 'block' : 'none';
+}
+function applyManualLocation(lat, lon, name){
+  observer.set(lat, lon, -(new Date().getTimezoneOffset()/60), name);
+  observer.updateCityName(lat, lon);
+  try{
+    localStorage.setItem('zijLastLocation', JSON.stringify({lat, lon}));
+    localStorage.setItem('zijLocationLocked', 'true'); // التحديد اليدوي موثوق بطبيعته، فبنقفله على طول
+  }catch(e){}
+  const lockBtn = document.getElementById('lockLocationBtn');
+  if (lockBtn) lockBtn.textContent = '🔒 الموقع مثبّت (دوس تاني للفتح)';
+  const statusEl = document.getElementById('manualLocStatus');
+  if (statusEl) statusEl.textContent = '✅ تم تعيين الموقع وتثبيته: '+name+' ('+lat.toFixed(4)+', '+lon.toFixed(4)+')';
+}
+function searchCityForManualLocation(){
+  const input = document.getElementById('manualLocSearchInput');
+  const resultsEl = document.getElementById('manualLocResults');
+  if (!input || !input.value.trim()) return;
+  resultsEl.innerHTML = '<p style="color:var(--ink-dim);font-size:12px;">جارٍ البحث...</p>';
+  fetch('https://geocoding-api.open-meteo.com/v1/search?name='+encodeURIComponent(input.value.trim())+'&count=5&language=ar')
+    .then(r=>r.json())
+    .then(data=>{
+      if (!data.results || !data.results.length){
+        resultsEl.innerHTML = '<p style="color:#f0938a;font-size:12px;">مفيش نتائج — جرب تكتب اسم المدينة بالإنجليزي.</p>';
+        return;
+      }
+      resultsEl.innerHTML = '';
+      data.results.forEach(r=>{
+        const btn = document.createElement('button');
+        const label = [r.name, r.admin1, r.country].filter(Boolean).join('، ');
+        btn.textContent = '📍 '+label;
+        btn.style.cssText = 'display:block;width:100%;text-align:right;background:#0b0f17;border:1px solid var(--brass-dark);border-radius:8px;padding:8px 10px;color:var(--brass-light);font-family:\'Amiri\',serif;font-size:12.5px;cursor:pointer;margin-bottom:6px;';
+        btn.onclick = () => applyManualLocation(r.latitude, r.longitude, label);
+        resultsEl.appendChild(btn);
+      });
+    })
+    .catch(()=>{ resultsEl.innerHTML = '<p style="color:#f0938a;font-size:12px;">تعذر الاتصال بخدمة البحث.</p>'; });
+}
+function setManualCoordinates(){
+  const latInput = document.getElementById('manualLatInput');
+  const lonInput = document.getElementById('manualLonInput');
+  const lat = parseFloat(latInput.value), lon = parseFloat(lonInput.value);
+  const statusEl = document.getElementById('manualLocStatus');
+  if (isNaN(lat) || isNaN(lon) || lat < -90 || lat > 90 || lon < -180 || lon > 180){
+    if (statusEl) statusEl.textContent = '⚠️ الإحداثيات غير صحيحة — خط العرض بين -90 و90، وخط الطول بين -180 و180.';
+    return;
+  }
+  applyManualLocation(lat, lon, 'إحداثيات يدوية');
+}
+// ===== نظام تنبيه الأذان والإقامة — نغمة مركّبة (Web Audio API) + بانر مرئي، شغّال طول ما الصفحة مفتوحة =====
+// ملحوظة صريحة: دي نغمة تنبيه بسيطة مش أذان حقيقي بصوت مؤذن — أي تسجيل أذان حقيقي محتاج ملف صوتي فعلي، ومينفعش نولّده من الكود لوحده لأسباب حقوق الملكية.
+// لو حابب تستخدم تسجيل أذان حقيقي، ارفعه كملف mp3 مع الصفحة وقولّي اسمه وهربطه بدل النغمة دي.
+const IQAMA_DELAY_MIN = 15; // المدة بين الأذان والإقامة بالدقايق — قابلة للتعديل لو حبيت مدة مختلفة لكل صلاة
+function playAlertTone(){
+  try{
+    if (!adhanAudioCtx) adhanAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const ctx = adhanAudioCtx;
+    [0, 0.35, 0.7].forEach((delay, i)=>{
+      const osc = ctx.createOscillator(), gain = ctx.createGain();
+      osc.frequency.value = i===2 ? 880 : 660;
+      osc.type = 'sine';
+      gain.gain.setValueAtTime(0.001, ctx.currentTime+delay);
+      gain.gain.exponentialRampToValueAtTime(0.25, ctx.currentTime+delay+0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+delay+0.3);
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start(ctx.currentTime+delay); osc.stop(ctx.currentTime+delay+0.32);
+    });
+  }catch(e){}
+}
+function toggleAdhanAlerts(){
+  const btn = document.getElementById('adhanToggleBtn');
+  const statusEl = document.getElementById('adhanStatus');
+  adhanAlertsEnabled = !adhanAlertsEnabled;
+  if (adhanAlertsEnabled){
+    try{ adhanAudioCtx = new (window.AudioContext || window.webkitAudioContext)(); playAlertTone(); }catch(e){}
+    if (btn){ btn.textContent = '🔕 إيقاف تنبيه الأذان والإقامة'; btn.style.color = 'var(--verdigris-light)'; btn.style.borderColor = 'var(--verdigris)'; }
+    if (statusEl) statusEl.textContent = 'هتوصلك نغمة + رسالة عند كل أذان وعند وقت الإقامة (بعد '+IQAMA_DELAY_MIN+' دقيقة) — طول ما الصفحة دي مفتوحة في المتصفح.';
+  } else {
+    if (btn){ btn.textContent = '🔔 تفعيل تنبيه الأذان والإقامة'; btn.style.color = '#f0938a'; btn.style.borderColor = 'var(--red)'; }
+    if (statusEl) statusEl.textContent = '';
+  }
+}
+function showAdhanBanner(text){
+  const banner = document.getElementById('adhanBanner');
+  const textEl = document.getElementById('adhanBannerText');
+  if (textEl) textEl.textContent = text;
+  if (banner) banner.style.display = 'block';
+  playAlertTone();
+  setTimeout(dismissAdhanBanner, 15000);
+}
+function dismissAdhanBanner(){
+  const banner = document.getElementById('adhanBanner');
+  if (banner) banner.style.display = 'none';
+}
+function checkAdhanAndIqama(now, prayerTimeMap){
+  if (!adhanAlertsEnabled) return;
+  const todayKey = now.getFullYear()+'-'+now.getMonth()+'-'+now.getDate();
+  const nowMin = now.getHours()*60 + now.getMinutes() + now.getSeconds()/60;
+  const names = { boxFajr:'الفجر', boxDhuhr:'الظهر', boxAsr:'العصر', boxMaghrib:'المغرب', boxIsha:'العشاء' };
+  Object.entries(prayerTimeMap).forEach(([id, tmin])=>{
+    // الأذان: أول ثانية بعد دخول الوقت (فرق أقل من 30 ثانية)
+    if (Math.abs(nowMin - tmin) < 0.5 && _adhanFiredToday[id] !== todayKey){
+      _adhanFiredToday[id] = todayKey;
+      showAdhanBanner('🕌 حان الآن موعد أذان '+names[id]);
+    }
+    // الإقامة: بعد مدة محددة من الأذان
+    const iqamaMin = tmin + IQAMA_DELAY_MIN;
+    if (Math.abs(nowMin - iqamaMin) < 0.5 && _iqamaFiredToday[id] !== todayKey){
+      _iqamaFiredToday[id] = todayKey;
+      showAdhanBanner('🕌 حان الآن وقت إقامة صلاة '+names[id]);
+    }
+  });
+}
+// ===== لوحة الأجسام الثلاثة (الأرض • الشمس • القمر) — كله من Ephemeris الموحّد ومن موقع المستخدم =====
+const MANSION_NAMES = ["الشرطين","البطين","الثريا","الدبران","الهقعة","الهنعة","الذراع","النثرة","الطرف","الجبهة","الزبرة","الصرفة","العواء","السماك","الغفر","الزبانا","الإكليل","القلب","الشولة","النعائم","البلدة","سعد الذابح","سعد بلع","سعد السعود","سعد الأخبية","الفرغ المقدم","الفرغ المؤخر","الرشاء"];
+const _tb = { lastMap: 0, lastHeavy: 0, heavy: null, heavyKey: '' };
+const tbFmt = {
+  lat: v => Math.abs(v).toFixed(2)+'°'+(v>=0?' شمالًا':' جنوبًا'),
+  lon: v => Math.abs(v).toFixed(2)+'°'+(v>=0?' شرقًا':' غربًا'),
+  hms: h => { h=((h%24)+24)%24; const H=Math.floor(h), M=Math.floor((h-H)*60), S=Math.floor(((h-H)*60-M)*60); return AstroMath.pad(H)+':'+AstroMath.pad(M)+':'+AstroMath.pad(S); },
+  dir: az => ['شمال','شمال شرق','شرق','جنوب شرق','جنوب','جنوب غرب','غرب','شمال غرب'][Math.round(az/45)%8],
+  span: ms => { const m=Math.max(0,Math.round(ms/60000)), d=Math.floor(m/1440), h=Math.floor((m%1440)/60), mm=m%60; return d? d+' يوم '+h+' س' : (h? h+' س '+mm+' د' : mm+' د'); },
+  when: d => d ? d.toLocaleString('ar-EG',{day:'numeric',month:'long',hour:'numeric',minute:'2-digit'}) : '—',
+  clock: m => (m==null||isNaN(m)) ? '—' : AstroMath.minToHHMM(m).replace('AM','ص').replace('PM','م')
+};
+// حد المناطق المضاءة لمصدر ضوء فوق نقطة (subLon, subLat): خط الفصل + مضلع النهار + مضلع الليل، على خريطة 360×180
+function tbHemisphere(subLon, subLat){
+  const k = Math.PI/180; let dec = subLat*k; if (Math.abs(dec) < 1e-6) dec = 1e-6;
+  const pts = [];
+  for (let lon=-180; lon<=180; lon+=2){ const lat = Math.atan(-Math.cos((lon-subLon)*k)/Math.tan(dec))/k; pts.push((lon+180).toFixed(1)+','+(90-lat).toFixed(1)); }
+  const line = 'M'+pts.join(' L');
+  const southNight = dec > 0;
+  return { line, nightPath: line+(southNight?' L360,180 L0,180 Z':' L360,0 L0,0 Z'), dayPath: line+(southNight?' L360,0 L0,0 Z':' L360,180 L0,180 Z') };
+}
+function tbAngDist(lat1, lon1, lat2, lon2){
+  const k = Math.PI/180;
+  const c = Math.sin(lat1*k)*Math.sin(lat2*k) + Math.cos(lat1*k)*Math.cos(lat2*k)*Math.cos((lon1-lon2)*k);
+  return Math.acos(Math.max(-1, Math.min(1, c)))/k;
+}
+function toggleThreeBody(){
+  const on = !document.body.classList.contains('three-body-mode');
+  if (on) document.body.classList.add('three-body-mode'); else document.body.classList.remove('three-body-mode');
+  const panel = document.getElementById('threeBodyPanel'); if (panel) panel.style.display = on ? 'block' : 'none';
+  const btn = document.getElementById('threeBodyBtn');
+  if (btn){ btn.style.background = on ? 'var(--brass)' : 'var(--bg-panel)'; btn.style.color = on ? '#0a0c12' : 'var(--brass-light)'; btn.textContent = on ? '⏹ رجوع للساعة' : '🌍 الأجسام الثلاثة'; }
+  if (on){ _tb.lastMap = 0; _tb.lastHeavy = 0; updateThreeBody(new Date()); if (panel && panel.scrollIntoView) panel.scrollIntoView({behavior:'smooth', block:'start'}); }
+}
+function updateThreeBody(now){
+  const panel = document.getElementById('threeBodyPanel');
+  if (!panel || panel.style.display === 'none') return;
+  const t = now.getTime(), k = AstroMath.DEGR, lat = observer.lat, lon = observer.lon;
+  const sun = Ephemeris.sun(now), moon = Ephemeris.moon(now), ph = Ephemeris.moonPhase(now), gm = Ephemeris.gmst(now);
+  const sSub = { lat: sun.dec, lon: Ephemeris.normLon(sun.ra - gm) }, mSub = { lat: moon.dec, lon: Ephemeris.normLon(moon.ra - gm) };
+  const sAA = Ephemeris.altAz(sun.ra, sun.dec, now, lat, lon), mAA = renderer.trueSky.moonAltTopo(now);
+  // الحسابات الأتقل (الأحداث الجاية) مرة كل دقيقة أو لما الموقع يتغير
+  const hk = lat.toFixed(3)+','+lon.toFixed(3);
+  if (!_tb.heavy || t - _tb.lastHeavy > 60000 || _tb.heavyKey !== hk){
+    _tb.lastHeavy = t; _tb.heavyKey = hk;
+    _tb.heavy = { newMoon: Ephemeris.nextElongation(now,0), fullMoon: Ephemeris.nextElongation(now,180), season: Ephemeris.nextSeasonEvent(now), sunT: observer.sunTimes(now), moonRS: renderer.trueSky.moonRiseSet(now) };
+  }
+  const H = _tb.heavy, $ = id => document.getElementById(id);
+  // ---- الخريطة (خط الفصل بيتحدّث كل 5 ثواني، والعلامات في كل مرة) ----
+  if (t - _tb.lastMap > 5000){
+    _tb.lastMap = t;
+    const hs = tbHemisphere(sSub.lon, sSub.lat), hm = tbHemisphere(mSub.lon, mSub.lat);
+    $('tbNight').setAttribute('d', hs.nightPath); $('tbTerm').setAttribute('d', hs.line);
+    $('tbMoonVis').setAttribute('d', hm.dayPath); $('tbMoonVisLine').setAttribute('d', hm.line);
+  }
+  const mk = (id, p) => { const el=$(id); if (el) el.setAttribute('transform','translate('+(p.lon+180).toFixed(2)+','+(90-p.lat).toFixed(2)+')'); };
+  mk('tbSunMark', sSub); mk('tbMoonMark', mSub); mk('tbUserMark', { lat: lat, lon: lon });
+  applyMoonShadow('tbMoonShadow', 4.6, ph, 0, 0);
+  // ---- المشهد الجيومركزي ----
+  const rotG = (id, deg) => { const el=$(id); if (el) el.setAttribute('transform','rotate('+deg.toFixed(2)+' 150 150)'); };
+  rotG('tbSunG', sun.lon); rotG('tbMoonG', moon.lon);
+  const litRot = (ph.waxing ? sun.lon - 90 : sun.lon + 90) - moon.lon;   // وجه القمر المضاء يواجه الشمس
+  $('tbMoonIcon').setAttribute('transform','translate(150,86) rotate('+litRot.toFixed(2)+')');
+  applyMoonShadow('tbDiagMoonShadow', 9, ph, 0, 0);
+  const alpha = AstroMath.normDeg(gm + lon)*k, eps = Ephemeris.obliquity(now)*k;
+  rotG('tbZenithG', Math.atan2(Math.sin(alpha), Math.cos(alpha)*Math.cos(eps))/k);
+  $('tbElongLine').textContent = 'الزاوية بين القمر والشمس: '+ph.elong.toFixed(1)+'° • مضاء '+Math.round(ph.illum*100)+'٪ • '+ph.name+(ph.waxing?' (متزايد)':' (متناقص)');
+  $('tbLoc').textContent = observer.name+' ('+lat.toFixed(3)+'°, '+lon.toFixed(3)+'°)';
+  // ---- الكروت ----
+  const R = (a,b) => '<div class="tb-row"><span class="k">'+a+'</span><span class="v">'+b+'</span></div>', S = s => '<div class="tb-sec">'+s+'</div>';
+  const utcH = now.getUTCHours() + now.getUTCMinutes()/60 + now.getUTCSeconds()/3600 + now.getUTCMilliseconds()/3.6e6;
+  const astH = utcH + lon/15 + sun.eqMin/60, lstH = AstroMath.normDeg(gm + lon)/15;
+  let si = Math.floor(sun.lon/90)%4; if (lat < 0) si = (si+2)%4;
+  const angToSub = tbAngDist(lat, lon, sSub.lat, sSub.lon);
+  const sunDiam = (0.5332/sun.dist)*60, moonKm = moon.dist*6378.137, moonDiam = 2*Math.asin(1737.4/moonKm)/k*60;
+  const dayMin = ((H.sunT.sunset - H.sunT.sunrise)%1440+1440)%1440;
+  $('tbEarth').innerHTML =
+    S('الدوران والزمن') + R('الوقت الشمسي الحقيقي عندك', tbFmt.hms(astH)) + R('الوقت النجمي المحلي', tbFmt.hms(lstH)) +
+    R('معادلة الزمن', (sun.eqMin>=0?'+':'')+sun.eqMin.toFixed(1)+' دقيقة') + R('ميل محور الأرض', Ephemeris.obliquity(now).toFixed(2)+'°') +
+    S('الفصل') + R('الفصل الفلكي', ['الربيع','الصيف','الخريف','الشتاء'][si]) +
+    (H.season ? R(H.season.name, tbFmt.when(H.season.date)) + R('بعد', tbFmt.span(H.season.date - now)) : '') +
+    S('موقعك') + R('الإحداثيات', lat.toFixed(3)+'°, '+lon.toFixed(3)+'°') +
+    R('بُعدك عن نقطة الشمس فوق الرأس', angToSub.toFixed(1)+'° ≈ '+Math.round(angToSub*111.195).toLocaleString('ar-EG')+' كم');
+  $('tbSun').innerHTML =
+    S('في الكون') + R('النقطة تحت الشمس', tbFmt.lat(sSub.lat)+' / '+tbFmt.lon(sSub.lon)) + R('ميل الشمس', sun.dec.toFixed(2)+'°') +
+    R('خط الطول الفلكي', sun.lon.toFixed(1)+'° • برج '+AstroMath.zodiacSignOf(now)) +
+    R('المسافة', (sun.dist*149.5979).toFixed(1)+' مليون كم ('+sun.dist.toFixed(4)+' و.ف)') + R('القطر الظاهري', sunDiam.toFixed(1)+'′') +
+    S('من مكانك') + R('الارتفاع', sAA.alt.toFixed(1)+'° ('+(sAA.alt>-0.833?'فوق الأفق':'تحت الأفق')+')') +
+    R('السمت', sAA.az.toFixed(0)+'° • '+tbFmt.dir(sAA.az)) + R('الشروق', tbFmt.clock(H.sunT.sunrise)) + R('الزوال (الظهر)', tbFmt.clock(H.sunT.noon)) +
+    R('الغروب', tbFmt.clock(H.sunT.sunset)) + R('طول اليوم', Math.floor(dayMin/60)+' س '+Math.round(dayMin%60)+' د');
+  $('tbMoon').innerHTML =
+    S('في الكون') + R('النقطة تحت القمر', tbFmt.lat(mSub.lat)+' / '+tbFmt.lon(mSub.lon)) + R('ميل القمر', moon.dec.toFixed(2)+'°') +
+    R('المسافة', Math.round(moonKm).toLocaleString('ar-EG')+' كم ('+(moonKm>=384400?'+':'')+((moonKm/384400-1)*100).toFixed(1)+'٪ عن المتوسط)') + R('القطر الظاهري', moonDiam.toFixed(1)+'′') +
+    R('الطور', ph.name+' • '+Math.round(ph.illum*100)+'٪ مضاء') + R('الاستطالة عن الشمس', ph.elong.toFixed(1)+'°') + R('العمر التقريبي', ph.age.toFixed(1)+' يوم') +
+    S('من مكانك') + R('الارتفاع', mAA.alt.toFixed(1)+'° ('+(mAA.alt > (-0.5667-0.2725*mAA.par) ? 'فوق الأفق':'تحت الأفق')+')') +
+    R('السمت', mAA.az.toFixed(0)+'° • '+tbFmt.dir(mAA.az)) + R('شروق القمر', tbFmt.clock(H.moonRS.riseMin)) + R('غروب القمر', tbFmt.clock(H.moonRS.setMin)) +
+    R('المنزلة', (renderer.trueSky.moonMansionIndex(now)+1)+' — '+MANSION_NAMES[renderer.trueSky.moonMansionIndex(now)]) +
+    S('الأحداث الجاية (تقريبًا ±6 دقايق)') +
+    R('المحاق الفلكي (اقتران)', tbFmt.when(H.newMoon)) + R('بعد', H.newMoon ? tbFmt.span(H.newMoon - now) : '—') +
+    R('البدر (استقبال)', tbFmt.when(H.fullMoon)) + R('بعد', H.fullMoon ? tbFmt.span(H.fullMoon - now) : '—');
+}
 function toggleTrueSky(){
   renderer.trueSkyMode = !renderer.trueSkyMode;
   const btn = document.getElementById('trueSkyBtn');
@@ -2123,9 +2521,26 @@ function toggleTrueSky(){
 }
 // ===== الميزان — تحقق من دقة معادلة الشمس عندنا مقابل مصدر خارجي مستقل (sunrise-sunset.org) =====
 // المصدر ده منفصل تمامًا عن كودنا، فلو النتيجتين متطابقتين تقريبًا، يبقى تأكيد حقيقي إن الحساب صح
+// فحص داخلي (بدون إنترنت) لدقة معادلات الشمس والقمر على أحداث فلكية معروفة — بيتضاف لنتيجة الميزان
+function astroSelfTest(){
+  const ev = [['2017-08-21T18:30:00Z',0],['2023-10-14T17:55:00Z',0],['2024-04-08T18:21:00Z',0],
+              ['2019-01-21T05:16:00Z',180],['2022-11-08T11:02:00Z',180],['2025-09-07T18:09:00Z',180]]; // محاق (اقتران) وبدر (استقبال)
+  let maxMoon = 0;
+  ev.forEach(([iso,target])=>{ const t = new Date(iso); let x = AstroMath.normDeg(Ephemeris.moon(t).lon - Ephemeris.sun(t).lon - target); if (x>180) x-=360; maxMoon = Math.max(maxMoon, Math.abs(x)); });
+  const pts = [['2026-03-20T14:46:00Z',0],['2026-06-21T08:24:00Z',23.44],['2026-09-23T00:05:00Z',0],['2026-12-21T20:50:00Z',-23.44]]; // الاعتدالان والانقلابان
+  let maxDec = 0;
+  pts.forEach(([iso,known])=>{ maxDec = Math.max(maxDec, Math.abs(Ephemeris.sun(new Date(iso)).dec - known)); });
+  // نجوم المنازل المعروفة: (خط الطول الاستوائي J2000 + ~0.36° للحركة حتى 2026، رقم المنزلة الصحيح)
+  const ms = [[59.9,3],[69.8,4],[113.2,7],[149.8,10],[203.8,14],[249.8,18]];
+  const ay = Ephemeris.ayanamsa(new Date('2026-09-28T00:00:00Z'));
+  const mansOk = ms.filter(([l,n])=> Math.floor(AstroMath.normDeg(l+0.36-ay)/(360/28))+1 === n).length;
+  const ok = maxMoon <= 0.2 && maxDec <= 0.05 && mansOk === ms.length;
+  return (ok?'✅':'⚠️')+' فحص داخلي للشمس والقمر: خط طول القمر ≤ '+maxMoon.toFixed(2)+'° على 6 أحداث محاق/بدر معروفة، وميل الشمس ≤ '+maxDec.toFixed(3)+'° عند الاعتدالين والانقلابين، وتقسيم المنازل مطابق لـ '+mansOk+'/'+ms.length+' نجوم معروفة';
+}
 function verifyAgainstInternet(){
   const statusEl = document.getElementById('verifyStatus');
   if (!statusEl) return;
+  const stLine = astroSelfTest();
   statusEl.textContent = '⚖️ جارٍ التحقق من مصدرين مستقلين (الشمس + مواقيت الصلاة)...';
   const now = new Date();
   const dateStr = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
@@ -2183,10 +2598,10 @@ function verifyAgainstInternet(){
     const header = maxDiff <= 3
       ? '✅ كل الحسابات مطابقة (فارق أقصى '+Math.round(maxDiff)+' دقيقة) — الشمس من sunrise-sunset.org، والصلاة من Aladhan API بنفس طريقة الحساب ('+observer.calcMethod+')'
       : '⚠️ فيه فارق '+Math.round(maxDiff)+' دقيقة في «'+worstLabel+'» يستاهل مراجعة — الباقي متطابق';
-    statusEl.innerHTML = header+'<br><span style="font-size:11px;line-height:1.9;">'+lines.join('<br>')+'</span>';
+    statusEl.innerHTML = header+'<br><span style="font-size:11px;line-height:1.9;">'+lines.join('<br>')+'<br>'+stLine+'</span>';
   }).catch(err=>{
     statusEl.style.color = '#f0938a';
-    statusEl.textContent = '⚠️ تعذر الاتصال بمصدر التحقق: '+err.message;
+    statusEl.innerHTML = '⚠️ تعذر الاتصال بمصدر التحقق: '+err.message+'<br><span style="font-size:11px;">'+stLine+'</span>';
   });
 }
 function toggleNavTool(){ navTool.toggle(); }
