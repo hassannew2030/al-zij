@@ -81,6 +81,20 @@ section.philosophy p{font-size:17px;line-height:1.85;color:var(--ink);margin:0 0
 .simple-view .detail-only{display:none;}
 @keyframes prayerFlash{0%,100%{background:linear-gradient(90deg,#c0453a,#e8574a);}50%{background:#ffffff;}}
 .prayer-flash{animation:prayerFlash 0.5s ease-in-out 20;}
+/* ===== مكبّر التوربيون ===== */
+@keyframes tbBalanceOsc{ 0%{transform:rotate(-19deg);} 50%{transform:rotate(19deg);} 100%{transform:rotate(-19deg);} }
+@keyframes tbForkOsc{ 0%{transform:rotate(-4deg);} 50%{transform:rotate(4deg);} 100%{transform:rotate(-4deg);} }
+@keyframes tbEscStep{ 0%,45%{transform:rotate(0deg);} 55%,100%{transform:rotate(30deg);} }
+@keyframes tbSparkle{ 0%,100%{opacity:0.15;} 50%{opacity:0.9;} }
+#tourbillonBox #tbBalance{ transform-origin:200px 200px; animation: tbBalanceOsc 0.8s ease-in-out infinite; }
+#tourbillonBox #tbFork{ transform-origin:200px 108px; animation: tbForkOsc 0.8s ease-in-out infinite; }
+#tourbillonBox #tbEscGear{ transform-origin:200px 108px; animation: tbEscStep 0.8s steps(1) infinite; }
+#tourbillonBox .tb-sp{ animation: tbSparkle 2.6s ease-in-out infinite; }
+.tb-modal-backdrop{ position:fixed; inset:0; background:rgba(3,4,7,0.88); backdrop-filter:blur(3px); z-index:9000; display:none; align-items:center; justify-content:center; padding:16px; }
+.tb-modal-backdrop.open{ display:flex; }
+.tb-modal-box{ background:var(--bg-panel); border:1px solid rgba(201,163,93,0.3); border-radius:16px; padding:16px; max-width:440px; width:100%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.6); }
+.tb-modal-close{ background:var(--bg-panel); color:var(--brass-light); border:1px solid var(--brass); padding:8px 20px; border-radius:18px; font-family:'Amiri',serif; font-size:13px; cursor:pointer; margin-top:10px; }
+
 /* ===== مسجّل لحظة الأذان ===== */
 .al-sel{background:#0b0f17;color:var(--brass-light);border:1px solid var(--brass-dark);border-radius:8px;padding:6px 8px;font-family:'Amiri',serif;font-size:13px;}
 .al-lbl{display:flex;flex-direction:column;gap:3px;font-family:'Amiri',serif;font-size:12px;color:var(--ink-dim);min-width:120px;}
@@ -452,6 +466,16 @@ body.three-body-mode .stage, body.three-body-mode #glanceCard, body.three-body-m
           <polygon points="300,78 291,101 309,101" fill="#9b6bcc"/>
         </g>
 
+        <!-- مؤشرا "حقيقة السماء" الاتجاهيين: بيوروك فين الشمس والقمر فعليًا بالنسبة لاتجاه موبايلك الحقيقي (مش زخرفة) — يظهروا بس لما البوصلة شغالة ووضع حقيقة السماء مفعّل -->
+        <g id="sunSkyPointer" style="display:none;">
+          <line x1="300" y1="300" x2="300" y2="150" stroke="#ffd23f" stroke-width="2" stroke-linecap="round" opacity="0.9"/>
+          <circle cx="300" cy="142" r="9" fill="#ffd23f" stroke="#a37a2c" stroke-width="1"/>
+        </g>
+        <g id="moonSkyPointer" style="display:none;">
+          <line x1="300" y1="300" x2="300" y2="120" stroke="#cfd8ec" stroke-width="2" stroke-linecap="round" opacity="0.9"/>
+          <circle id="moonSkyPointerDot" cx="300" cy="112" r="7" fill="#e9e2cf" stroke="#8a8570" stroke-width="2.5"/>
+        </g>
+
         <!-- star ring: famous fixed stars, real RA/Dec → Alt/Az projection, not decorative rotation -->
         <g id="starRing" class="detail-only">
           <circle cx="300" cy="300" r="222" fill="none" stroke="url(#brassGrad)" stroke-width="1" opacity="0.4"/>
@@ -709,10 +733,11 @@ body.three-body-mode .stage, body.three-body-mode #glanceCard, body.three-body-m
   <div style="text-align:center;margin:0 0 8px;">
     <button id="viewModeBtn" onclick="toggleViewMode()" style="background:var(--bg-panel);color:var(--brass-light);border:1px solid var(--brass-dark);padding:9px 18px;border-radius:20px;font-family:'Amiri',serif;font-size:13px;cursor:pointer;white-space:nowrap;margin:0 4px;">📱 عرض مبسط</button>
     <button id="glanceBtn" onclick="toggleGlanceCard()" style="background:var(--bg-panel);color:var(--brass-light);border:1px solid var(--brass-dark);padding:9px 18px;border-radius:20px;font-family:'Amiri',serif;font-size:13px;cursor:pointer;white-space:nowrap;margin:0 4px;">👁️ نظرة أولى</button>
-    <button id="trueSkyBtn" onclick="toggleTrueSky()" style="background:var(--bg-panel);color:var(--verdigris-light);border:1px solid var(--verdigris);padding:9px 18px;border-radius:20px;font-family:'Amiri',serif;font-size:13px;cursor:pointer;white-space:nowrap;margin:0 4px;">🌌 حقيقة السماء</button>
+    <button id="trueSkyBtn" onclick="toggleTrueSky()" style="background:var(--bg-panel);color:var(--verdigris-light);border:1px solid var(--verdigris);padding:9px 18px;border-radius:20px;font-family:'Amiri',serif;font-size:13px;cursor:pointer;white-space:nowrap;margin:0 4px;">🌌 حقيقة السماء 🌙 وتتبع الهلال</button>
     <button id="verifyBtn" onclick="verifyAgainstInternet()" style="background:var(--bg-panel);color:#f0938a;border:1px solid var(--red);padding:9px 18px;border-radius:20px;font-family:'Amiri',serif;font-size:13px;cursor:pointer;white-space:nowrap;margin:0 4px;">⚖️ الميزان (تحقق)</button>
     <button id="windowScreenBtn" onclick="toggleWindowScreen()" style="background:var(--bg-panel);color:var(--brass-light);border:1px solid var(--brass-dark);padding:9px 18px;border-radius:20px;font-family:'Amiri',serif;font-size:13px;cursor:pointer;white-space:nowrap;margin:0 4px;">🖥️ شاشة ويندوز</button>
     <button id="adhanLogBtn" onclick="toggleAdhanLog()" style="background:var(--bg-panel);color:var(--brass-light);border:1px solid var(--brass);padding:9px 18px;border-radius:20px;font-family:'Amiri',serif;font-size:13px;cursor:pointer;white-space:nowrap;margin:0 4px;">⏱️ سجّل لحظة الأذان</button>
+    <button id="tourbillonBtn" onclick="openTourbillonBox()" style="background:var(--bg-panel);color:var(--brass-light);border:1px solid var(--brass);padding:9px 18px;border-radius:20px;font-family:'Amiri',serif;font-size:13px;cursor:pointer;white-space:nowrap;margin:0 4px;">🔬 مكبّر التوربيون</button>
     <button id="threeBodyBtn" onclick="toggleThreeBody()" style="background:var(--bg-panel);color:var(--brass-light);border:1px solid var(--brass);padding:9px 18px;border-radius:20px;font-family:'Amiri',serif;font-size:13px;cursor:pointer;white-space:nowrap;margin:0 4px;">🌍 الأجسام الثلاثة</button>
     <button id="adhanToggleBtn" onclick="toggleAdhanAlerts()" style="background:var(--bg-panel);color:#f0938a;border:1px solid var(--red);padding:9px 18px;border-radius:20px;font-family:'Amiri',serif;font-size:13px;cursor:pointer;white-space:nowrap;margin:0 4px;">🔔 تفعيل تنبيه الأذان والإقامة</button>
   </div>
@@ -726,10 +751,13 @@ body.three-body-mode .stage, body.three-body-mode #glanceCard, body.three-body-m
       <div id="alNext" style="text-align:center;margin:10px 0 4px;color:var(--brass-light);font-family:'Amiri',serif;font-size:14px;line-height:1.8;">—</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:8px 0;">
         <label class="al-lbl">الصلاة<select id="alPrayerSel" class="al-sel" onchange="alSaveControls()"><option value="auto">تلقائي (الأقرب)</option><option value="fajr">الفجر</option><option value="dhuhr">الظهر</option><option value="asr">العصر</option><option value="maghrib">المغرب</option><option value="isha">العشاء</option></select></label>
-        <label class="al-lbl">مصدر الأذان<select id="alSourceSel" class="al-sel" onchange="alSaveControls()"><option value="haram">الحرم المكي (بث/تلفزيون)</option><option value="clock">ساعة الحرمين (مكة)</option><option value="mosque">مسجد الحي</option><option value="other">مصدر آخر</option></select></label>
+        <label class="al-lbl">مصدر الأذان<select id="alSourceSel" class="al-sel" onchange="alSaveControls()"><option value="haram_dish">الحرم المكي (دش)</option><option value="haram_net">الحرم المكي (إنترنت)</option><option value="clock">ساعة الحرمين (مكة)</option><option value="mosque">مسجد الحي</option><option value="other">مصدر آخر</option></select></label>
         <label class="al-lbl">خصم زمن رد فعلك (ثانية)<input id="alReact" type="number" step="0.1" min="0" max="2" value="0" class="al-sel" style="width:100px;" onchange="alSaveControls()"></label>
       </div>
-      <button id="alTapBtn" class="al-tap" onclick="alRecord()">🕌 سمعت «الله أكبر» — سجّل الآن</button>
+      <div style="display:flex;gap:8px;">
+        <button id="alTapBtn" class="al-tap" style="flex:1;" onclick="alRecord()">🕌 بداية الأذان</button>
+        <button id="alEndBtn" class="al-tap" style="flex:1;background:linear-gradient(180deg,#2f6a4a,#1f4a34);border-color:#8ac9a4;" onclick="alRecordEnd()">⏹ نهاية الأذان</button>
+      </div>
       <p id="alLastMsg" style="text-align:center;font-family:'Amiri',serif;font-size:13px;color:var(--brass-light);margin:10px 0 0;min-height:18px;line-height:1.8;"></p>
     </div>
     <div class="tb-card">
@@ -741,11 +769,77 @@ body.three-body-mode .stage, body.three-body-mode #glanceCard, body.three-body-m
         <button class="al-mini" onclick="alClear()">🗑️ مسح الكل</button>
       </div>
       <p id="alCopyMsg" style="text-align:center;font-size:11.5px;color:var(--ink-dim);min-height:14px;margin:4px 0 0;"></p>
+      <div style="margin-top:10px;border-top:1px dashed rgba(201,163,93,0.2);padding-top:10px;">
+        <button class="al-mini" onclick="alApplyOffsetFromLog()">📌 استخدم متوسط القياسات كتعويض لكل صلاة</button>
+        <button class="al-mini" onclick="alClearOffsets()">✖️ إلغاء كل التعويضات</button>
+        <p id="alOffsetStatus" style="text-align:center;font-size:12px;color:var(--brass-light);margin:8px 0 0;line-height:1.9;"></p>
+      </div>
     </div>
     <div class="tb-card">
       <h4 style="font-family:'Amiri',serif;color:var(--brass-light);margin:0 0 8px;text-align:center;">ملخص الفروق (ثانية)</h4>
       <div id="alStats" style="overflow-x:auto;"></div>
       <p class="tb-note">الفرق = لحظة ضغطك − وقت المرجع. <b>موجب</b> = المؤذن بدأ بعد الحساب، و<b>سالب</b> = قبله. الفرق بيشمل زمن رد فعلك (حوالي نص ثانية) لو ما خصمتوش. لو المصدر الحرم أو ساعة الحرمين، المرجع محسوب لمكة، ولو مسجد الحي فلموقعك المثبّت.</p>
+    </div>
+  </div>
+
+
+  <!-- ===== مكبّر التوربيون: نفس دوران القفص الحقيقي في الساعة (دورة كل 60 ثانية)، مع ميزان متذبذب وهروب زخرفيين لغرض العرض ===== -->
+  <div id="tourbillonBox" class="tb-modal-backdrop" onclick="if(event.target===this) closeTourbillonBox()">
+    <div class="tb-modal-box">
+      <h3 style="font-family:'Amiri',serif;color:var(--brass-light);margin:0 0 8px;font-size:17px;">🔬 مكبّر التوربيون</h3>
+      <svg viewBox="0 0 400 400" style="width:100%;max-width:360px;display:block;margin:0 auto;">
+        <defs>
+          <radialGradient id="tbDialBg" cx="35%" cy="28%" r="85%"><stop offset="0%" stop-color="#1d2333"/><stop offset="65%" stop-color="#0c0e15"/><stop offset="100%" stop-color="#040507"/></radialGradient>
+          <linearGradient id="tbBrassRing" x1="15%" y1="10%" x2="85%" y2="90%"><stop offset="0%" stop-color="#fbe7ab"/><stop offset="25%" stop-color="#d4af6a"/><stop offset="50%" stop-color="#8a6a34"/><stop offset="75%" stop-color="#f0d492"/><stop offset="100%" stop-color="#6b5220"/></linearGradient>
+          <linearGradient id="tbSteelCage" x1="10%" y1="0%" x2="90%" y2="100%"><stop offset="0%" stop-color="#f2f5f9"/><stop offset="40%" stop-color="#9aa6b5"/><stop offset="52%" stop-color="#3f4a58"/><stop offset="75%" stop-color="#c9d0da"/><stop offset="100%" stop-color="#5a6674"/></linearGradient>
+          <linearGradient id="tbBlueSteel" x1="10%" y1="0%" x2="90%" y2="100%"><stop offset="0%" stop-color="#bfe4ff"/><stop offset="45%" stop-color="#3a7cb0"/><stop offset="55%" stop-color="#123151"/><stop offset="100%" stop-color="#0a1c30"/></linearGradient>
+          <radialGradient id="tbRubyJewel" cx="32%" cy="28%" r="75%"><stop offset="0%" stop-color="#ffb3aa"/><stop offset="35%" stop-color="#e6493a"/><stop offset="75%" stop-color="#8a1e14"/><stop offset="100%" stop-color="#4a0d08"/></radialGradient>
+          <radialGradient id="tbGoldCenter" cx="32%" cy="28%" r="75%"><stop offset="0%" stop-color="#fff6da"/><stop offset="45%" stop-color="#e8c164"/><stop offset="100%" stop-color="#5c4514"/></radialGradient>
+          <radialGradient id="tbScrewHead" cx="35%" cy="30%" r="70%"><stop offset="0%" stop-color="#dce8f5"/><stop offset="45%" stop-color="#5f7690"/><stop offset="100%" stop-color="#1c2733"/></radialGradient>
+          <filter id="tbDShadow" x="-60%" y="-60%" width="220%" height="220%"><feDropShadow dx="0" dy="1.5" stdDeviation="1.8" flood-color="#000" flood-opacity="0.65"/></filter>
+          <filter id="tbBigGlow" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="4"/></filter>
+        </defs>
+        <circle cx="200" cy="200" r="196" fill="url(#tbDialBg)"/>
+        <circle cx="200" cy="200" r="160" fill="none" stroke="url(#tbBrassRing)" stroke-width="7" filter="url(#tbDShadow)"/>
+        <circle cx="200" cy="200" r="160" fill="none" stroke="#2b2210" stroke-width="0.8" opacity="0.6"/>
+        <g id="tbTicks"></g>
+        <circle cx="200" cy="200" r="100" fill="#6fa8ff" opacity="0.05" filter="url(#tbBigGlow)"/>
+        <g id="tbCage" filter="url(#tbDShadow)">
+          <ellipse cx="200" cy="200" rx="100" ry="100" fill="none" stroke="url(#tbSteelCage)" stroke-width="5.5"/>
+          <ellipse cx="200" cy="200" rx="100" ry="100" fill="none" stroke="#161a20" stroke-width="0.7" opacity="0.6"/>
+          <line x1="100" y1="200" x2="300" y2="200" stroke="url(#tbSteelCage)" stroke-width="4.2"/>
+          <line x1="200" y1="100" x2="200" y2="300" stroke="url(#tbSteelCage)" stroke-width="4.2"/>
+          <line x1="129" y1="129" x2="271" y2="271" stroke="url(#tbSteelCage)" stroke-width="2.2" opacity="0.85"/>
+          <line x1="271" y1="129" x2="129" y2="271" stroke="url(#tbSteelCage)" stroke-width="2.2" opacity="0.85"/>
+          <circle cx="100" cy="200" r="7.5" fill="url(#tbRubyJewel)"/><circle cx="300" cy="200" r="7.5" fill="url(#tbRubyJewel)"/>
+          <circle cx="200" cy="100" r="7.5" fill="url(#tbRubyJewel)"/><circle cx="200" cy="300" r="7.5" fill="url(#tbRubyJewel)"/>
+          <circle cx="100" cy="200" r="2" fill="#fff" class="tb-sp"/><circle cx="300" cy="200" r="2" fill="#fff" class="tb-sp" style="animation-delay:.6s"/>
+          <circle cx="200" cy="100" r="2" fill="#fff" class="tb-sp" style="animation-delay:1.2s"/><circle cx="200" cy="300" r="2" fill="#fff" class="tb-sp" style="animation-delay:1.8s"/>
+          <g id="tbBalance">
+            <circle cx="200" cy="200" r="72" fill="none" stroke="url(#tbBlueSteel)" stroke-width="5"/>
+            <circle cx="200" cy="200" r="72" fill="none" stroke="#03101c" stroke-width="0.8" opacity="0.5"/>
+            <line x1="128" y1="200" x2="272" y2="200" stroke="url(#tbBlueSteel)" stroke-width="2.8"/>
+            <line x1="200" y1="128" x2="200" y2="272" stroke="url(#tbBlueSteel)" stroke-width="2.8"/>
+            <g transform="translate(200,138)"><circle r="4.8" fill="url(#tbScrewHead)"/><line x1="-2.8" y1="0" x2="2.8" y2="0" stroke="#0a1420" stroke-width="0.9"/></g>
+            <g transform="translate(262,200) rotate(90)"><circle r="4.8" fill="url(#tbScrewHead)"/><line x1="-2.8" y1="0" x2="2.8" y2="0" stroke="#0a1420" stroke-width="0.9"/></g>
+            <g transform="translate(200,262)"><circle r="4.8" fill="url(#tbScrewHead)"/><line x1="-2.8" y1="0" x2="2.8" y2="0" stroke="#0a1420" stroke-width="0.9"/></g>
+            <g transform="translate(138,200) rotate(90)"><circle r="4.8" fill="url(#tbScrewHead)"/><line x1="-2.8" y1="0" x2="2.8" y2="0" stroke="#0a1420" stroke-width="0.9"/></g>
+            <g transform="translate(251,149)"><circle r="3.8" fill="url(#tbScrewHead)"/><line x1="-2.2" y1="0" x2="2.2" y2="0" stroke="#0a1420" stroke-width="0.7"/></g>
+            <g transform="translate(149,149)"><circle r="3.8" fill="url(#tbScrewHead)"/><line x1="-2.2" y1="0" x2="2.2" y2="0" stroke="#0a1420" stroke-width="0.7"/></g>
+            <g transform="translate(251,251)"><circle r="3.8" fill="url(#tbScrewHead)"/><line x1="-2.2" y1="0" x2="2.2" y2="0" stroke="#0a1420" stroke-width="0.7"/></g>
+            <g transform="translate(149,251)"><circle r="3.8" fill="url(#tbScrewHead)"/><line x1="-2.2" y1="0" x2="2.2" y2="0" stroke="#0a1420" stroke-width="0.7"/></g>
+            <g transform="translate(200,200) scale(1.15)"><path d="M5.00,0.00 L5.19,1.02 L5.16,2.12 L4.90,3.24 L4.38,4.33 L3.63,5.33 L2.64,6.20 L1.45,6.88 L0.09,7.32 L-1.38,7.48 L-2.91,7.35 L-4.43,6.89 L-5.88,6.11 L-7.19,5.02 L-8.29,3.65 L-9.12,2.04 L-9.64,0.24 L-9.79,-1.68 L-9.55,-3.64 L-8.91,-5.58 L-7.87,-7.39 L-6.46,-9.01 L-4.72,-10.36 L-2.69,-11.36 L-0.45,-11.95 L1.92,-12.10 L4.32,-11.77 L6.67,-10.96 L8.86,-9.68 L10.80,-7.95 L12.40,-5.83 L13.57,-3.39 L14.26,-0.72 L14.42,2.10 L14.01,4.95 L13.04,7.71 L11.52,10.28 L9.48,12.55 L7.00,14.41 L4.16,15.77 L1.04,16.57 L-2.22,16.74 L-5.51,16.27 L-8.70,15.15 L-11.66,13.40 L-14.26,11.06 L-16.39,8.22 L-17.95,4.97 L-18.87,1.43 L-19.07,-2.29 L-18.55,-6.03 L-17.28,-9.64 L-15.31,-12.99 L-12.69,-15.94 L-9.49,-18.35 L-5.84,-20.12 L-1.87,-21.16 L2.30,-21.41 L6.48,-20.84 L10.53,-19.44 L14.28,-17.26" fill="none" stroke="url(#tbBlueSteel)" stroke-width="1.2"/></g>
+          </g>
+          <g id="tbEscGear" transform="translate(200,108)"><path d="M15.00,0.00 L11.08,2.97 L12.99,7.50 L8.11,8.11 L7.50,12.99 L2.97,11.08 L0.00,15.00 L-2.97,11.08 L-7.50,12.99 L-8.11,8.11 L-12.99,7.50 L-11.08,2.97 L-15.00,0.00 L-11.08,-2.97 L-12.99,-7.50 L-8.11,-8.11 L-7.50,-12.99 L-2.97,-11.08 L-0.00,-15.00 L2.97,-11.08 L7.50,-12.99 L8.11,-8.11 L12.99,-7.50 L11.08,-2.97 Z" fill="url(#tbSteelCage)" stroke="#1a1e24" stroke-width="0.6"/><circle r="4" fill="url(#tbGoldCenter)"/></g>
+          <g id="tbFork"><path d="M200,108 L194,140 L206,140 Z" fill="url(#tbSteelCage)" stroke="#1a1e24" stroke-width="0.6" opacity="0.95"/><circle cx="194" cy="140" r="2.6" fill="url(#tbRubyJewel)"/><circle cx="206" cy="140" r="2.6" fill="url(#tbRubyJewel)"/></g>
+          <circle cx="200" cy="200" r="10" fill="url(#tbGoldCenter)"/><circle cx="200" cy="200" r="10" fill="none" stroke="#4a3a12" stroke-width="0.7"/><circle cx="200" cy="200" r="4" fill="url(#tbRubyJewel)"/>
+        </g>
+      </svg>
+      <p style="font-family:'Amiri',serif;color:var(--ink-dim);font-size:12px;margin:10px 0 0;line-height:1.8;">
+        القفص الفضي بيلف <b style="color:var(--brass-light);">دورة كاملة كل 60 ثانية</b> — نفس حركته في الساعة الرئيسية بالظبط.
+        الميزان الأزرق (بالبراغي) وترس الهروب والمرساة فوق بيتحركوا زخرفيًا بسرعة تقليدية لساعات الجيب (~75 اهتزازة/دقيقة) — مش مربوطين بحساب فلكي، الهدف عرض الحركة الميكانيكية بوضوح.
+      </p>
+      <button class="tb-modal-close" onclick="closeTourbillonBox()">إغلاق</button>
     </div>
   </div>
 
@@ -802,6 +896,7 @@ body.three-body-mode .stage, body.three-body-mode #glanceCard, body.three-body-m
   </div>
 
   <p id="trueSkyStatus" style="text-align:center;color:var(--ink-dim);font-size:12px;margin:0 0 4px;min-height:16px;"></p>
+  <p id="skyLockStatus" style="text-align:center;color:var(--brass-light);font-size:12.5px;margin:0 0 8px;min-height:16px;line-height:1.7;max-width:480px;margin-left:auto;margin-right:auto;"></p>
   <p id="verifyStatus" style="text-align:center;color:var(--ink-dim);font-size:12px;margin:0 0 20px;min-height:16px;"></p>
 
   <!-- لوحة إلكترونية بكل معطيات الساعة — منظّمة في أقسام: الوقت، الإسلامي، الفلكي، الطقس -->
@@ -839,6 +934,17 @@ body.three-body-mode .stage, body.three-body-mode #glanceCard, body.three-body-m
           <div id="boxAsr" style="border-radius:5px;padding:3px;transition:box-shadow 0.3s;"><div style="font-family:'Amiri',serif;font-size:11px;color:var(--ink-dim,#8a8570);">العصر</div><div id="dataAsr" style="color:var(--brass-light);font-size:11.5px;margin-top:2px;">—</div></div>
           <div id="boxMaghrib" style="border-radius:5px;padding:3px;transition:box-shadow 0.3s;"><div style="font-family:'Amiri',serif;font-size:11px;color:var(--ink-dim,#8a8570);">المغرب</div><div id="dataMaghrib" style="color:var(--brass-light);font-size:11.5px;margin-top:2px;">—</div></div>
           <div id="boxIsha" style="border-radius:5px;padding:3px;transition:box-shadow 0.3s;"><div style="font-family:'Amiri',serif;font-size:11px;color:var(--ink-dim,#8a8570);">العشاء</div><div id="dataIsha" style="color:var(--brass-light);font-size:11.5px;margin-top:2px;">—</div></div>
+        </div>
+        <div style="margin-top:10px;text-align:center;">
+          <label style="font-family:'Amiri',serif;font-size:12px;color:var(--verdigris-light);">طريقة الحساب:
+            <select id="calcMethodSel" class="al-sel" onchange="setCalcMethod(this.value)" style="margin-right:6px;">
+              <option value="UMM_AL_QURA">أم القرى (السعودية)</option>
+              <option value="EGYPT">الهيئة المصرية (19.5° / 17.5°)</option>
+              <option value="MWL">رابطة العالم الإسلامي (18° / 17°)</option>
+              <option value="ISNA">أمريكا الشمالية (15° / 15°)</option>
+            </select>
+          </label>
+          <div id="calcMethodNote" style="font-family:'Amiri',serif;font-size:11.5px;color:var(--ink-dim);margin-top:5px;line-height:1.7;"></div>
         </div>
       </div>
       <div style="background:rgba(0,0,0,0.2);padding:10px;border-radius:6px;text-align:center;"><div style="color:var(--verdigris-light);font-family:'Amiri',serif;font-size:12px;">باقي على رمضان</div><div id="dataRamadanCountdown" style="color:var(--brass-light);font-size:13px;margin-top:4px;">—</div></div>
@@ -1052,6 +1158,13 @@ class AstroMath {
   static zodiacSignOf(date){
     const names = ['الحمل','الثور','الجوزاء','السرطان','الأسد','العذراء','الميزان','العقرب','القوس','الجدي','الدلو','الحوت'];
     return names[Math.floor(Ephemeris.sun(date).lon/30)%12];
+  }
+  // تقدير الانحراف المغناطيسي (الفرق بين الشمال المغناطيسي والحقيقي) — مضبوط بانحدار خطي محلي من 3 قيم حقيقية موثّقة
+  // (جدة +3.58° • مكة +3.5° • الرياض +2.7° — من magnetic-declination.com وWMM) صالح داخل شبه الجزيرة العربية تقريبًا فقط؛
+  // برّه النطاق ده بيرجع 0 (بدون تصحيح) بدل رقم غلط، لأن الانحراف الحقيقي مش خط مستقيم على مستوى العالم كله
+  static magneticDeclination(lat, lon){
+    if (lat < 12 || lat > 33 || lon < 33 || lon > 56) return 0;
+    return 8.1325 + 0.008465*lat - 0.120871*lon;
   }
   static equationOfTimeMinutes(date){ return Ephemeris.sun(date).eqMin; }
   // عمر القمر مبني على الاستطالة الفعلية عن الشمس (اتساق كامل مع الهندسة الحقيقية)
@@ -1280,7 +1393,8 @@ class Observer {
   constructor(){
     this.lat = 21.5433; this.lon = 39.1728; this.tz = 3;
     this.name = "جدة (موقع مثبّت)"; // جدة افتراضيًا ومثبّتة: الـGPS في المنطقة معرّض لتشويش/تضليل موثّق، فمنعتمدش عليه تلقائيًا
-    this.calcMethod = "EGYPT";
+    this.calcMethod = "UMM_AL_QURA";   // القرار: أم القرى هي الافتراضي (السعودية)؛ اختيار المستخدم بيتخزن محليًا
+    try{ const m = localStorage.getItem('zijCalcMethod'); if (m && ['UMM_AL_QURA','EGYPT','MWL','ISNA'].indexOf(m) >= 0) this.calcMethod = m; }catch(e){}
     this.KAABA_LAT = 21.4225; this.KAABA_LON = 39.8262;
     this.lastGeocodedKey = null;
     this.lastWeatherKey = null;
@@ -1465,6 +1579,7 @@ class Observer {
   }
   realPrayerTimes(d, hDate){
     const t = this.sunTimes(d);
+    const _off = (()=>{ try{ return JSON.parse(localStorage.getItem('zijAdhanOffsets')||'{}'); }catch(e){ return {}; } })();
     let fajrAngle=-19.5, ishaAngle=-17.5, ishaFixed=0;
     if (this.calcMethod==="UMM_AL_QURA"){ fajrAngle=-18.5; ishaFixed = (hDate.month===9) ? 120 : 90; }
     else if (this.calcMethod==="MWL"){ fajrAngle=-18; ishaAngle=-17; }
@@ -1473,7 +1588,8 @@ class Observer {
     const isha = ishaFixed ? t.sunset + ishaFixed : this._eventMin(d,'is'+ishaAngle,()=>ishaAngle,+1);
     // العصر: ظل الجسم = طوله + ظل الزوال (مذهب الجمهور) — الارتفاع هندسي بدون خصم انكسار، زي المراجع القياسية
     const asr = this._eventMin(d,'asr',dec=>Math.atan(1/(1+Math.abs(Math.tan(this.lat*AstroMath.DEGR - dec))))*AstroMath.RADD,+1);
-    return { fajr, sunrise:t.sunrise, dhuhr:t.noon, asr, maghrib:t.sunset, isha, noon:t.noon };
+    const withOff = (m,k)=> m + (_off[k]||0)/60;
+    return { fajr: withOff(fajr,'fajr'), sunrise:t.sunrise, dhuhr: withOff(t.noon,'dhuhr'), asr: withOff(asr,'asr'), maghrib: withOff(t.sunset,'maghrib'), isha: withOff(isha,'isha'), noon:t.noon };
   }
 }
 
@@ -1684,17 +1800,18 @@ class ClockRenderer {
 
     const pg = document.getElementById('prayerMarkers');
     pg.innerHTML = '';
+    // الرموز اتكبّرت (~55%) وزودنا هالة سودا خلفهم عشان تفصلهم بصريًا عن زحمة الحزام والأرقام حواليهم — الشكل والمكان الفلكي زي ما هو، بس أوضح للعين
     const prayerIcons = {
       // الفجر: إشراقة أولى — سهم صغير صاعد من خط أفق قصير
-      "الفجر": (x,y)=>`<g transform="translate(${x},${y})"><line x1="-5" y1="3" x2="5" y2="3" stroke="#eddba0" stroke-width="1.2"/><path d="M -3 1 L 0 -6 L 3 1" fill="none" stroke="#eddba0" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></g>`,
+      "الفجر": (x,y)=>`<g transform="translate(${x},${y})"><circle r="8" fill="#0d1119" opacity="0.55"/><line x1="-7.5" y1="4.5" x2="7.5" y2="4.5" stroke="#eddba0" stroke-width="1.8"/><path d="M -4.5 1.5 L 0 -9 L 4.5 1.5" fill="none" stroke="#eddba0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>`,
       // الظهر: قرص شمس ممتلئ، الشمس في أعلى نقطة لها
-      "الظهر": (x,y)=>`<circle cx="${x}" cy="${y}" r="4.2" fill="#f7d978" stroke="#0d1119" stroke-width="1"/>`,
+      "الظهر": (x,y)=>`<g transform="translate(${x},${y})"><circle r="8" fill="#0d1119" opacity="0.55"/><circle r="6.3" fill="#f7d978" stroke="#0d1119" stroke-width="1.3"/></g>`,
       // العصر: قرص شمس صغير + ظل مائل طويل يدل على طول الظل وقت العصر
-      "العصر": (x,y)=>`<g transform="translate(${x},${y})"><circle r="3.4" fill="#e8a94a" stroke="#0d1119" stroke-width="0.8"/><line x1="0" y1="0" x2="7" y2="6" stroke="#8a8570" stroke-width="1.3" stroke-linecap="round"/></g>`,
+      "العصر": (x,y)=>`<g transform="translate(${x},${y})"><circle r="8" fill="#0d1119" opacity="0.55"/><circle r="5.1" fill="#e8a94a" stroke="#0d1119" stroke-width="1.1"/><line x1="0" y1="0" x2="10.5" y2="9" stroke="#c9c2ab" stroke-width="1.8" stroke-linecap="round"/></g>`,
       // المغرب: نصف قرص شمس غاطس في خط الأفق
-      "المغرب": (x,y)=>`<g transform="translate(${x},${y})"><path d="M -4.5 0 A 4.5 4.5 0 0 1 4.5 0 Z" fill="#c1613f" stroke="#0d1119" stroke-width="0.8"/><line x1="-6" y1="0" x2="6" y2="0" stroke="#8a8570" stroke-width="1"/></g>`,
+      "المغرب": (x,y)=>`<g transform="translate(${x},${y})"><circle r="8" fill="#0d1119" opacity="0.55"/><path d="M -6.8 0 A 6.8 6.8 0 0 1 6.8 0 Z" fill="#c1613f" stroke="#0d1119" stroke-width="1.1"/><line x1="-9" y1="0" x2="9" y2="0" stroke="#c9c2ab" stroke-width="1.5"/></g>`,
       // العشاء: بريق نجمي رباعي الأطراف — مختلف تمامًا عن شكل الهلال
-      "العشاء": (x,y)=>`<g transform="translate(${x},${y})"><path d="M0,-5 L1.2,-1.2 L5,0 L1.2,1.2 L0,5 L-1.2,1.2 L-5,0 L-1.2,-1.2 Z" fill="#eddba0" stroke="#0d1119" stroke-width="0.6"/></g>`
+      "العشاء": (x,y)=>`<g transform="translate(${x},${y})"><circle r="8" fill="#0d1119" opacity="0.55"/><path d="M0,-7.5 L1.8,-1.8 L7.5,0 L1.8,1.8 L0,7.5 L-1.8,1.8 L-7.5,0 L-1.8,-1.8 Z" fill="#eddba0" stroke="#0d1119" stroke-width="0.7"/></g>`
     };
     [["الفجر",prayers.fajr],["الظهر",prayers.dhuhr],["العصر",prayers.asr],["المغرب",prayers.maghrib],["العشاء",prayers.isha]].forEach(([name,tmin])=>{
       const p = AstroMath.polar(300,300,Rsol,AstroMath.timeToAngle(tmin));
@@ -1841,7 +1958,7 @@ class TrueSkyEngine {
     let E = M + e*Math.sin(M)*(1+e*Math.cos(M));
     for (let z=0;z<5;z++) E -= (E - e*Math.sin(E) - M)/(1 - e*Math.cos(E));
     const xv = Math.cos(E)-e, yv = Math.sqrt(1-e*e)*Math.sin(E);
-    const v = Math.atan2(yv,xv), r = Math.hypot(xv,yv), lon = v+w;
+    const v = Math.atan2(yv,xv), r = Math.hypot(xv,yv), lon = v+w+Math.PI;   // موضع الأرض من الشمس = عكس موضع الشمس من الأرض (كان ناقص 180° وده كان بيقلب اتجاه كل الكواكب)
     return { x: r*Math.cos(lon), y: r*Math.sin(lon), z: 0 };
   }
   planetEquatorial(name, d){
@@ -1905,15 +2022,36 @@ class CompassController {
     this.isCompassListening = false;
     this.currentHeading = 0;
     this.targetHeading = 0;
+    this.currentTilt = 0;
+    this.targetTilt = 0;
+    this.hasTilt = false;
+    this._lastLockVibrate = 0;
+    this._headingBuf = [];   // آخر 6 قراءات خام من الحساس — متوسط دائري (يراعي لفة 359°→1°) بيمتص رعشة اليد والتشويش قبل فلتر التنعيم في animateSmooth، فالسهم يفضل ثابت زي عقرب الثواني
     this.orientationEventCount = 0; // عداد تشخيصي — لو فضل صفر يبقى الحساس مش بيبعت للصفحة أصلاً
     this.handleOrientation = this.handleOrientation.bind(this);
   }
   handleOrientation(event){
     this.orientationEventCount++;
+    const decl = AstroMath.magneticDeclination(observer.lat, observer.lon);   // نصحّح فورًا لحظة القراءة، فكل استخدام لاحق لـ targetHeading بيبقى شمال حقيقي
+    let rawHeading = null;
     if (typeof event.webkitCompassHeading !== 'undefined' && event.webkitCompassHeading !== null){
-      this.targetHeading = event.webkitCompassHeading; // iOS Safari: already 0°=N, clockwise
+      rawHeading = (event.webkitCompassHeading + decl + 360) % 360; // iOS: مغناطيسي أصلًا، + الانحراف = حقيقي
     } else if (event.alpha !== null){
-      this.targetHeading = (360 - event.alpha) % 360; // Android approximation
+      rawHeading = ((360 - event.alpha) + decl + 360) % 360; // Android: نفس التصحيح
+    }
+    if (rawHeading !== null){
+      this._headingBuf.push(rawHeading);
+      if (this._headingBuf.length > 6) this._headingBuf.shift();
+      let sx = 0, sy = 0;
+      this._headingBuf.forEach(a => { sx += Math.cos(a*Math.PI/180); sy += Math.sin(a*Math.PI/180); });
+      this.targetHeading = (Math.atan2(sy, sx)*180/Math.PI + 360) % 360;   // متوسط دائري لآخر 6 قراءات — بيمتص رعشة اليد والتشويش قبل فلتر التنعيم في animateSmooth
+    }
+    // ميل الموبايل لفوق/تحت (beta): بيتفترض إمساك الموبايل واقف رأسي قدامك زي كاميرا موجّهة للسماء —
+    // beta=90° يعني الموبايل واقف رأسي بيبص للأفق (ارتفاع=0)، beta=0° يعني الموبايل مستلقي بيبص لقمة السما (ارتفاع=90)
+    // ⚠️ الافتراض ده لسه محتاج تأكيد على جهاز حقيقي، ممكن يحتاج تعديل حسب طريقة إمساكك الفعلية
+    if (typeof event.beta === 'number'){
+      this.targetTilt = Math.max(-90, Math.min(90, 90 - event.beta));
+      this.hasTilt = true;
     }
   }
   // ===== FIXED start =====
@@ -2009,6 +2147,11 @@ class CompassController {
       this.renderer.rot('secondHand', (sec + ms/1000)/60*360, 300, 300);
       this.renderer.rot('tourbillonCage', (sec*1000 + ms)/60000*360, 560, 560);
 
+      if (!this.isCompassListening){
+        const sunEl0 = document.getElementById('sunSkyPointer'), moonEl0 = document.getElementById('moonSkyPointer');
+        if (sunEl0) sunEl0.style.display = 'none';
+        if (moonEl0) moonEl0.style.display = 'none';
+      }
       if (this.isCompassListening){
         let diff = this.targetHeading - this.currentHeading;
         diff = (diff + 180) % 360 - 180; // يمنع القفزة الكاذبة عند عبور حد ٣٦٠°/٠°
@@ -2017,6 +2160,40 @@ class CompassController {
         this.renderer.rot('qiblaArrow', this.qiblaBearing - this.currentHeading, 300, 300);
         this.renderer.rot('glanceCompassNeedle', this.qiblaBearing - this.currentHeading, 50, 50);
         this.renderer.rot('shadowHand', this.renderer.observer.shadowDirectionNow(new Date()) - this.currentHeading, 300, 300);
+
+        // مؤشرا حقيقة السماء: بيتحرّكوا بس لو المستخدم فعّل الزرار، وبيختفوا/يخفتوا لو الجرم تحت الأفق فعليًا
+        if (this.renderer.trueSkyMode){
+          const nowSky = new Date();
+          const sunAA = this.renderer.observer.sunAltAzNow(nowSky);
+          const moonAA = this.renderer.trueSky.moonAltTopo(nowSky);
+          const sunEl = document.getElementById('sunSkyPointer'), moonEl = document.getElementById('moonSkyPointer');
+          if (sunEl){ sunEl.style.display = ''; sunEl.style.opacity = sunAA.alt > -0.833 ? '1' : '0.25'; this.renderer.rot('sunSkyPointer', sunAA.az - this.currentHeading, 300, 300); }
+          if (moonEl){ moonEl.style.display = ''; moonEl.style.opacity = moonAA.alt > (-0.5667 - 0.2725*moonAA.par) ? '1' : '0.25'; this.renderer.rot('moonSkyPointer', moonAA.az - this.currentHeading, 300, 300); }
+
+          // ===== تتبع القمر بالارتفاع كمان (تجريبي): لما اتجاهك واتجاه ميل موبايلك الاتنين يطابقوا سمت وارتفاع القمر الحقيقي، اهتزاز + تلوين أخضر =====
+          const lockEl = document.getElementById('skyLockStatus');
+          if (this.hasTilt){
+            let tDiff = this.targetTilt - this.currentTilt; tDiff = (tDiff+540)%360-180;
+            this.currentTilt += tDiff*0.2;
+            let azDiff = moonAA.az - this.currentHeading; azDiff = ((azDiff+540)%360-180);
+            const altDiff = moonAA.alt - this.currentTilt;
+            const locked = Math.abs(azDiff) < 4 && Math.abs(altDiff) < 4 && moonAA.alt > -1;
+            const moonDot = document.getElementById('moonSkyPointerDot'); if (moonDot){ moonDot.setAttribute('stroke', locked ? '#3ddc84' : '#8a8570'); moonDot.setAttribute('stroke-width', locked ? '3.5' : '2.5'); }
+            if (locked){
+              const t = Date.now();
+              if (t - this._lastLockVibrate > 1500){ this._lastLockVibrate = t; try{ if (navigator.vibrate) navigator.vibrate([30,40,30]); }catch(e){} }
+            }
+            if (lockEl) lockEl.innerHTML = (locked ? '🎯 <b>القمر قدامك دلوقتي بالظبط!</b>' : 'وجّه يمين/شمال ولف الموبايل لفوق أو تحت — ')
+              +'ميل موبايلك التقريبي: <b>'+this.currentTilt.toFixed(0)+'°</b> • ارتفاع القمر الحقيقي: <b>'+moonAA.alt.toFixed(0)+'°</b>'
+              +' ('+(Math.abs(altDiff)<1?'بالظبط ✅':(altDiff>0?'ارفع الموبايل أكتر '+Math.abs(altDiff).toFixed(0)+'°':'نزّل الموبايل شوية '+Math.abs(altDiff).toFixed(0)+'°'))+')';
+          } else if (lockEl) {
+            lockEl.textContent = 'ℹ️ جهازك مش بيبعت قراءة ميل (beta) — التتبع بالارتفاع مش متاح، بس اتجاه اليمين/الشمال (المؤشر الأبيض) لسه شغال.';
+          }
+        } else {
+          const sunEl = document.getElementById('sunSkyPointer'), moonEl = document.getElementById('moonSkyPointer');
+          if (sunEl) sunEl.style.display = 'none';
+          if (moonEl) moonEl.style.display = 'none';
+        }
         const statusEl = document.getElementById('compassStatus');
         if (statusEl){
           if (this.orientationEventCount === 0){
@@ -2195,8 +2372,10 @@ class NavTool {
     let heading = event.alpha;
     if (event.webkitCompassHeading) heading = event.webkitCompassHeading;
     if (heading !== null){
+      const decl = AstroMath.magneticDeclination(this.lat, this.lon);
+      heading = (heading + decl + 360) % 360;   // تصحيح الانحراف المغناطيسي — نفس التصحيح المستخدم في البوصلة الرئيسية
       this.deviceHeading = heading;
-      document.getElementById('navHeadingInfo').innerText = `اتجاه الجهاز: ${heading.toFixed(0)}°`;
+      document.getElementById('navHeadingInfo').innerText = `اتجاه الجهاز (حقيقي): ${heading.toFixed(0)}°`;
     }
   }
   drawLoop(){
@@ -2614,7 +2793,8 @@ function updateThreeBody(now){
 // ===== مسجّل لحظة الأذان — تسجيل بالثانية + مقارنة بمراجع محسوبة (أم القرى وبدائل الفجر والعشاء) =====
 const AL_KEY = 'zijAdhanLog', AL_CTRL_KEY = 'zijAdhanCtrl';
 const AL_PRAYERS = [['fajr','الفجر'],['dhuhr','الظهر'],['asr','العصر'],['maghrib','المغرب'],['isha','العشاء']];
-const AL_SOURCES = { haram:['الحرم المكي (بث)','makkah'], clock:['ساعة الحرمين (مكة)','makkah'], mosque:['مسجد الحي','me'], other:['مصدر آخر','me'] };
+const AL_SOURCES = { haram_dish:['الحرم المكي (دش)','makkah'], haram_net:['الحرم المكي (إنترنت)','makkah'], clock:['ساعة الحرمين (مكة)','makkah'], mosque:['مسجد الحي','me'], other:['مصدر آخر','me'] };
+let _alPendingStart = null;   // لحظة بداية الأذان المسجّلة، مستنية ضغطة "نهاية الأذان" لحساب المدة
 let _alMakkahObs = null;
 function alObserverFor(src){
   if ((AL_SOURCES[src]||[])[1] === 'makkah'){
@@ -2677,14 +2857,26 @@ function alRecord(tsOverride){
   const entry = { ts, prayer, src, city: obs === observer ? 'me' : 'makkah', lat: +obs.lat.toFixed(4), lon: +obs.lon.toFixed(4), react, diff: +((ts - ref[prayer])/1000).toFixed(1), alts: {} };
   (prayer==='fajr' ? ['فجر 19°','فجر 19.5°','فجر 18°'] : prayer==='isha' ? ['عشاء 17°','عشاء 17.5°'] : []).forEach(k=>{ entry.alts[k] = +((ts - alts[k])/1000).toFixed(1); });
   const log = alLoad(); log.push(entry); alSave(log);
-  if (msg) msg.innerHTML = '✅ اتسجّل: <b>'+alPName(prayer)+'</b> عند '+alTimeStr(ts)+' — الفرق عن المرجع '+alSigned(entry.diff)+' ثانية';
+  _alPendingStart = { ts, prayer, index: log.length-1 };
+  if (msg) msg.innerHTML = '✅ بداية '+alPName(prayer)+' عند '+alTimeStr(ts)+' — الفرق عن المرجع '+alSigned(entry.diff)+' ثانية. دوس "نهاية الأذان" لما يخلص.';
   const btn = document.getElementById('alTapBtn'); if (btn){ const old = btn.textContent; btn.textContent = '✅ اتسجّل'; setTimeout(()=>{ btn.textContent = old; }, 900); }
   try{ if (navigator.vibrate) navigator.vibrate(40); }catch(e){}
   alRender();
   return entry;
 }
-function alUndo(){ const log = alLoad(); if (!log.length) return; log.pop(); alSave(log); const m = document.getElementById('alLastMsg'); if (m) m.textContent = '↩️ اتحذف آخر تسجيل.'; alRender(); }
-function alClear(){ if (!alLoad().length) return; if (confirm('تمسح كل تسجيلات الأذان؟')){ alSave([]); alRender(); } }
+function alRecordEnd(){
+  const msg = document.getElementById('alLastMsg');
+  if (!_alPendingStart){ if (msg) msg.textContent = '⚠️ محتاج تدوس "بداية الأذان" الأول.'; return; }
+  const durationSec = +((Date.now() - _alPendingStart.ts)/1000).toFixed(1);
+  const log = alLoad();
+  const e = log[_alPendingStart.index];
+  if (e && e.ts === _alPendingStart.ts){ e.durationSec = durationSec; alSave(log); }
+  if (msg) msg.innerHTML = '⏹ خلص '+alPName(_alPendingStart.prayer)+' — <b>المدة: '+durationSec.toFixed(1)+' ثانية</b> (من بداية الأذان لنهايته)';
+  _alPendingStart = null;
+  alRender();
+}
+function alUndo(){ const log = alLoad(); if (!log.length) return; log.pop(); alSave(log); _alPendingStart = null; const m = document.getElementById('alLastMsg'); if (m) m.textContent = '↩️ اتحذف آخر تسجيل.'; alRender(); }
+function alClear(){ if (!alLoad().length) return; if (confirm('تمسح كل تسجيلات الأذان؟')){ alSave([]); _alPendingStart = null; alRender(); } }
 function alMedian(a){ const s = a.slice().sort((x,y)=>x-y), n = s.length; return n%2 ? s[(n-1)/2] : (s[n/2-1]+s[n/2])/2; }
 function alRender(){
   const log = alLoad(), tbl = document.getElementById('alTable'), st = document.getElementById('alStats');
@@ -2695,6 +2887,7 @@ function alRender(){
     rows += '<tr><td>'+alDateStr(e.ts)+'</td><td>'+alPName(e.prayer)+'</td><td>'+alTimeStr(e.ts)+'</td><td>'+alSigned(e.diff)+'</td><td>'+((AL_SOURCES[e.src]||[e.src])[0])+'</td></tr>';
     const ak = Object.keys(e.alts||{});
     if (ak.length) rows += '<tr><td colspan="5" class="al-alt">بدائل: '+ak.map(k=>k+': '+alSigned(e.alts[k])).join(' • ')+'</td></tr>';
+    if (e.durationSec !== undefined) rows += '<tr><td colspan="5" class="al-alt">⏱ مدة الأذان: '+e.durationSec.toFixed(1)+' ثانية</td></tr>';
   });
   tbl.innerHTML = rows + '</table>';
   const g = {};
@@ -2709,11 +2902,11 @@ function alRender(){
 // نص جاهز للنسخ والإرسال للتحليل
 function alExportText(){
   const log = alLoad();
-  const lines = ['سجل الأذان — الزيج | المرجع: أم القرى (فجر 18.5°، عشاء المغرب+90د و+120د في رمضان)', 'الصلاة | المصدر | التاريخ | لحظة الضغط | الفرق(ث) | بدائل | زمن_رد_الفعل | مرجع'];
+  const lines = ['سجل الأذان — الزيج | المرجع: أم القرى (فجر 18.5°، عشاء المغرب+90د و+120د في رمضان)', 'الصلاة | المصدر | التاريخ | لحظة الضغط | الفرق(ث) | بدائل | زمن_رد_الفعل | مرجع | مدة_الأذان'];
   log.forEach(e=>{
     const d = new Date(e.ts);
     lines.push([alPName(e.prayer), (AL_SOURCES[e.src]||[e.src])[0], alDateStr(e.ts), alPad(d.getHours())+':'+alPad(d.getMinutes())+':'+alPad(d.getSeconds())+'.'+Math.floor(d.getMilliseconds()/100),
-      (e.diff>=0?'+':'')+e.diff, Object.keys(e.alts||{}).map(k=>k+'='+e.alts[k]).join(';')||'-', e.react||0, (e.city==='makkah'?'مكة':'موقعي')+' '+e.lat+','+e.lon].join(' | '));
+      (e.diff>=0?'+':'')+e.diff, Object.keys(e.alts||{}).map(k=>k+'='+e.alts[k]).join(';')||'-', e.react||0, (e.city==='makkah'?'مكة':'موقعي')+' '+e.lat+','+e.lon, e.durationSec!==undefined?e.durationSec+'ث':'-'].join(' | '));
   });
   return lines.join('\n');
 }
@@ -2738,21 +2931,117 @@ function alTick(now){
   const left = Math.max(0, Math.round((nxt[1]-t)/1000)), hh = Math.floor(left/3600), mm = Math.floor((left%3600)/60), ss = left%60;
   el.innerHTML = 'الأذان القادم حسب المرجع ('+(obs===observer?'موقعك':'مكة')+'): <b>'+alPName(nxt[0])+'</b> عند '+alTimeStr(nxt[1])+'<br>باقي <bdi dir="ltr">'+alPad(hh)+':'+alPad(mm)+':'+alPad(ss)+'</bdi>';
 }
+// ===== تعويضات الأذان: فرق ثابت (ثانية) لكل صلاة، مبني على متوسط "بداية الأذان" المسجّلة — بيتطبق على مواقيت جدة =====
+const AL_OFFSET_KEY = 'zijAdhanOffsets';
+function alLoadOffsets(){ try{ return JSON.parse(localStorage.getItem(AL_OFFSET_KEY)||'{}'); }catch(e){ return {}; } }
+function alSaveOffsets(o){ try{ localStorage.setItem(AL_OFFSET_KEY, JSON.stringify(o)); }catch(e){} }
+function alApplyOffsetFromLog(){
+  const log = alLoad(), st = document.getElementById('alOffsetStatus');
+  if (!log.length){ if (st) st.textContent = '⚠️ مفيش تسجيلات لحد دلوقتي.'; return; }
+  const g = {};
+  log.forEach(e=>{ (g[e.prayer] = g[e.prayer]||[]).push(e.diff); });
+  const offsets = {};
+  Object.keys(g).forEach(p=>{ const a=g[p]; offsets[p] = +(a.reduce((x,y)=>x+y,0)/a.length).toFixed(1); });
+  alSaveOffsets(offsets);
+  observer._memoMap && observer._memoMap.clear();
+  alShowOffsetStatus();
+  try{ renderer.tick(); }catch(e){}
+}
+function alClearOffsets(){ alSaveOffsets({}); observer._memoMap && observer._memoMap.clear(); alShowOffsetStatus(); try{ renderer.tick(); }catch(e){} }
+function alShowOffsetStatus(){
+  const st = document.getElementById('alOffsetStatus'); if (!st) return;
+  const o = alLoadOffsets(), keys = Object.keys(o);
+  st.textContent = keys.length ? 'التعويض الحالي على المواقيت: '+keys.map(k=>alPName(k)+' '+alSigned(o[k])+'ث').join(' • ') : 'مفيش تعويض مطبّق الآن — المواقيت على حساب أم القرى المباشر.';
+}
 function toggleAdhanLog(){
   const panel = document.getElementById('adhanLogPanel'), btn = document.getElementById('adhanLogBtn');
   const on = panel.style.display !== 'block';
   panel.style.display = on ? 'block' : 'none';
   if (btn){ btn.style.background = on ? 'var(--brass)' : 'var(--bg-panel)'; btn.style.color = on ? '#0a0c12' : 'var(--brass-light)'; btn.textContent = on ? '⏹ إغلاق التسجيل' : '⏱️ سجّل لحظة الأذان'; }
-  if (on){ alInitControls(); alRender(); alTick(new Date()); if (panel.scrollIntoView) panel.scrollIntoView({behavior:'smooth', block:'start'}); }
+  if (on){ alInitControls(); alRender(); alTick(new Date()); alShowOffsetStatus(); if (panel.scrollIntoView) panel.scrollIntoView({behavior:'smooth', block:'start'}); }
+}
+// ===== اختيار طريقة حساب الصلاة (أم القرى افتراضيًا) =====
+const CALC_NAMES = { UMM_AL_QURA:'أم القرى', EGYPT:'الهيئة المصرية', MWL:'رابطة العالم الإسلامي', ISNA:'أمريكا الشمالية' };
+const CALC_NOTES = {
+  UMM_AL_QURA:'أم القرى: الفجر 18.5°، والعشاء بعد المغرب بـ90 دقيقة (120 في رمضان). العصر بمذهب الجمهور (ظل = طول الجسم).',
+  EGYPT:'الهيئة المصرية: الفجر 19.5° والعشاء 17.5°. (مش الرسمي في السعودية)',
+  MWL:'رابطة العالم الإسلامي: الفجر 18° والعشاء 17°.',
+  ISNA:'أمريكا الشمالية: الفجر 15° والعشاء 15°.'
+};
+function initCalcMethodUI(){
+  const sel = document.getElementById('calcMethodSel'), note = document.getElementById('calcMethodNote');
+  if (sel) sel.value = observer.calcMethod;
+  if (note) note.textContent = CALC_NOTES[observer.calcMethod] || '';
+}
+function setCalcMethod(v){
+  if (!CALC_NAMES[v]) return;
+  observer.calcMethod = v;
+  try{ localStorage.setItem('zijCalcMethod', v); }catch(e){}
+  if (observer._memoMap) observer._memoMap.clear();   // الكاش القديم كان بالطريقة السابقة
+  initCalcMethodUI();
+  try{ renderer.tick(); }catch(e){}
+}
+// ===== مكبّر التوربيون: نافذة منبثقة، دوران القفص مطابق للساعة الحقيقية =====
+let _tbBoxRAF = null;
+function tbBoxTicks(){
+  const g = document.getElementById('tbTicks'); if (!g || g.childElementCount) return;
+  for (let i=0;i<60;i++){
+    const a = i*6*Math.PI/180, r1=155, r2 = i%5===0?142:148;
+    const x1=200+r1*Math.sin(a), y1=200-r1*Math.cos(a), x2=200+r2*Math.sin(a), y2=200-r2*Math.cos(a);
+    const l = document.createElementNS('http://www.w3.org/2000/svg','line');
+    l.setAttribute('x1',x1); l.setAttribute('y1',y1); l.setAttribute('x2',x2); l.setAttribute('y2',y2);
+    l.setAttribute('stroke', i%5===0? '#e8c878':'#5a4a2e'); l.setAttribute('stroke-width', i%5===0?2.2:1);
+    g.appendChild(l);
+  }
+}
+function tbBoxLoop(){
+  const now = new Date();
+  const deg = (now.getSeconds()*1000 + now.getMilliseconds())/60000*360;   // نفس معادلة التوربيون في الساعة الرئيسية بالظبط
+  const cage = document.getElementById('tbCage'); if (cage) cage.setAttribute('transform', 'rotate('+deg+' 200 200)');
+  _tbBoxRAF = requestAnimationFrame(tbBoxLoop);
+}
+function openTourbillonBox(){
+  tbBoxTicks();
+  document.getElementById('tourbillonBox').classList.add('open');
+  if (!_tbBoxRAF) tbBoxLoop();
+}
+function closeTourbillonBox(){
+  document.getElementById('tourbillonBox').classList.remove('open');
+  if (_tbBoxRAF){ cancelAnimationFrame(_tbBoxRAF); _tbBoxRAF = null; }
 }
 function toggleTrueSky(){
   renderer.trueSkyMode = !renderer.trueSkyMode;
   const btn = document.getElementById('trueSkyBtn');
   if (btn) btn.style.background = renderer.trueSkyMode ? 'var(--verdigris)' : 'var(--bg-panel)';
   if (btn) btn.style.color = renderer.trueSkyMode ? '#0a0c12' : 'var(--verdigris-light)';
+  const statusEl = document.getElementById('trueSkyStatus');
   if (!renderer.trueSkyMode){
-    const statusEl = document.getElementById('trueSkyStatus');
     if (statusEl) statusEl.textContent = '';
+    return;
+  }
+  const hDate = hijriCal.fromGregorian(new Date());
+  const isHilalWindow = hDate.day >= 27 || hDate.day <= 2;   // آخر أيام الشهر (ترقّب هلال الشهر الجاي) أو أول يومين (الهلال لسه صغير)
+  let hilalNote = '';
+  if (isHilalWindow){
+    const nowD = new Date(), sunT = observer.sunTimes(nowD);
+    const sunsetLocal = new Date(nowD.getFullYear(), nowD.getMonth(), nowD.getDate(), 0, 0, 0, 0);
+    sunsetLocal.setMinutes(sunT.sunset);
+    const sunAtSet = observer.sunAltAzNow(sunsetLocal), moonAtSet = renderer.trueSky.moonAltTopo(sunsetLocal);
+    const arcv = moonAtSet.alt - sunAtSet.alt;   // قوس الرؤية: الفرق بين ارتفاع القمر والشمس وقت الغروب — أهم معيار عملي لرؤية الهلال
+    const ph = Ephemeris.moonPhase(sunsetLocal);
+    const ageHrs = ph.age*24;
+    const mrs = renderer.trueSky.moonRiseSet(nowD);
+    const lagMin = mrs.setMin!==null ? mrs.setMin - sunT.sunset : null;
+    const visLikely = arcv >= 8 && (lagMin===null || lagMin >= 25);   // تقريب مبسّط لمعيار يالوب/الدنجون المعروف، مش فتوى رسمية
+    hilalNote = '<br>🌒 <b>رصد الهلال:</b> بعد المغرب مباشرة، وجّه الموبايل ناحية المؤشر الأبيض — الهلال هيكون منخفض جدًا وقريب من مكان غروب الشمس (الأصفر)، فدوّر الأفق الغربي فيما بينهم.'
+      +'<br>عمر القمر وقت الغروب: <b>'+(ageHrs>=0?ageHrs.toFixed(1):'—')+' ساعة</b> • قوس الرؤية (ARCV): <b>'+arcv.toFixed(1)+'°</b> • '
+      +(lagMin!==null ? 'غروب القمر بعد الشمس بـ <b>'+Math.round(lagMin)+' دقيقة</b>' : 'القمر بيغرب قبل الشمس (مش هيبان)')
+      +'<br>'+(visLikely ? '✅ الظروف الفلكية مبدئيًا تسمح بمحاولة الرصد (تقريب مبسّط، مش معيار فلكي رسمي ولا فتوى).' : '⚠️ الظروف الفلكية صعبة الليلة (هلال حديث جدًا أو منخفض جدًا) — احتمال الرؤية بالعين ضعيف.');
+  }
+  if (!compass.isCompassListening){
+    if (statusEl) statusEl.innerHTML = '🌌 دوس "تفعيل البوصلة الحقيقية" كمان عشان تشوف اتجاه الشمس والقمر الفعلي — وجّه الموبايل زي البوصلة العادية.'+hilalNote;
+  } else if (statusEl) {
+    statusEl.innerHTML = '🌌 المؤشر الأصفر = الشمس، الأبيض = القمر — وجّه الموبايل ناحيتهم عشان تشوفهم فعليًا في السما.'+hilalNote;
   }
 }
 // ===== الميزان — تحقق من دقة معادلة الشمس عندنا مقابل مصدر خارجي مستقل (sunrise-sunset.org) =====
@@ -2773,8 +3062,13 @@ function astroSelfTest(){
   // التاريخ الهجري: بدايات رمضان وعيد الأضحى الرسمية المعروفة في السعودية (لازم المتصفح يطبّق أم القرى فعلًا)
   const hk = [[2023,2,23,1,9,1444],[2024,2,11,1,9,1445],[2025,2,1,1,9,1446],[2024,5,16,10,12,1445]];
   const hjOk = hk.filter(([y,m,d,hd,hm,hy])=>{ const h = hijriCal.fromGregorian(new Date(y,m,d,12)); return h.day===hd && h.month===hm && h.year===hy; }).length;
-  const ok = maxMoon <= 0.2 && maxDec <= 0.05 && mansOk === ms.length && hjOk === hk.length;
-  return (ok?'✅':'⚠️')+' فحص داخلي للشمس والقمر: خط طول القمر ≤ '+maxMoon.toFixed(2)+'° على 6 أحداث محاق/بدر معروفة، وميل الشمس ≤ '+maxDec.toFixed(3)+'° عند الاعتدالين والانقلابين، وتقسيم المنازل مطابق لـ '+mansOk+'/'+ms.length+' نجوم معروفة، والتاريخ الهجري (أم القرى) مطابق لـ '+hjOk+'/'+hk.length+' مناسبات رسمية';
+  // الكواكب: استطالات عطارد والزهرة المعروفة فعليًا في 2026 (JPL) — يتحقق من earthXYZ ومن معادلات الكواكب الخمسة كلها
+  const pe = [['Mercury','2026-02-19T18:00:00Z',18.1],['Mercury','2026-04-03T23:00:00Z',-27.8],['Mercury','2026-06-15T20:00:00Z',24.5],['Venus','2026-01-06T00:00:00Z',0],['Venus','2025-03-23T00:00:00Z',0]];
+  const epsF=t=>Ephemeris.obliquity(t)*Math.PI/180;
+  const eclLonF=(n,t)=>{ const p=renderer.trueSky.planetEquatorial(n,t); const ra=p.ra*15*Math.PI/180, de=p.dec*Math.PI/180, e=epsF(t); return AstroMath.normDeg(Math.atan2(Math.sin(ra)*Math.cos(e)+Math.tan(de)*Math.sin(e), Math.cos(ra))*180/Math.PI); };
+  let maxPlanet=0; pe.forEach(([n,iso,known])=>{ const t=new Date(iso); let x=AstroMath.normDeg(eclLonF(n,t)-Ephemeris.sun(t).lon-known); if(x>180)x-=360; maxPlanet=Math.max(maxPlanet,Math.abs(x)); });
+  const ok = maxMoon <= 0.2 && maxDec <= 0.05 && mansOk === ms.length && hjOk === hk.length && maxPlanet <= 0.5;
+  return (ok?'✅':'⚠️')+' فحص داخلي للشمس والقمر: خط طول القمر ≤ '+maxMoon.toFixed(2)+'° على 6 أحداث محاق/بدر معروفة، وميل الشمس ≤ '+maxDec.toFixed(3)+'° عند الاعتدالين والانقلابين، وتقسيم المنازل مطابق لـ '+mansOk+'/'+ms.length+' نجوم معروفة، والتاريخ الهجري (أم القرى) مطابق لـ '+hjOk+'/'+hk.length+' مناسبات رسمية، والكواكب (عطارد والزهرة) ≤ '+maxPlanet.toFixed(2)+'° عن استطالات معروفة فعليًا';
 }
 function verifyAgainstInternet(){
   const statusEl = document.getElementById('verifyStatus');
@@ -2835,7 +3129,7 @@ function verifyAgainstInternet(){
 
     statusEl.style.color = maxDiff <= 3 ? '#7fb3a8' : '#f0938a';
     const header = maxDiff <= 3
-      ? '✅ كل الحسابات مطابقة (فارق أقصى '+Math.round(maxDiff)+' دقيقة) — الشمس من sunrise-sunset.org، والصلاة من Aladhan API بنفس طريقة الحساب ('+observer.calcMethod+')'
+      ? '✅ كل الحسابات مطابقة (فارق أقصى '+Math.round(maxDiff)+' دقيقة) — الشمس من sunrise-sunset.org، والصلاة من Aladhan API بنفس طريقة الحساب ('+(CALC_NAMES[observer.calcMethod]||observer.calcMethod)+')'
       : '⚠️ فيه فارق '+Math.round(maxDiff)+' دقيقة في «'+worstLabel+'» يستاهل مراجعة — الباقي متطابق';
     statusEl.innerHTML = header+'<br><span style="font-size:11px;line-height:1.9;">'+lines.join('<br>')+'<br>'+stLine+'</span>';
   }).catch(err=>{
@@ -2845,6 +3139,8 @@ function verifyAgainstInternet(){
 }
 function toggleNavTool(){ navTool.toggle(); }
 function navRequestCompassPermission(){ navTool.requestCompassPermission(); }
+
+try{ initCalcMethodUI(); }catch(e){}
 </script>
 </body>
 </html>
