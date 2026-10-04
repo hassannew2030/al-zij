@@ -1702,9 +1702,8 @@ class ClockRenderer {
     checkAdhanAndIqama(now, prayerTimeMap);
     const glancePrayerEl = document.getElementById('glancePrayer');
     if (glancePrayerEl){
-      const h24 = Math.floor(prayerTimeMap[nextId]/60)%24, mn = Math.round(prayerTimeMap[nextId]%60);
-      const ph12 = h24%12 || 12, pAmpm = h24 < 12 ? 'ص' : 'م';
-      glancePrayerEl.textContent = prayerNames[nextId]+' الساعة '+AstroMath.pad(ph12)+':'+AstroMath.pad(mn)+' '+pAmpm;
+      const hhmm = AstroMath.minToHHMM(prayerTimeMap[nextId]).replace('AM','ص').replace('PM','م');
+      glancePrayerEl.textContent = prayerNames[nextId]+' الساعة '+hhmm;
     }
     // شريط تايمر مرئي زي تطبيقات مواقيت الصلاة — بيتملى كل ما اقتربنا من الأذان، وبيلمع 10 ثواني أول ما الوقت يدخل
     const remainSec = Math.round(remainMin*60);
