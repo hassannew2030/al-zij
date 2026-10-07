@@ -3650,7 +3650,7 @@ function listenTop(){if(SEN.live)return;SEN.live=true;addEventListener('deviceor
 const needPerm=()=>typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function';
 function askTop(){try{return DeviceOrientationEvent.requestPermission().then(r=>{if(r==='granted'){try{localStorage.setItem('zijMotionOK','1');}catch(e){}listenTop();}
   else{$('qShieldTxt').textContent='الإذن مترفوض: من الإعدادات ← Safari ← الحركة والاتجاه';}}).catch(()=>{});}catch(e){return Promise.resolve();}}
-$('qShield').addEventListener('click',()=>{askTop();});
+$('qShield').addEventListener('click',()=>{wakeAudio();askTop();});
 function startCompassTop(){
   if(SEN.live)return;
   if(!needPerm()){listenTop();return;}                                   // Android & desktop: starts by itself
@@ -3659,10 +3659,27 @@ function startCompassTop(){
   if(ok)askTop();                                                        // granted before → often comes back without a prompt
 }
 window.zijQiblaReady=()=>{if(document.body.dataset.scr==='qibla')startCompassTop();};
-let lastHap=0;
+/* feedback: Android vibrates; iPhone Safari has no vibration for websites, so it gets a soft tick and a chime instead
+   (Web Audio needs one touch to wake up — the same touch that turns the compass on; the phone's silent switch mutes it) */
+let lastHap=0,AC=null;
+const soundOn=()=>{try{return localStorage.getItem('zijCompassSound')!=='0';}catch(e){return true;}};
+function wakeAudio(){try{if(!AC){const C=window.AudioContext||window.webkitAudioContext;if(C)AC=new C();}if(AC&&AC.state==='suspended')AC.resume();}catch(e){}}
+function beep(f,dur,vol,at){if(!AC)return;const t=AC.currentTime+(at||0),o=AC.createOscillator(),g=AC.createGain();
+  o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+0.005);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+dur+0.02);}
 window.zijHaptic=k=>{const n=performance.now();if(k!=='ok'&&n-lastHap<70)return;lastHap=n;
   if(navigator.vibrate){navigator.vibrate(k==='ok'?[35,60,35]:k==='cardinal'?22:10);return;}
-  try{const l=$('zHapL');l.click();if(k==='ok')setTimeout(()=>l.click(),110);}catch(e){}};
+  try{const l=$('zHapL');l.click();if(k==='ok')setTimeout(()=>l.click(),110);}catch(e){}
+  if(!soundOn()||!AC||AC.state!=='running')return;
+  if(k==='ok'){beep(880,0.35,0.18,0);beep(1320,0.5,0.14,0.12);}      // two-note chime: you are facing the Qibla
+  else if(k==='cardinal')beep(520,0.06,0.10);else beep(1800,0.025,0.05); // soft mechanical tick
+};
+document.addEventListener('pointerup',wakeAudio,{capture:true});
+{const lab=document.createElement('label');lab.className='z-btn';lab.style.cssText='display:flex;align-items:center;gap:10px;justify-content:space-between';
+ lab.innerHTML='<span>صوت البوصلة (تكّة وجرس عند القبلة)</span><input type="checkbox" id="zSnd" style="width:22px;height:22px;accent-color:#c9a35d">';
+ $('mView').prepend(lab);$('zSnd').checked=soundOn();$('zSnd').addEventListener('change',e=>{try{localStorage.setItem('zijCompassSound',e.target.checked?'1':'0');}catch(_){}});}
+
+
 
 /* ---- 3. router ---- */
 const tabs=[...document.querySelectorAll('.htab [data-go]')];
