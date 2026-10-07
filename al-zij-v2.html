@@ -3673,7 +3673,7 @@ window.zijHaptic=k=>{const n=performance.now();if(k!=='ok'&&n-lastHap<70)return;
   if(navigator.vibrate){navigator.vibrate(k==='ok'?[35,60,35]:k==='cardinal'?22:10);return;}
   try{const l=$('zHapL');l.click();if(k==='ok')setTimeout(()=>l.click(),110);}catch(e){}
   if(!soundOn()||!AC||AC.state!=='running')return;
-  if(k==='ok'){beep(880,0.35,0.18,0);beep(1320,0.5,0.14,0.12);}      // two-note chime: you are facing the Qibla
+  if(k==='ok'){beep(880,0.5,0.5,0);beep(1320,0.7,0.4,0.12);}      // two-note chime: you are facing the Qibla
   else if(k==='cardinal')beep(520,0.06,0.10);else beep(1800,0.025,0.05); // soft mechanical tick
 };
 ['touchend','pointerup','click'].forEach(ev=>document.addEventListener(ev,wakeAudio,{capture:true}));
