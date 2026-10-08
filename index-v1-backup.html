@@ -2482,9 +2482,6 @@ starField.init();
 // استرجاع آخر موقع محفوظ محليًا. أول فتح (مفيش موقع محفوظ): نثبّت جدة ونقفلها — القراءة التلقائية من GPS ممكن تتشوّش (تضليل الإشارة موثّق في المنطقة)
 try{
   const saved = localStorage.getItem('zijLastLocation');
-  try{const L=JSON.parse(saved||'null');
-    if(L&&L.lat===21.5433&&L.lon===39.1728&&localStorage.getItem('zijLocationLocked')==='true'&&localStorage.getItem('zijLockByUser')!=='1'){
-      localStorage.setItem('zijLocationLocked','false');localStorage.setItem('zijLocAuto','1');}}catch(_){}
   if (saved){
     const loc = JSON.parse(saved);
     observer.set(loc.lat, loc.lon, -(new Date().getTimezoneOffset()/60), 'آخر موقع محفوظ');
@@ -2492,7 +2489,7 @@ try{
   } else {
     observer.set(21.5433, 39.1728, -(new Date().getTimezoneOffset()/60), 'جدة (موقع مثبّت)');
     localStorage.setItem('zijLastLocation', JSON.stringify({lat:21.5433, lon:39.1728}));
-    localStorage.setItem('zijLocAuto', '1');
+    localStorage.setItem('zijLocationLocked', 'true');
     if (document.getElementById('dataCityName')) document.getElementById('dataCityName').textContent = 'جدة (موقع مثبّت)';
     observer.updateCityName(21.5433, 39.1728);
   }
@@ -2500,17 +2497,6 @@ try{
   if (document.getElementById('dataCityName')) document.getElementById('dataCityName').textContent = 'جدة (موقع مثبّت)';
 }
 viewMode.initDefault();
-(function autoLocation(){
-  try{ if(localStorage.getItem('zijLocationLocked')==='true') return; }catch(e){}
-  if(!navigator.geolocation) return;
-  navigator.geolocation.getCurrentPosition(function(p){
-    var c=p.coords; if(c.accuracy && c.accuracy>3000) return;
-    observer.set(c.latitude, c.longitude, -(new Date().getTimezoneOffset()/60), 'موقعك');
-    observer.updateCityName(c.latitude, c.longitude);
-    try{ localStorage.setItem('zijLastLocation', JSON.stringify({lat:c.latitude, lon:c.longitude})); localStorage.setItem('zijLocAuto','0'); }catch(e){}
-    try{ compass.qiblaBearing=observer.computeQiblaBearing(c.latitude,c.longitude); renderer.qiblaBearingOverride=compass.qiblaBearing; }catch(e){}
-  }, function(){}, {enableHighAccuracy:true, timeout:20000, maximumAge:300000});
-})();
 
 renderer.tick();
 setInterval(()=>renderer.tick(), 1000);
@@ -2603,11 +2589,10 @@ function toggleLocationLock(){
     if (!isLocked){
       localStorage.setItem('zijLocationLocked', 'true');
       localStorage.setItem('zijLastLocation', JSON.stringify({lat: observer.lat, lon: observer.lon}));
-      localStorage.setItem('zijLockByUser','1');
       if (btn) btn.textContent = '🔒 الموقع مثبّت (دوس تاني للفتح)';
       if (statusEl) statusEl.textContent = 'مش هيتغيّر تلقائيًا تاني حتى لو الـGPS جاب قراءة مختلفة.';
     } else {
-      localStorage.setItem('zijLocationLocked', 'false');localStorage.removeItem('zijLockByUser');
+      localStorage.setItem('zijLocationLocked', 'false');
       if (btn) btn.textContent = '🔓 ثبّت هذا الموقع (لو صح)';
       if (statusEl) statusEl.textContent = 'الموقع هيتحدّث تلقائيًا تاني من الـGPS.';
     }
@@ -2651,7 +2636,6 @@ function applyManualLocation(lat, lon, name){
   observer.updateCityName(lat, lon);
   try{
     localStorage.setItem('zijLastLocation', JSON.stringify({lat, lon}));
-    localStorage.setItem('zijLockByUser','1');
     localStorage.setItem('zijLocationLocked', 'true'); // التحديد اليدوي موثوق بطبيعته، فبنقفله على طول
   }catch(e){}
   const lockBtn = document.getElementById('lockLocationBtn');
