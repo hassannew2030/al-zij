@@ -3198,7 +3198,10 @@ function buildDiagReportText(){
     'القبلة: '+Math.round(observer.computeQiblaBearing(observer.lat, observer.lon))+'° من الشمال',
     'الانحراف المغناطيسي المطبّق: '+AstroMath.magneticDeclination(observer.lat, observer.lon).toFixed(2)+'°',
     'طور القمر: '+Ephemeris.moonPhase(now).name+' ('+Math.round(Ephemeris.moonPhase(now).illum*100)+'٪)',
-    'عدد تسجيلات الأذان المحفوظة: '+alLoad().length
+    'عدد تسجيلات الأذان المحفوظة: '+alLoad().length,
+    (()=>{try{const L=JSON.parse(localStorage.getItem('zijLocLast')||'null');if(!L)return 'آخر قراءة موقع من الجوال: لسه مفيش';
+      const ago=Math.round((Date.now()-L.at)/60000);return L.err?'آخر قراءة موقع: فشلت ('+L.err+') من '+ago+' د':'آخر قراءة موقع: '+L.lat.toFixed(4)+', '+L.lon.toFixed(4)+' بدقة ±'+L.acc+' م، من '+ago+' د';}catch(e){return '';}})(),
+    'تثبيت الموقع: '+(localStorage.getItem('zijLocationLocked')==='true'?(localStorage.getItem('zijLockByUser')==='1'?'مثبّت بإيد المستخدم':'مثبّت تلقائي'):'تلقائي من الجوال')
   ].join('\n');
 }
 
@@ -3765,18 +3768,28 @@ function applyAutoLocation(lat,lon){
   syncModules();
 }
 let locBusy=false;
+function locNote(o){try{localStorage.setItem('zijLocLast',JSON.stringify({...o,at:Date.now()}));}catch(e){}}
 function refreshLocation(force){
   if(locBusy||!navigator.geolocation)return;
   if(LS.get('zijLocationLocked')==='true'&&LS.get('zijLockByUser')==='1')return; // the user pinned it on purpose
   if(!force&&Date.now()-(+LS.get('zijLocAt')||0)<10*60e3)return;
   locBusy=true;
-  navigator.geolocation.getCurrentPosition(p=>{locBusy=false;
-    LS.set('zijLocDenied','0');const {latitude:la,longitude:lo,accuracy:ac}=p.coords;
-    if(ac&&ac>3000)return;                                     // too rough to trust
+  const ok=p=>{locBusy=false;LS.set('zijLocDenied','0');
+    const {latitude:la,longitude:lo,accuracy:ac}=p.coords;
+    locNote({lat:la,lon:lo,acc:Math.round(ac||0)});
+    if(ac&&ac>20000)return;                                   // a whole-region guess: keep what we have
+    LS.set('zijLocAcc',String(Math.round(ac||0)));
     const first=LS.get('zijLocAuto')!=='0';
-    if(first||kmBetween(observer.lat,observer.lon,la,lo)>0.3)applyAutoLocation(la,lo); // even a move to a nearby house counts
+    if(first||kmBetween(observer.lat,observer.lon,la,lo)>0.3)applyAutoLocation(la,lo); // a move to a nearby house counts
     else LS.set('zijLocAt',String(Date.now()));
-  },e=>{locBusy=false;if(e&&e.code===1)LS.set('zijLocDenied','1');},{enableHighAccuracy:true,timeout:20000,maximumAge:5*60e3});
+    try{window.zijLocInfo&&zijLocInfo();}catch(e){}
+  };
+  const opts=(hi)=>({enableHighAccuracy:hi,timeout:hi?15000:30000,maximumAge:hi?60e3:10*60e3});
+  navigator.geolocation.getCurrentPosition(ok,e=>{
+    if(e&&e.code===1){locBusy=false;LS.set('zijLocDenied','1');locNote({err:'رفض الإذن'});try{zijLocInfo();}catch(_){}return;}
+    // indoors the precise fix can time out: ask again for any fix (Wi-Fi/cell)
+    navigator.geolocation.getCurrentPosition(ok,e2=>{locBusy=false;locNote({err:(e2&&e2.message)||'تعذر'});},opts(false));
+  },opts(true));
 }
 window.zijRefreshLocation=refreshLocation;
 
@@ -3822,7 +3835,8 @@ if('serviceWorker' in navigator&&location.protocol==='https:'){navigator.service
   function label(p){if(!p)return '';const c=clean(p.city),h=(p.hood||'').trim();
     if(!h||h===c)return c;return c?c+' · '+(/^حي\s/.test(h)?h:'حي '+h):h;}
   window.zijPlaceLabel=()=>{
-    if(LS.get('zijLocAuto')==='1'&&LS.get('zijLocDenied')==='1')return 'اضغط لتحديد موقعك';
+    if(LS.get('zijLocAuto')!=='0'&&LS.get('zijLockByUser')!=='1') // the phone hasn't given its location yet: never name a district for the default point
+      return LS.get('zijLocDenied')==='1'?'اضغط لتحديد موقعك':'جارٍ تحديد موقعك…';
     if(place&&place.key===key())return label(place);
     if(place&&kmBetween(observer.lat,observer.lon,place.lat,place.lon)<2)return label(place); // still the same district
     resolve();return '';
@@ -3836,12 +3850,26 @@ if('serviceWorker' in navigator&&location.protocol==='https:'){navigator.service
     if(!p||!p.city){try{const r=await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${la}&longitude=${lo}&localityLanguage=ar`);
       const d=await r.json();p={city:d.city||d.principalSubdivision||'',hood:d.locality&&d.locality!==d.city?d.locality:''};}catch(e){}}
     busy=false;
+    if(p&&+LS.get('zijLocAcc')>1500)p.hood=''; // rough fix (Precise Location off): the city is sure, the district is not
     if(p&&(p.city||p.hood)){place={...p,key:k,lat:la,lon:lo};try{localStorage.setItem('zijPlace',JSON.stringify(place));}catch(e){}
       setTimeout(syncModules,50);}
   }
   addEventListener('online',()=>{lastTry='';});
   const chip=zq('hCity');if(chip)chip.addEventListener('click',()=>{try{window.zijGo&&zijGo('more');}catch(e){}});
 })();
+
+window.zijLocInfo=function(){
+  const box=zq('mLoc');if(!box)return;let el=zq('zLocInfo');
+  if(!el){el=document.createElement('p');el.id='zLocInfo';el.style.cssText='margin:0 0 10px;font-size:14px;line-height:1.7;color:var(--h-dim)';box.prepend(el);}
+  const acc=+LS.get('zijLocAcc')||0,auto=LS.get('zijLocAuto')!=='0',denied=LS.get('zijLocDenied')==='1',byUser=LS.get('zijLockByUser')==='1';
+  const m=a=>a>=1000?(a/1000).toFixed(1)+' كم':Math.round(a)+' م';
+  el.innerHTML=byUser?'📌 الموقع مثبّت بإيدك.'
+    :denied?'⚠️ الجوال رافض يدّي الموقع. من الإعدادات ← الخصوصية والأمان ← خدمات الموقع ← مواقع سفاري ← «أثناء الاستخدام».'
+    :auto?'⏳ لسه بنجيب موقعك من الجوال…'
+    :acc>1500?'⚠️ الموقع تقريبي (±'+m(acc)+')، فالحي مش هيظهر. فعّل «الموقع الدقيق»: الإعدادات ← الخصوصية والأمان ← خدمات الموقع ← مواقع سفاري.'
+    :'✅ موقعك من الجوال، بدقة ±'+m(acc)+'.';
+};
+zijLocInfo();
 
 </script>
 <script>/* ===== One digit style for the whole Zij: ٠١٢٣ (default) or 0123 — chosen once in المزيد ← العرض =====
