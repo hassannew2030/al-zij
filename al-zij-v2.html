@@ -3864,10 +3864,15 @@ window.zijLocInfo=function(){
   const acc=+LS.get('zijLocAcc')||0,auto=LS.get('zijLocAuto')!=='0',denied=LS.get('zijLocDenied')==='1',byUser=LS.get('zijLockByUser')==='1';
   const m=a=>a>=1000?(a/1000).toFixed(1)+' كم':Math.round(a)+' م';
   el.innerHTML=byUser?'📌 الموقع مثبّت بإيدك.'
-    :denied?'⚠️ الجوال رافض يدّي الموقع. من الإعدادات ← الخصوصية والأمان ← خدمات الموقع ← مواقع سفاري ← «أثناء الاستخدام».'
+    :denied?'⚠️ المتصفح رافض يدّي الموقع.<br>١) في سفاري: دوس زرار الصفحة جنب العنوان ← إعدادات موقع الويب ← الموقع ← «سماح».<br>٢) ولو لسه: الإعدادات ← الخصوصية والأمان ← خدمات الموقع ← مواقع سفاري ← «أثناء الاستخدام».<br>وبعدين اقفل الزيج وافتحه تاني.'
     :auto?'⏳ لسه بنجيب موقعك من الجوال…'
     :acc>1500?'⚠️ الموقع تقريبي (±'+m(acc)+')، فالحي مش هيظهر. فعّل «الموقع الدقيق»: الإعدادات ← الخصوصية والأمان ← خدمات الموقع ← مواقع سفاري.'
     :'✅ موقعك من الجوال، بدقة ±'+m(acc)+'.';
+  // no real location from the phone yet → nothing to "pin" or compare; only the manual choice makes sense
+  const real=!auto||byUser;
+  ['lockLocationBtn','gpsCheckBtn','gpsCheckStatus','locationLockStatus'].forEach(id=>{const b=zq(id);if(b)b.style.display=real?'':'none';});
+  const dn=zq('dataCityName');if(dn&&!real)dn.textContent=denied?'مش معروفة — حدّدها بإيدك من الزرار تحت':'لسه بتتحدد…';
+  const dk=zq('dataKaabaDist');if(dk&&dk.parentElement)dk.parentElement.style.display=real?'':'none';
 };
 zijLocInfo();
 
