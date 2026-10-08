@@ -141,7 +141,8 @@ body{background:var(--h-bg)!important;padding-bottom:calc(92px + env(safe-area-i
 .zoom-controls,#windowScreenExitBtn{display:none!important}
 #hTop,#hBottom{max-width:520px;margin:0 auto;padding-inline:16px;font-family:'Amiri','Geeza Pro',serif;direction:rtl;color:var(--h-ink)}
 #hTop{padding-top:calc(10px + env(safe-area-inset-top,0px));text-align:center}
-#hCity{display:inline-flex;align-items:center;gap:6px;font-size:15px;color:var(--h-ink);background:var(--h-panel);border:1px solid var(--h-line);border-radius:16px;padding:3px 12px 3px 14px;white-space:nowrap}
+#hCity{display:inline-flex;align-items:center;gap:6px;font-size:15px;color:var(--h-ink);background:var(--h-panel);border:1px solid var(--h-line);border-radius:16px;padding:3px 12px 3px 14px;white-space:nowrap;max-width:calc(100vw - 32px);overflow:hidden;cursor:pointer}
+#hCityName{overflow:hidden;text-overflow:ellipsis}
 #hCity b{color:var(--h-brass-l)}
 #hCity svg{width:15px;height:15px}
 #hClock{font-family:'EB Garamond',Georgia,serif;font-size:46px;line-height:1.1;color:#fff;font-variant-numeric:tabular-nums;margin-top:6px;direction:ltr;display:flex;justify-content:center;align-items:baseline;gap:8px}
@@ -181,7 +182,7 @@ body{background:var(--h-bg)!important;padding-bottom:calc(92px + env(safe-area-i
 </style>
 
 <header id="hTop">
-  <div id="hCity"><svg viewBox="0 0 24 24" fill="none" stroke="#c9a35d" stroke-width="1.8" aria-hidden="true"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/></svg><span>مدينتك:</span> <b id="hCityName">—</b></div>
+  <div id="hCity"><svg viewBox="0 0 24 24" fill="none" stroke="#c9a35d" stroke-width="1.8" aria-hidden="true"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/></svg><b id="hCityName">—</b></div>
   <div id="hClock" aria-label="الساعة الآن"><span id="hTime">—</span><span class="ap" id="hAp"></span></div>
   <div id="hDate"><span id="hWd"></span><span class="sep">|</span><b id="hHijri">—</b><span class="sep">|</span><b id="hGreg">—</b></div>
 </header>
@@ -3545,7 +3546,7 @@ function tick(){
   const friday=lp.wd===5,ramadan=h.month===9;
   // header
   const city=(document.getElementById('dataLoc')&&document.getElementById('dataLoc').textContent.trim())||observer.name||'جدة';
-  $('hCityName').textContent=(observer.name&&!/موقع|مثبّت|محفوظ/.test(observer.name)?observer.name:city.split('·')[0].split('(')[0].trim())||'—';
+  $('hCityName').textContent=(window.zijPlaceLabel&&zijPlaceLabel())||(observer.name&&!/موقع|مثبّت|محفوظ/.test(observer.name)?observer.name:city.split('·')[0].split('(')[0].trim())||'—';
   $('hWd').textContent=WD[lp.wd];
   $('hHijri').textContent=ar(h.day)+' '+HM[h.month-1]+' '+ar(h.year)+' هـ';
   $('hGreg').textContent=ar(lp.d)+' '+GM[lp.m]+' '+ar(lp.y)+' م';
@@ -3770,12 +3771,12 @@ function refreshLocation(force){
   if(!force&&Date.now()-(+LS.get('zijLocAt')||0)<10*60e3)return;
   locBusy=true;
   navigator.geolocation.getCurrentPosition(p=>{locBusy=false;
-    const {latitude:la,longitude:lo,accuracy:ac}=p.coords;
+    LS.set('zijLocDenied','0');const {latitude:la,longitude:lo,accuracy:ac}=p.coords;
     if(ac&&ac>3000)return;                                     // too rough to trust
     const first=LS.get('zijLocAuto')!=='0';
     if(first||kmBetween(observer.lat,observer.lon,la,lo)>0.3)applyAutoLocation(la,lo); // even a move to a nearby house counts
     else LS.set('zijLocAt',String(Date.now()));
-  },()=>{locBusy=false;},{enableHighAccuracy:true,timeout:20000,maximumAge:5*60e3});
+  },e=>{locBusy=false;if(e&&e.code===1)LS.set('zijLocDenied','1');},{enableHighAccuracy:true,timeout:20000,maximumAge:5*60e3});
 }
 window.zijRefreshLocation=refreshLocation;
 
@@ -3811,6 +3812,36 @@ addEventListener('online',()=>{const f=zq('mod-sky');try{if(f&&f._ready){const w
 
 // keep working with no network at all: cache the app on the phone (network first, so updates still arrive)
 if('serviceWorker' in navigator&&location.protocol==='https:'){navigator.serviceWorker.register('sw.js').catch(()=>{});}
+
+/* ===== Place name: city + district («جدة · حي الروضة»), kept on the phone so it shows with no network too ===== */
+(function(){
+  const key=()=>observer.lat.toFixed(3)+','+observer.lon.toFixed(3); // ~100 m
+  let place=null;try{place=JSON.parse(localStorage.getItem('zijPlace')||'null');}catch(e){}
+  let busy=false,lastTry='';
+  const clean=s=>(s||'').replace(/^(محافظة|منطقة|مدينة)\s+/,'').trim();
+  function label(p){if(!p)return '';const c=clean(p.city),h=(p.hood||'').trim();
+    if(!h||h===c)return c;return c?c+' · '+(/^حي\s/.test(h)?h:'حي '+h):h;}
+  window.zijPlaceLabel=()=>{
+    if(LS.get('zijLocAuto')==='1'&&LS.get('zijLocDenied')==='1')return 'اضغط لتحديد موقعك';
+    if(place&&place.key===key())return label(place);
+    if(place&&kmBetween(observer.lat,observer.lon,place.lat,place.lon)<2)return label(place); // still the same district
+    resolve();return '';
+  };
+  async function resolve(){
+    const k=key();if(busy||lastTry===k||!navigator.onLine)return;busy=true;lastTry=k;
+    const la=observer.lat,lo=observer.lon;let p=null;
+    try{const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${la}&lon=${lo}&zoom=16&addressdetails=1&accept-language=ar`);
+      const d=await r.json(),a=d.address||{};
+      p={city:a.city||a.town||a.village||a.county||a.state||'',hood:a.neighbourhood||a.suburb||a.quarter||a.city_district||''};}catch(e){}
+    if(!p||!p.city){try{const r=await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${la}&longitude=${lo}&localityLanguage=ar`);
+      const d=await r.json();p={city:d.city||d.principalSubdivision||'',hood:d.locality&&d.locality!==d.city?d.locality:''};}catch(e){}}
+    busy=false;
+    if(p&&(p.city||p.hood)){place={...p,key:k,lat:la,lon:lo};try{localStorage.setItem('zijPlace',JSON.stringify(place));}catch(e){}
+      setTimeout(syncModules,50);}
+  }
+  addEventListener('online',()=>{lastTry='';});
+  const chip=zq('hCity');if(chip)chip.addEventListener('click',()=>{try{window.zijGo&&zijGo('more');}catch(e){}});
+})();
 
 </script>
 <script>/* ===== One digit style for the whole Zij: ٠١٢٣ (default) or 0123 — chosen once in المزيد ← العرض =====
