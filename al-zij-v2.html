@@ -2547,6 +2547,9 @@ starField.init();
 // استرجاع آخر موقع محفوظ محليًا. أول فتح (مفيش موقع محفوظ): نثبّت جدة ونقفلها — القراءة التلقائية من GPS ممكن تتشوّش (تضليل الإشارة موثّق في المنطقة)
 try{
   const saved = localStorage.getItem('zijLastLocation');
+  try{const L=JSON.parse(saved||'null');
+    if(L&&L.lat===21.5433&&L.lon===39.1728&&localStorage.getItem('zijLocationLocked')==='true'&&localStorage.getItem('zijLockByUser')!=='1'){
+      localStorage.setItem('zijLocationLocked','false');localStorage.setItem('zijLocAuto','1');}}catch(_){}
   if (saved){
     const loc = JSON.parse(saved);
     observer.set(loc.lat, loc.lon, -(new Date().getTimezoneOffset()/60), 'آخر موقع محفوظ');
@@ -2554,7 +2557,7 @@ try{
   } else {
     observer.set(21.5433, 39.1728, -(new Date().getTimezoneOffset()/60), 'جدة (موقع مثبّت)');
     localStorage.setItem('zijLastLocation', JSON.stringify({lat:21.5433, lon:39.1728}));
-    localStorage.setItem('zijLocationLocked', 'true');
+    localStorage.setItem('zijLocAuto', '1'); // just a starting point until the phone's own location arrives — never locked
     if (document.getElementById('dataCityName')) document.getElementById('dataCityName').textContent = 'جدة (موقع مثبّت)';
     observer.updateCityName(21.5433, 39.1728);
   }
@@ -2654,10 +2657,11 @@ function toggleLocationLock(){
     if (!isLocked){
       localStorage.setItem('zijLocationLocked', 'true');
       localStorage.setItem('zijLastLocation', JSON.stringify({lat: observer.lat, lon: observer.lon}));
+      localStorage.setItem('zijLockByUser','1');localStorage.removeItem('zijLocAuto');
       if (btn) btn.textContent = '🔒 الموقع مثبّت (دوس تاني للفتح)';
       if (statusEl) statusEl.textContent = 'مش هيتغيّر تلقائيًا تاني حتى لو الـGPS جاب قراءة مختلفة.';
     } else {
-      localStorage.setItem('zijLocationLocked', 'false');
+      localStorage.setItem('zijLocationLocked', 'false');localStorage.removeItem('zijLockByUser');
       if (btn) btn.textContent = '🔓 ثبّت هذا الموقع (لو صح)';
       if (statusEl) statusEl.textContent = 'الموقع هيتحدّث تلقائيًا تاني من الـGPS.';
     }
@@ -2701,6 +2705,7 @@ function applyManualLocation(lat, lon, name){
   observer.updateCityName(lat, lon);
   try{
     localStorage.setItem('zijLastLocation', JSON.stringify({lat, lon}));
+    localStorage.setItem('zijLockByUser','1');localStorage.removeItem('zijLocAuto');
     localStorage.setItem('zijLocationLocked', 'true'); // التحديد اليدوي موثوق بطبيعته، فبنقفله على طول
   }catch(e){}
   const lockBtn = document.getElementById('lockLocationBtn');
@@ -3742,6 +3747,70 @@ const hs=(location.hash||'').slice(1);if(['clock','prayer','qibla','sky','more']
 go(['clock','prayer','qibla','sky','more'].includes(s0)?s0:'clock');
 window.zijCityName=()=>{const e=$('hCityName');return e?e.textContent:'';};
 })();
+
+/* ===== Everything automatic: location + compass on one tap the first time, then silent forever =====
+   Online is the normal state; with no network the Zij keeps the last saved location and data, and catches up by itself when the network returns. */
+const zq=id=>document.getElementById(id);
+window.observer=observer; // the sky/qibla screens read the location from here
+const LS={get:k=>{try{return localStorage.getItem(k);}catch(e){return null;}},set:(k,v)=>{try{localStorage.setItem(k,v);}catch(e){}}};
+const kmBetween=(a,b,c,d)=>{const r=Math.PI/180,x=Math.sin((c-a)*r/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin((d-b)*r/2)**2;return 12742*Math.asin(Math.sqrt(x));};
+function syncModules(){['mod-qibla','mod-sky'].forEach(id=>{const f=zq(id);try{f&&f._ready&&f.contentWindow.zijSync&&f.contentWindow.zijSync();}catch(e){}});
+  }
+function applyAutoLocation(lat,lon){
+  observer.set(lat,lon,-(new Date().getTimezoneOffset()/60),'موقعك');
+  try{observer.updateCityName(lat,lon);}catch(e){}
+  LS.set('zijLastLocation',JSON.stringify({lat,lon}));LS.set('zijLocAuto','0');LS.set('zijLocAt',String(Date.now()));
+  setTimeout(syncModules,1500); // after the city name arrives
+  syncModules();
+}
+let locBusy=false;
+function refreshLocation(force){
+  if(locBusy||!navigator.geolocation)return;
+  if(LS.get('zijLocationLocked')==='true'&&LS.get('zijLockByUser')==='1')return; // the user pinned it on purpose
+  if(!force&&Date.now()-(+LS.get('zijLocAt')||0)<10*60e3)return;
+  locBusy=true;
+  navigator.geolocation.getCurrentPosition(p=>{locBusy=false;
+    const {latitude:la,longitude:lo,accuracy:ac}=p.coords;
+    if(ac&&ac>3000)return;                                     // too rough to trust
+    const first=LS.get('zijLocAuto')!=='0';
+    if(first||kmBetween(observer.lat,observer.lon,la,lo)>0.3)applyAutoLocation(la,lo); // even a move to a nearby house counts
+    else LS.set('zijLocAt',String(Date.now()));
+  },()=>{locBusy=false;},{enableHighAccuracy:true,timeout:20000,maximumAge:5*60e3});
+}
+window.zijRefreshLocation=refreshLocation;
+
+// browsers inside other apps (Instagram, Facebook, TikTok, Snapchat…) block the compass on iPhone
+const inAppBrowser=/FBAN|FBAV|Instagram|Snapchat|TikTok|musical_ly|Line\//i.test(navigator.userAgent);
+
+function welcome(){
+  if(LS.get('zijWelcomed')==='1')return false;
+  const w=document.createElement('div');w.id='zWelcome';
+  w.style.cssText='position:fixed;inset:0;z-index:50;background:radial-gradient(circle at 50% 35%,#1c2540,#05070d 75%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:32px;text-align:center;font-family:Amiri,serif;direction:rtl';
+  w.innerHTML='<div style="font-size:44px;color:#eddba0;font-weight:700">الزيج</div>'+
+    '<div style="font-size:18px;color:#cfc4a4;line-height:1.7;max-width:320px">المواقيت والقبلة والبوصلة<br>بتتظبط لوحدها على مكانك.</div>'+
+    (inAppBrowser?'<div style="font-size:15px;color:#e0796d;max-width:320px;line-height:1.6">افتح الرابط في سفاري عشان البوصلة تشتغل:<br>دوس ⋯ فوق ← «فتح في المتصفح»</div>':'')+
+    '<button type="button" id="zGo" style="margin-top:6px;background:linear-gradient(180deg,#e6c983,#b8904a);color:#1a140a;border:0;border-radius:28px;padding:14px 56px;font-family:Amiri,serif;font-size:22px;font-weight:700;box-shadow:0 6px 18px #0008">ابدأ</button>'+
+    '<div style="font-size:13px;color:#8a8570;max-width:300px">هيسألك الجوال مرة واحدة عن الموقع والاتجاه — اختار «سماح».</div>';
+  document.body.appendChild(w);
+  zq('zGo').addEventListener('click',()=>{
+    // the compass question must be asked inside this very tap (iPhone rule), so it goes first
+    try{if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){
+      DeviceOrientationEvent.requestPermission().then(r=>{if(r==='granted')LS.set('zijMotionOK','1');}).catch(()=>{});}}catch(e){}
+    refreshLocation(true);
+    try{window.zijWakeAudio&&window.zijWakeAudio();}catch(e){}
+    LS.set('zijWelcomed','1');
+    w.style.transition='opacity .35s';w.style.opacity='0';setTimeout(()=>w.remove(),380);
+  });
+  return true;
+}
+if(!welcome())refreshLocation(false);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')refreshLocation(false);});
+
+// network comes back → refresh what needs it (weather), nothing for the user to press
+addEventListener('online',()=>{const f=zq('mod-sky');try{if(f&&f._ready){const w=f.contentWindow;w.WX=null;w.loadWeather&&w.loadWeather();}}catch(e){}});
+
+// keep working with no network at all: cache the app on the phone (network first, so updates still arrive)
+if('serviceWorker' in navigator&&location.protocol==='https:'){navigator.serviceWorker.register('sw.js').catch(()=>{});}
 
 </script>
 <script>/* ===== One digit style for the whole Zij: ٠١٢٣ (default) or 0123 — chosen once in المزيد ← العرض =====
