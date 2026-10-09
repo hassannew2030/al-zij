@@ -1,6 +1,6 @@
 // الزيج — يشتغل من غير نت. النت هو الأصل: كل مرة بنجيب أحدث نسخة، ولو مفيش نت بنفتح آخر نسخة محفوظة.
-const CACHE_NAME = 'al-zij-v3';
-const FILES_TO_CACHE = ['./', './index.html', './al-zij-v2.html', './manifest.json'];
+const CACHE_NAME = 'al-zij-v4';
+const FILES_TO_CACHE = ['./', './index.html', './manifest.json', './version.json'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(FILES_TO_CACHE)).catch(() => {}));
@@ -24,6 +24,6 @@ self.addEventListener('fetch', (event) => {
     fetch(req, { cache: 'no-cache' }).then((res) => {   // always ask GitHub if there is something newer
       if (res && res.ok) { const copy = res.clone(); caches.open(CACHE_NAME).then((c) => c.put(req, copy)); }
       return res;
-    }).catch(() => caches.match(req, { ignoreSearch: true }).then((hit) => hit || caches.match('./al-zij-v2.html')))
+    }).catch(() => caches.match(req, { ignoreSearch: true }).then((hit) => hit || caches.match('./index.html')))
   );
 });
