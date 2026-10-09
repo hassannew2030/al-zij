@@ -1,9 +1,10 @@
 {
-  "name": "الزّيج — ساعة حائط فلكية",
-  "short_name": "الزّيج",
-  "start_url": "./index.html",
+  "name": "الزيج",
+  "short_name": "الزيج",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#0a0c12",
-  "theme_color": "#c9a35d",
-  "orientation": "portrait"
+  "theme_color": "#0a0c12",
+  "orientation": "portrait",
+  "scope": "./"
 }
