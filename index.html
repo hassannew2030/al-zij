@@ -4369,14 +4369,15 @@ function toggleGlanceCard(){
   if (!showing) window.scrollTo({top:0, behavior:'smooth'});
 }
 // ===== مشاركة الساعة / اتجاه القبلة — Web Share API مع نسخ للرابط كبديل لو المتصفح مش بيدعمها =====
+const ZIJ_OFFICIAL_URL = 'https://alzijapp.com'; // الرابط الرسمي — كل مشاركة بتستخدمه بدل رابط الصفحة الحالي
 function shareClock(){
   const EN = window.ZIJ_LANG === 'en';
-  const shareData = EN ? { title: 'Al-Zij', text: 'Al-Zij — a real astronomical clock: the time, the Qibla, prayer times, and the Hijri and Gregorian calendars.\nA waqf (endowment) for the sake of Allah: free forever — no subscription, no fees, no ads, no sign-up. It keeps no information about you and is never used for any commercial purpose.', url: location.href }
-                       : { title: 'الزّيج', text: 'الزّيج — ساعة فلكية حقيقية: الوقت، والقبلة، ومواقيت الصلاة، والتقويمان الهجري والميلادي.\nوقفٌ لله تعالى: مجاني بالكامل ودائمًا، بلا اشتراك ولا رسوم ولا إعلانات ولا تسجيل، ولا يحتفظ بأي معلومات عنك، ولا يُستعمل لأي غرض تجاري.', url: location.href };
+  const shareData = EN ? { title: 'Al-Zij', text: 'Al-Zij — a real astronomical clock: the time, the Qibla, prayer times, and the Hijri and Gregorian calendars.\nA waqf (endowment) for the sake of Allah: free forever — no subscription, no fees, no ads, no sign-up. It keeps no information about you and is never used for any commercial purpose.\nOfficial link: ' + ZIJ_OFFICIAL_URL, url: ZIJ_OFFICIAL_URL }
+                       : { title: 'الزّيج', text: 'الزّيج — ساعة فلكية حقيقية: الوقت، والقبلة، ومواقيت الصلاة، والتقويمان الهجري والميلادي.\nوقفٌ لله تعالى: مجاني بالكامل ودائمًا، بلا اشتراك ولا رسوم ولا إعلانات ولا تسجيل، ولا يحتفظ بأي معلومات عنك، ولا يُستعمل لأي غرض تجاري.\nالرابط الرسمي: ' + ZIJ_OFFICIAL_URL, url: ZIJ_OFFICIAL_URL };
   if (navigator.share){
     navigator.share(shareData).catch(()=>{});
   } else {
-    navigator.clipboard.writeText(location.href).then(()=>alert(EN?'Link copied! Paste it wherever you want to share it.':'تم نسخ الرابط! الصقه في أي مكان تريد مشاركته فيه.')).catch(()=>alert(location.href));
+    navigator.clipboard.writeText(shareData.text).then(()=>alert(EN?'Link copied! Paste it wherever you want to share it.':'تم نسخ الرابط! الصقه في أي مكان تريد مشاركته فيه.')).catch(()=>alert(shareData.text));
   }
 }
 function shareQibla(){
@@ -4385,8 +4386,8 @@ function shareQibla(){
   let city = (window.zijCityName && window.zijCityName()) || '';
   if (!city || city === 'موقعك' || /غير معروفة|جارٍ|اضغط/.test(city)) city = EN ? 'my location' : 'موقعي'; // never a status line inside the message
   else if (EN && window.zijTr) city = window.zijTr(city);
-  const text = EN ? 'Qibla direction from '+city+': '+q+' 🕋\nFrom Al-Zij — a waqf (endowment) for the sake of Allah: completely free, no subscription, no fees, no ads, and it keeps no information about you.\n'+location.href
-                  : 'اتجاه القبلة من '+city+': '+q+' 🕋\nمن تطبيق «الزّيج» — وقفٌ لله تعالى: مجاني بالكامل، بلا اشتراك ولا رسوم ولا إعلانات، ولا يحتفظ بأي معلومات عنك.\n'+location.href;
+  const text = EN ? 'Qibla direction from '+city+': '+q+' 🕋\nFrom Al-Zij — a waqf (endowment) for the sake of Allah: completely free, no subscription, no fees, no ads, and it keeps no information about you.\nOfficial link: '+ZIJ_OFFICIAL_URL
+                  : 'اتجاه القبلة من '+city+': '+q+' 🕋\nمن تطبيق «الزّيج» — وقفٌ لله تعالى: مجاني بالكامل، بلا اشتراك ولا رسوم ولا إعلانات، ولا يحتفظ بأي معلومات عنك.\nالرابط الرسمي: '+ZIJ_OFFICIAL_URL;
   if (navigator.share){
     navigator.share({ title: EN?'Qibla direction':'اتجاه القبلة', text: text }).catch(()=>{});
   } else {
