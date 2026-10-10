@@ -5722,7 +5722,7 @@ function welcome(){
     const cards=[...w.querySelectorAll('#zCards .zc')],dots=[...w.querySelectorAll('#zDots i')],nb=zq('zNext');
     function show(){cards.forEach((c,k)=>{c.style.transform='translateX('+((k-i)*100*sign)+'%)';c.style.opacity=k===i?'1':'0';c.setAttribute('aria-hidden',k===i?'false':'true');});
       dots.forEach((d,k)=>d.classList.toggle('on',k===i));nb.textContent=i===CARDS.length-1?'ابدأ':'التالي';}
-    const finish=()=>{zijLog('الترحيب','التعريف '+(i+1)+'/'+CARDS.length);next();};
+    const finish=()=>{zijLog('الترحيب','التعريف '+(i+1)+'/'+CARDS.length);try{window.zijAlerts&&zijAlerts.enableFromWelcome();}catch(e){}next();}; // #14: «ابدأ» turns the adhan alert on
     const go=d=>{const j=i+d;if(j<0)return;if(j>=CARDS.length){finish();return;}i=j;show();};
     nb.onclick=()=>go(1);zq('zSkip').onclick=finish;
     let x0=null,y0=0;const box=zq('zCards');
@@ -6238,6 +6238,153 @@ function zijWorldOpen(n){
 window.zijWorldOpen=zijWorldOpen;
 setInterval(zijWorldMount,1500);
 
+</script>
+<script id="alertsJs">
+/* ===== التنبيهات الثلاثة لكل صلاة (#26) — قبل الأذان · الأذان · الإقامة، وكل واحد يعدّله المستخدم لوحده =====
+   تعمل ما دام الزيج مفتوحًا. نفس الإعدادات تنتقل كما هي للتطبيق (تنبيهات محلية مجدولة على الجوال، بلا سيرفر). */
+(function(){
+  const EN=window.ZIJ_LANG==='en', T=(a,e)=>EN?e:a;
+  const AR='٠١٢٣٤٥٦٧٨٩', D=n=>EN?String(n):String(n).replace(/\d/g,d=>AR[d]);
+  const KEY='zijAlerts', FIRED='zijAlertsFired';
+  const P=[['fajr','الفجر','Fajr'],['dhuhr','الظهر','Dhuhr'],['asr','العصر','Asr'],['maghrib','المغرب','Maghrib'],['isha','العشاء','Isha']];
+  const IQ={fajr:25,dhuhr:20,asr:20,maghrib:10,isha:20}; // a common iqama gap in Saudi mosques; each one is editable
+  const SOUNDS={brass:['نغمة النحاس','Brass chime'],bell:['جرس','Bell'],soft:['نغمة هادئة','Soft tone'],silent:['بدون صوت (رسالة فقط)','No sound (message only)']};
+  const PRE_MIN=[5,10,15,20,25,30,45,60], IQ_MIN=[5,10,15,20,25,30,35,40,45];
+  const LS={get:k=>{try{return localStorage.getItem(k);}catch(e){return null;}},set:(k,v)=>{try{localStorage.setItem(k,v);}catch(e){}}};
+
+  function defaults(){const s={on:true,v:1,p:{}};
+    P.forEach(([k])=>s.p[k]={pre:{on:false,min:10,snd:'soft'},adhan:{on:true,snd:'brass'},iqama:{on:false,min:IQ[k],snd:'bell'}});return s;}
+  function load(){const d=defaults();let s=null;try{s=JSON.parse(LS.get(KEY)||'null');}catch(e){}
+    if(!s||!s.p)return d;
+    P.forEach(([k])=>{const a=s.p[k]||{};d.p[k]={pre:{...d.p[k].pre,...(a.pre||{})},adhan:{...d.p[k].adhan,...(a.adhan||{})},iqama:{...d.p[k].iqama,...(a.iqama||{})}};});
+    d.on=s.on!==false;return d;}
+  let S=load();
+  const save=()=>{LS.set(KEY,JSON.stringify(S));try{window.zijLog&&zijLog('التنبيهات','حُفظت');}catch(e){}};
+  const mins=n=>EN?(n===60?'1 hour':n+' min'):(n===60?'ساعة':D(n)+' '+(n<=10?'دقائق':'دقيقة'));
+  const pname=k=>{const fri=isFriday();const r=P.find(x=>x[0]===k);if(k==='dhuhr'&&fri)return T('الجمعة','Jumu\'ah');return EN?r[2]:r[1];};
+
+  /* ---- sounds: made in the browser (no recordings yet) ---- */
+  let ctx=null;
+  function ac(){try{if(!ctx){const C=window.AudioContext||window.webkitAudioContext;if(C)ctx=new C();}if(ctx&&ctx.state==='suspended')ctx.resume();}catch(e){}return ctx;}
+  ['pointerdown','touchend','keydown'].forEach(ev=>document.addEventListener(ev,()=>{if(ctx&&ctx.state==='suspended')ctx.resume();},{passive:true}));
+  function strike(c,f,t,dur,vol){[[1,1],[2.76,.35],[5.4,.12]].forEach(([m,g])=>{const o=c.createOscillator(),v=c.createGain();o.type='sine';o.frequency.value=f*m;
+    v.gain.setValueAtTime(.0001,t);v.gain.exponentialRampToValueAtTime(vol*g,t+.02);v.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(v);v.connect(c.destination);o.start(t);o.stop(t+dur+.05);});}
+  function play(snd){if(snd==='silent')return;const c=ac();if(!c)return;const t=c.currentTime+.05;
+    if(snd==='brass'){[0,1.6].forEach(o=>{strike(c,523.25,t+o,1.4,.32);strike(c,659.25,t+o+.45,1.4,.3);strike(c,783.99,t+o+.9,1.8,.3);});}
+    else if(snd==='bell'){[0,.35,.7].forEach((o,i)=>strike(c,i===2?880:660,t+o,.9,.28));}
+    else{strike(c,523.25,t,1.2,.16);strike(c,659.25,t+.5,1.4,.16);}
+    try{navigator.vibrate&&navigator.vibrate(snd==='brass'?[300,150,300,150,600]:[200,100,200]);}catch(e){}}
+
+  /* ---- firing ---- */
+  function banner(text,secs){const b=document.getElementById('adhanBanner'),t=document.getElementById('adhanBannerText');
+    if(t)t.textContent=text;if(b){b.style.display='block';clearTimeout(b._h);b._h=setTimeout(()=>{b.style.display='none';},secs*1000);}}
+  function notify(text){try{if(!('Notification' in window)||Notification.permission!=='granted'||!document.hidden)return;
+    const o={body:text,tag:'zij-alert',lang:EN?'en':'ar',dir:EN?'ltr':'rtl'};
+    if(navigator.serviceWorker&&navigator.serviceWorker.getRegistration)navigator.serviceWorker.getRegistration().then(r=>r?r.showNotification(T('الزّيج','Al-Zij'),o):new Notification(T('الزّيج','Al-Zij'),o)).catch(()=>{});
+    else new Notification(T('الزّيج','Al-Zij'),o);}catch(e){}}
+  function fire(kind,k,cfg){
+    const n=pname(k);let text,secs=20;
+    if(kind==='pre')text=EN?n+' adhan in '+mins(cfg.min):'بعد '+mins(cfg.min)+' أذان '+n;
+    else if(kind==='adhan'){text=EN?'🕌 It is now time for the '+n+' adhan':'🕌 حان الآن موعد أذان '+n;secs=60;}
+    else text=EN?'🕌 It is now time for the '+n+' iqamah':'🕌 حان الآن وقت إقامة صلاة '+n;
+    banner(text,secs);play(cfg.snd);notify(text);
+    try{window.zijLog&&zijLog('تنبيه',kind+' '+k);}catch(e){}
+  }
+  let fired={};try{fired=JSON.parse(LS.get(FIRED)||'{}');}catch(e){}
+  function localNow(){const now=new Date(),tz=(window.observer&&observer.tz)||(-now.getTimezoneOffset()/60),ld=new Date(now.getTime()+tz*36e5);
+    return {now,key:ld.getUTCFullYear()+'-'+(ld.getUTCMonth()+1)+'-'+ld.getUTCDate(),nm:ld.getUTCHours()*60+ld.getUTCMinutes()+ld.getUTCSeconds()/60,wd:ld.getUTCDay()};}
+  function isFriday(){return localNow().wd===5;}
+  let cache={key:'',min:-1,p:null};
+  function times(L){const m=Math.floor(L.nm);if(cache.key!==L.key||cache.min!==m||!cache.p){
+      try{cache={key:L.key,min:m,p:observer.realPrayerTimes(L.now,hijriCal.fromGregorian(L.now))};}catch(e){cache.p=null;}}return cache.p;}
+  function tick(){
+    if(!S.on||typeof observer==='undefined')return;const L=localNow(),p=times(L);if(!p)return;
+    P.forEach(([k])=>{const t=p[k];if(t==null||isNaN(t))return;const c=S.p[k];
+      [['pre',t-c.pre.min,c.pre],['adhan',t,c.adhan],['iqama',t+c.iqama.min,c.iqama]].forEach(([kind,at,cfg])=>{
+        if(!cfg.on)return;const id=k+'.'+kind;
+        if(L.nm>=at&&L.nm<at+1&&fired[id]!==L.key){fired[id]=L.key;LS.set(FIRED,JSON.stringify(fired));fire(kind,k,cfg);}
+      });});
+  }
+  setInterval(tick,1000);
+
+  /* ---- settings screen (Prayer → التنبيهات) ---- */
+  const css=`#zAl{direction:${EN?'ltr':'rtl'}}#zAl .m{display:flex;align-items:center;justify-content:space-between;gap:10px}
+#zAl .mb{flex:1;background:var(--h-raise);border:1px solid var(--h-brass-d);border-radius:22px;padding:10px 14px;color:var(--h-brass-l);font-family:inherit;font-size:17px;font-weight:700;cursor:pointer}
+#zAl .mb.off{color:#e0796d;border-color:#a4453a}
+#zAl .note{color:var(--h-dim);font-size:13.5px;line-height:1.6;margin:8px 0 10px}
+#zAl details{border:1px solid var(--h-line);border-radius:12px;margin-top:8px;background:rgba(0,0,0,.18)}
+#zAl summary{list-style:none;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 12px;cursor:pointer}
+#zAl summary::-webkit-details-marker{display:none}
+#zAl summary b{color:var(--h-brass-l);font-size:17px;font-weight:700}
+#zAl .chips{display:flex;flex-wrap:wrap;gap:4px;justify-content:flex-end}
+#zAl .chip{font-size:12.5px;border:1px solid var(--h-line);border-radius:10px;padding:1px 7px;color:var(--h-dim)}
+#zAl .chip.on{color:var(--h-teal);border-color:var(--h-teal)}
+#zAl .blk{border-top:1px dashed var(--h-line);padding:10px 12px}
+#zAl .bh{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px}
+#zAl .bh span{color:var(--h-ink);font-size:16px;font-weight:700}
+#zAl .bh small{display:block;color:var(--h-dim);font-size:12.5px;font-weight:400}
+#zAl .row{display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap}
+#zAl .row label{color:var(--h-dim);font-size:14px;min-width:64px}
+#zAl select{background:var(--h-raise);color:var(--h-brass-l);border:1px solid var(--h-brass-d);border-radius:10px;padding:6px 8px;font-family:inherit;font-size:15px;max-width:100%}
+#zAl .try{background:none;border:1px solid var(--h-line);border-radius:14px;color:var(--h-ink);padding:5px 10px;font-family:inherit;font-size:13.5px;cursor:pointer}
+#zAl .all{display:block;margin:2px 12px 12px;background:none;border:0;color:var(--h-teal);font-family:inherit;font-size:14px;cursor:pointer;padding:4px 0}
+#zAl .sw{position:relative;width:46px;height:26px;flex:none}
+#zAl .sw input{opacity:0;width:100%;height:100%;margin:0;position:absolute;inset:0;cursor:pointer;z-index:1}
+#zAl .sw i{position:absolute;inset:0;border-radius:13px;background:#3a3424;transition:background .2s}
+#zAl .sw i:after{content:"";position:absolute;top:3px;${EN?'left':'right'}:3px;width:20px;height:20px;border-radius:50%;background:#cfc4a4;transition:transform .2s}
+#zAl .sw input:checked+i{background:var(--h-teal)}
+#zAl .sw input:checked+i:after{transform:translateX(${EN?'20px':'-20px'});background:#fff}
+#zAl .dim{opacity:.45}`;
+  const sw=(id,on)=>`<span class="sw"><input type="checkbox" data-k="${id}"${on?' checked':''} aria-label="${T('تشغيل','On')}"><i></i></span>`;
+  const sel=(id,list,val,lab)=>`<select data-k="${id}">${list.map(v=>`<option value="${v}"${String(v)===String(val)?' selected':''}>${lab(v)}</option>`).join('')}</select>`;
+  const sndSel=(id,val,keys)=>sel(id,keys,val,v=>EN?SOUNDS[v][1]:SOUNDS[v][0]);
+  function chips(c){const a=[];
+    a.push(`<span class="chip${c.pre.on?' on':''}">${T('قبل','Before')} ${c.pre.on?mins(c.pre.min):'—'}</span>`);
+    a.push(`<span class="chip${c.adhan.on?' on':''}">${T('الأذان','Adhan')}${c.adhan.on?'':' —'}</span>`);
+    a.push(`<span class="chip${c.iqama.on?' on':''}">${T('الإقامة','Iqamah')} ${c.iqama.on?mins(c.iqama.min):'—'}</span>`);return a.join('');}
+  let openK=null;
+  function render(){
+    const box=document.getElementById('pAlert');if(!box)return;
+    if(!document.getElementById('zAlCss')){const st=document.createElement('style');st.id='zAlCss';st.textContent=css;document.head.appendChild(st);}
+    const h3=box.parentElement&&box.parentElement.querySelector('h3');if(h3)h3.textContent=T('التنبيهات','Alerts');
+    const canNotif='Notification' in window&&Notification.permission==='default';
+    box.innerHTML=`<div id="zAl"><div class="m"><button type="button" class="mb${S.on?'':' off'}" id="zAlMaster">${S.on?T('🔔 التنبيهات مفعّلة','🔔 Alerts are on'):T('🔕 التنبيهات متوقفة','🔕 Alerts are off')}</button></div>
+<div class="note">${T('لكل صلاة ثلاثة تنبيهات تعدّلها كما تحب: قبل الأذان، والأذان، والإقامة. تعمل ما دام الزّيج مفتوحًا على جوالك، والتنبيه والجوال مقفول يأتي مع تطبيق الزّيج في المتجر.','Each prayer has three alerts you can set as you like: before the adhan, the adhan, and the iqamah. They work while Al-Zij is open on your phone; alerts with the phone locked come with the Al-Zij app in the stores.')}</div>
+${canNotif?`<button type="button" class="try" id="zAlNotif" style="margin-bottom:6px">${T('اسمح بإشعارات المتصفح','Allow browser notifications')}</button>`:''}
+<div class="${S.on?'':'dim'}">${P.map(([k])=>{const c=S.p[k];return `<details data-p="${k}"${openK===k?' open':''}><summary><b>${pname(k)}</b><span class="chips">${chips(c)}</span></summary>
+<div class="blk"><div class="bh"><span>① ${T('قبل الأذان','Before the adhan')}<small>${T('تذكير يسبق الأذان','A reminder ahead of the adhan')}</small></span>${sw(k+'.pre.on',c.pre.on)}</div>
+<div class="row${c.pre.on?'':' dim'}"><label>${T('قبله بـ','Ahead by')}</label>${sel(k+'.pre.min',PRE_MIN,c.pre.min,mins)}</div>
+<div class="row${c.pre.on?'':' dim'}"><label>${T('الصوت','Sound')}</label>${sndSel(k+'.pre.snd',c.pre.snd,['soft','bell','brass','silent'])}<button type="button" class="try" data-try="${c.pre.snd}">🔊 ${T('جرّب','Test')}</button></div></div>
+<div class="blk"><div class="bh"><span>② ${T('الأذان','The adhan')}<small>${T('عند دخول الوقت','When the time begins')}</small></span>${sw(k+'.adhan.on',c.adhan.on)}</div>
+<div class="row${c.adhan.on?'':' dim'}"><label>${T('الصوت','Sound')}</label>${sndSel(k+'.adhan.snd',c.adhan.snd,['brass','bell','soft','silent'])}<button type="button" class="try" data-try="${c.adhan.snd}">🔊 ${T('جرّب','Test')}</button></div>
+<div class="note" style="margin:6px 0 0">${T('الأذان كاملًا والتكبير فقط بصوت مؤذّن: يُضاف قريبًا.','Full adhan and takbir-only in a muezzin\'s voice: coming soon.')}</div></div>
+<div class="blk"><div class="bh"><span>③ ${T('الإقامة','The iqamah')}<small>${T('بعد الأذان بمدة تختارها','A set time after the adhan')}</small></span>${sw(k+'.iqama.on',c.iqama.on)}</div>
+<div class="row${c.iqama.on?'':' dim'}"><label>${T('بعده بـ','After by')}</label>${sel(k+'.iqama.min',IQ_MIN,c.iqama.min,mins)}</div>
+<div class="row${c.iqama.on?'':' dim'}"><label>${T('الصوت','Sound')}</label>${sndSel(k+'.iqama.snd',c.iqama.snd,['bell','soft','brass','silent'])}<button type="button" class="try" data-try="${c.iqama.snd}">🔊 ${T('جرّب','Test')}</button></div></div>
+<button type="button" class="all" data-all="${k}">${T('طبّق إعدادات '+pname(k)+' على كل الصلوات','Apply '+pname(k)+'\'s settings to all prayers')}</button></details>`;}).join('')}</div></div>`;
+    box.querySelector('#zAlMaster').onclick=()=>{S.on=!S.on;ac();save();if(S.on)play('bell');render();};
+    const nb=box.querySelector('#zAlNotif');if(nb)nb.onclick=()=>{try{Notification.requestPermission().then(render);}catch(e){}};
+    box.querySelectorAll('details').forEach(d=>d.addEventListener('toggle',()=>{if(d.open)openK=d.dataset.p;else if(openK===d.dataset.p)openK=null;}));
+    box.querySelectorAll('[data-k]').forEach(el=>el.addEventListener('change',()=>{const [k,kind,f]=el.dataset.k.split('.');
+      S.p[k][kind][f]=el.type==='checkbox'?el.checked:(f==='min'?+el.value:el.value);openK=k;save();
+      if(el.type==='checkbox'&&el.checked)ac();if(f==='snd')play(el.value);render();}));
+    box.querySelectorAll('[data-try]').forEach(b=>b.onclick=()=>{ac();play(b.dataset.try);});
+    box.querySelectorAll('[data-all]').forEach(b=>b.onclick=()=>{const src=S.p[b.dataset.all];
+      P.forEach(([k])=>{if(k===b.dataset.all)return;const keepIq=S.p[k].iqama.min;S.p[k]=JSON.parse(JSON.stringify(src));S.p[k].iqama.min=src.iqama.min||keepIq;});
+      save();render();b.textContent=T('✅ طُبّقت على كل الصلوات','✅ Applied to all prayers');});
+  }
+
+  window.zijAlerts={
+    get:()=>JSON.parse(JSON.stringify(S)),
+    toggle(){S.on=!S.on;save();render();return S.on;},
+    // #14: the welcome's «ابدأ» turns the adhan alert on (and unlocks sound, since it is a tap)
+    enableFromWelcome(){S.on=true;save();ac();render();},
+    render,_tick:tick,_play:play
+  };
+  window.toggleAdhanAlerts=()=>window.zijAlerts.toggle(); // the old button's name keeps working
+  if(!LS.get(KEY))save();
+  render();
+})();
 </script>
 <script>/* ===== One digit style for the whole Zij: ٠١٢٣ (default) or 0123 — chosen once in المزيد ← العرض =====
    Works on what is drawn on screen, so every number in every screen follows it. Technical text (the diagnostics report, inputs) is left as is. */
