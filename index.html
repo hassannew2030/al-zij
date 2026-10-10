@@ -2,6 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
+<script>/* alzijapp.com opened over plain http: as soon as the https certificate works, move there (location, compass and share need https) */if(location.protocol==='http:'&&/(^|\.)alzijapp\.com$/.test(location.hostname)){fetch('https://'+location.host+'/version.json?u='+Date.now(),{mode:'no-cors',cache:'no-store'}).then(function(){location.replace('https://'+location.host+location.pathname+location.search+location.hash);}).catch(function(){});}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -1617,7 +1618,29 @@
 "العشاء بعد": "Isha in",
 "د على الشروق": "min until Sunrise",
 "الشروق الساعة": "Sunrise at",
-"الشروق بعد": "Sunrise in"
+"الشروق بعد": "Sunrise in",
+"أهلًا بك في الزّيج": "Welcome to Al-Zij",
+"ساعة فلكية حقيقية على جوالك": "A real astronomical clock on your phone",
+"تجمع الوقت والتقويمين الهجري والميلادي في قرص واحد": "bringing the time and the Hijri and Gregorian calendars together on one dial",
+"صلاتك وقبلتك": "Your prayers and your Qibla",
+"مواقيت الصلاة لمدينتك بالضبط": "Exact prayer times for your city",
+"وتنبيه الأذان": "the Adhan alert",
+"واتجاه القبلة بالبوصلة أينما كنت": "and the Qibla direction by compass wherever you are",
+"السماء فوقك": "The sky above you",
+"الشمس والقمر وأطواره والنجوم كما تراها من مكانك": "The Sun, the Moon and its phases, and the stars as you see them from where you are",
+"وقفٌ لله تعالى": "A waqf for the sake of Allah",
+"مجاني بالكامل ودائمًا": "Completely free, forever",
+"بلا إعلانات ولا اشتراك ولا تسجيل": "no ads, no subscription, no sign-up",
+"ولا يحتفظ بأي معلومات عنك": "and it keeps no information about you",
+"تخطَّ": "Skip",
+"التالي": "Next",
+"ابدأ": "Start",
+"اسحب للتعرّف أكثر": "Swipe to learn more",
+"لماذا نحتاج موقعك": "Why do we need your location",
+"مواقيت الصلاة واتجاه القبلة تختلف من مدينة لأخرى": "Prayer times and the Qibla direction change from city to city",
+"بل من حيّ لآخر": "even from one district to another",
+"يُحفظ موقعك على جوالك فقط": "Your location is kept on your phone only",
+"ولا يصلنا منه شيء": "and none of it ever reaches us"
 };</script>
 <script>/* ===== English for the whole Zij. Arabic stays the source; in English mode every Arabic phrase on screen is swapped
    for its English twin from ZIJ_EN (numbers, times and symbols are kept), and the page turns left-to-right. ===== */
@@ -4370,6 +4393,13 @@ function toggleGlanceCard(){
 }
 // ===== مشاركة الساعة / اتجاه القبلة — Web Share API مع نسخ للرابط كبديل لو المتصفح مش بيدعمها =====
 const ZIJ_OFFICIAL_URL = 'https://alzijapp.com'; // الرابط الرسمي — كل مشاركة بتستخدمه بدل رابط الصفحة الحالي
+function zijCopyText(text, okMsg){ // clipboard → old copy trick → show the text to copy by hand
+  const done=()=>alert(okMsg);
+  const old=()=>{try{const t=document.createElement('textarea');t.value=text;t.setAttribute('readonly','');t.style.cssText='position:fixed;top:0;left:0;opacity:0';document.body.appendChild(t);t.select();t.setSelectionRange(0,text.length);const ok=document.execCommand('copy');t.remove();if(ok){done();return;}}catch(e){}
+    prompt(window.ZIJ_LANG==='en'?'Copy the text from here:':'انسخ النص من هنا:', text);};
+  try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(done).catch(old);return;}}catch(e){}
+  old();
+}
 function shareClock(){
   const EN = window.ZIJ_LANG === 'en';
   const shareData = EN ? { title: 'Al-Zij', text: 'Al-Zij — a real astronomical clock: the time, the Qibla, prayer times, and the Hijri and Gregorian calendars.\nA waqf (endowment) for the sake of Allah: free forever — no subscription, no fees, no ads, no sign-up. It keeps no information about you and is never used for any commercial purpose.\nOfficial link: ' + ZIJ_OFFICIAL_URL, url: ZIJ_OFFICIAL_URL }
@@ -4377,7 +4407,7 @@ function shareClock(){
   if (navigator.share){
     navigator.share(shareData).catch(()=>{});
   } else {
-    navigator.clipboard.writeText(shareData.text).then(()=>alert(EN?'Link copied! Paste it wherever you want to share it.':'تم نسخ الرابط! الصقه في أي مكان تريد مشاركته فيه.')).catch(()=>alert(shareData.text));
+    zijCopyText(shareData.text, EN?'Link copied! Paste it wherever you want to share it.':'تم نسخ الرابط! الصقه في أي مكان تريد مشاركته فيه.');
   }
 }
 function shareQibla(){
@@ -4391,7 +4421,7 @@ function shareQibla(){
   if (navigator.share){
     navigator.share({ title: EN?'Qibla direction':'اتجاه القبلة', text: text }).catch(()=>{});
   } else {
-    navigator.clipboard.writeText(text).then(()=>alert(EN?'Qibla direction copied! Paste it anywhere.':'تم نسخ اتجاه القبلة! الصقه في أي مكان.')).catch(()=>alert(text));
+    zijCopyText(text, EN?'Qibla direction copied! Paste it anywhere.':'تم نسخ اتجاه القبلة! الصقه في أي مكان.');
   }
 }
 // ===== وضع "شاشة ويندوز" — الساعة تاخد الشاشة كلها بأقصى حجم ممكن، لعرضها على شاشة كمبيوتر كساعة حائط رقمية =====
@@ -5361,7 +5391,9 @@ function tick(){
     const left=Math.max(0,(nextMin-nm)*60),H=Math.floor(left/3600),M=Math.floor(left%3600/60),S=Math.floor(left%60);
     $('hLbl').textContent=lbl;$('hCd').textContent=ar((H?H+':':'')+two(M)+':'+two(S));$('hSub').textContent=sub;}
   // prayer row
-  $('hRow').innerHTML=list.map((x,i)=>`<div class="pc${x[0]==='sunrise'?' minor':''}${i===curI?' cur':''}${i===nextI&&nextMin===p[x[0]]?' next':''}"><div class="pn">${x[1]}</div><div class="pt">${fmt(p[x[0]]).replace(/ [صم]$/,'')}</div></div>`).join('');
+  // the gold box sits on what is coming next; only in the first minutes after an adhan it stays on that prayer
+  const focusI=(curIsPrayer&&sinceMin<10)?curI:nextI;
+  $('hRow').innerHTML=list.map((x,i)=>`<div class="pc${x[0]==='sunrise'?' minor':''}${i===focusI?' cur':''}${i===nextI&&i!==focusI?' next':''}"><div class="pn">${x[1]}</div><div class="pt">${fmt(i===nextI?nextMin:p[x[0]]).replace(/ [صم]$/,'')}</div></div>`).join('');
   // context note: one line, only when there is something worth saying today
   const ph=Ephemeris.moonPhase(now),notes=[];
   if(ramadan)notes.push('رمضان كريم · اليوم '+ar(h.day)+' من رمضان');
@@ -5535,7 +5567,7 @@ function renderPrayer(){
   if(nx===-1){nx=0;nmin=pt.fajr+1440;}else nmin=p[L[nx][0]];
   const left=Math.max(0,(nmin-nm)*60),H=Math.floor(left/3600),M=Math.floor(left%3600/60),S=Math.floor(left%60);
   $('pLbl').textContent=L[nx][1]+' بعد';$('pCd').textContent=ar((H?H+':':'')+two(M)+':'+two(S));$('pSub').textContent='الأذان '+fmt(nmin);
-  $('pList').innerHTML=L.map((x,i)=>`<li class="${x[0]==='sunrise'?'minor':''}${i===cur?' cur':''}${i===nx&&nmin===p[x[0]]?' next':''}"><span class="n">${x[1]}${i===cur&&x[0]!=='sunrise'?'<span class="tag">الآن</span>':''}${i===nx&&nmin===p[x[0]]?'<span class="tag">القادمة</span>':''}</span><span class="t">${fmt(p[x[0]])}</span></li>`).join('');
+  $('pList').innerHTML=L.map((x,i)=>`<li class="${x[0]==='sunrise'?'minor':''}${i===cur?' cur':''}${i===nx?' next':''}"><span class="n">${x[1]}${i===cur&&x[0]!=='sunrise'&&i!==nx?'<span class="tag">الآن</span>':''}${i===nx?'<span class="tag">القادمة</span>':''}</span><span class="t">${fmt(i===nx?nmin:p[x[0]])}</span></li>`).join('');
   const sel=$('calcMethodSel');
   const estNote=p.polar?'<div style="color:#e8b34a;margin-top:6px">⚠️ الشمس عندك اليوم لا تغيب أو لا تشرق (أو لا ترتفع بما يكفي للعصر)، لذلك حُسبت المواقيت على أقرب خط عرض فيه ليل ونهار (٦٥°).</div>'
     :(p.est&&(p.est.fajr||p.est.isha))?'<div style="color:#e8b34a;margin-top:6px">⚠️ '+(p.est.fajr&&p.est.isha?'الفجر والعشاء':p.est.fajr?'الفجر':'العشاء')+' مقدّر اليوم: الشفق عندك لا يغيب، لذلك حُسب بنسبة من الليل.</div>':'';
@@ -5661,8 +5693,44 @@ function welcome(){
       .catch(e=>{permHint(false);zijLog('إذن الحركة','خطأ');done();});
     });
   }
+
+  // ---- before asking for anything: who we are, in four swipeable cards ----
+  const G={
+    dial:'<svg viewBox="0 0 120 120" width="150" height="150" aria-hidden="true"><defs><radialGradient id="zwg" cx="50%" cy="40%"><stop offset="0" stop-color="#1f2a48"/><stop offset="1" stop-color="#0a0d18"/></radialGradient></defs><circle cx="60" cy="60" r="56" fill="url(#zwg)" stroke="#c9a35d" stroke-width="2"/><circle cx="60" cy="60" r="46" fill="none" stroke="#7c5f30" stroke-width="1"/><path d="M28 74A34 34 0 0 1 92 74" fill="none" stroke="#c9a35d" stroke-width="6" stroke-linecap="round" opacity=".8"/>'+Array.from({length:12},(_,i)=>{const a=i*30*Math.PI/180;return '<line x1="'+(60+40*Math.sin(a)).toFixed(1)+'" y1="'+(60-40*Math.cos(a)).toFixed(1)+'" x2="'+(60+44*Math.sin(a)).toFixed(1)+'" y2="'+(60-44*Math.cos(a)).toFixed(1)+'" stroke="#eddba0" stroke-width="'+(i%3?1:2)+'"/>';}).join('')+'<circle cx="60" cy="60" r="9" fill="#2c6e5a" stroke="#c9a35d"/><line x1="60" y1="60" x2="60" y2="30" stroke="#eddba0" stroke-width="3" stroke-linecap="round"/><line x1="60" y1="60" x2="80" y2="52" stroke="#eddba0" stroke-width="3" stroke-linecap="round"/><line x1="60" y1="60" x2="60" y2="22" stroke="#7fb3a8" stroke-width="1.2" style="transform-origin:60px 60px;animation:zSec 6s linear infinite"/><circle cx="44" cy="40" r="3.5" fill="#eddba0"/><circle cx="45.5" cy="39" r="3" fill="#1f2a48"/></svg>',
+    qibla:'<svg viewBox="0 0 120 120" width="150" height="150" aria-hidden="true"><circle cx="60" cy="60" r="54" fill="#0f1424" stroke="#c9a35d" stroke-width="2"/><circle cx="60" cy="60" r="44" fill="none" stroke="#7c5f30" stroke-dasharray="2 4"/><text x="60" y="15" text-anchor="middle" font-size="9" fill="#cfc4a4" font-family="serif">N</text><g style="transform-origin:60px 60px;animation:zSway 3.5s ease-in-out infinite"><path d="M60 22L66 60L60 98L54 60Z" fill="#c9a35d"/><path d="M60 22L66 60L54 60Z" fill="#eddba0"/></g><rect x="50" y="50" width="20" height="20" rx="1" fill="#14110c" stroke="#c9a35d"/><rect x="50" y="55" width="20" height="3" fill="#c9a35d"/><circle cx="60" cy="60" r="2" fill="#7fb3a8"/></svg>',
+    sky:'<svg viewBox="0 0 120 120" width="150" height="150" aria-hidden="true"><rect x="4" y="4" width="112" height="112" rx="56" fill="#0b1020" stroke="#c9a35d" stroke-width="2"/><circle cx="72" cy="48" r="20" fill="#e9e2cf"/><circle cx="80" cy="42" r="18" fill="#0b1020"/>'+[[28,30],[40,70],[24,86],[92,84],[60,96],[98,28],[50,26]].map((q,i)=>'<circle cx="'+q[0]+'" cy="'+q[1]+'" r="'+(i%2?1.6:1.1)+'" fill="#eddba0" style="animation:zTw 2.4s '+(i*.3)+'s ease-in-out infinite"/>').join('')+'<path d="M8 92Q60 70 112 92" fill="none" stroke="#7c5f30" stroke-width="1.5"/><circle cx="30" cy="92" r="6" fill="#e6c983"/></svg>',
+    waqf:'<svg viewBox="0 0 120 120" width="150" height="150" aria-hidden="true"><g style="transform-origin:60px 60px;animation:zSpin 24s linear infinite"><rect x="26" y="26" width="68" height="68" fill="none" stroke="#c9a35d" stroke-width="2"/><rect x="26" y="26" width="68" height="68" fill="none" stroke="#c9a35d" stroke-width="2" transform="rotate(45 60 60)"/></g><circle cx="60" cy="60" r="26" fill="#121726" stroke="#7c5f30"/><circle cx="57" cy="60" r="13" fill="#eddba0"/><circle cx="62" cy="57" r="11.5" fill="#121726"/><path d="M71 51l1.6 3.4 3.7.4-2.8 2.5.8 3.6-3.3-1.9-3.3 1.9.8-3.6-2.8-2.5 3.7-.4z" fill="#eddba0"/></svg>'
+  };
+  const CARDS=[
+    [G.dial,'أهلًا بك في الزّيج','ساعة فلكية حقيقية على جوالك، تجمع الوقت والتقويمين الهجري والميلادي في قرص واحد.'],
+    [G.qibla,'صلاتك وقبلتك','مواقيت الصلاة لمدينتك بالضبط، وتنبيه الأذان، واتجاه القبلة بالبوصلة أينما كنت.'],
+    [G.sky,'السماء فوقك','الشمس والقمر وأطواره والنجوم كما تراها من مكانك.'],
+    [G.waqf,'وقفٌ لله تعالى','مجاني بالكامل ودائمًا، بلا إعلانات ولا اشتراك ولا تسجيل، ولا يحتفظ بأي معلومات عنك.']];
+  function intro(next){
+    const en=window.ZIJ_LANG==='en',sign=en?1:-1;let i=0;
+    if(!zq('zIntroCss')){const st=document.createElement('style');st.id='zIntroCss';st.textContent='@keyframes zSec{to{transform:rotate(360deg)}}@keyframes zSway{0%,100%{transform:rotate(-14deg)}50%{transform:rotate(14deg)}}@keyframes zTw{0%,100%{opacity:.25}50%{opacity:1}}@keyframes zSpin{to{transform:rotate(360deg)}}#zCards{position:relative;width:100%;max-width:360px;height:360px;overflow:hidden;touch-action:pan-y}#zCards .zc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;transition:transform .45s cubic-bezier(.2,.8,.2,1),opacity .45s}#zDots{display:flex;gap:8px;justify-content:center}#zDots i{width:8px;height:8px;border-radius:50%;background:#3a3424;transition:all .3s}#zDots i.on{background:#e6c983;width:22px;border-radius:4px}@media (prefers-reduced-motion:reduce){#zCards .zc{transition:none}#zCards svg *{animation:none!important}}';document.head.appendChild(st);}
+    w.innerHTML='<button type="button" id="zLangW" data-notr style="position:absolute;top:calc(14px + env(safe-area-inset-top));'+(en?'right':'left')+':16px;background:transparent;border:1px solid #6b5a36;color:#cfc4a4;border-radius:18px;padding:6px 16px;font-family:'+(en?'Amiri,serif':'\'EB Garamond\',Georgia,serif')+';font-size:16px">'+(en?'العربية':'English')+'</button>'+
+      '<button type="button" id="zSkip" style="position:absolute;top:calc(14px + env(safe-area-inset-top));'+(en?'left':'right')+':16px;background:transparent;border:0;color:#8a8570;font-family:inherit;font-size:16px;padding:6px 10px">تخطَّ</button>'+
+      '<div id="zCards">'+CARDS.map(c=>'<div class="zc">'+c[0]+'<div style="font-size:29px;color:#eddba0;font-weight:700">'+c[1]+'</div><div style="font-size:18px;color:#cfc4a4;line-height:1.75;max-width:320px">'+c[2]+'</div></div>').join('')+'</div>'+
+      '<div id="zDots">'+CARDS.map(()=>'<i></i>').join('')+'</div>'+
+      '<button type="button" id="zNext" style="'+btn+'">التالي</button>'+
+      '<div style="font-size:14px;color:#8a8570;min-height:20px">اسحب للتعرّف أكثر</div>';
+    zq('zLangW').onclick=()=>window.zijSetLang(en?'ar':'en');
+    const cards=[...w.querySelectorAll('#zCards .zc')],dots=[...w.querySelectorAll('#zDots i')],nb=zq('zNext');
+    function show(){cards.forEach((c,k)=>{c.style.transform='translateX('+((k-i)*100*sign)+'%)';c.style.opacity=k===i?'1':'0';c.setAttribute('aria-hidden',k===i?'false':'true');});
+      dots.forEach((d,k)=>d.classList.toggle('on',k===i));nb.textContent=i===CARDS.length-1?'ابدأ':'التالي';}
+    const finish=()=>{zijLog('الترحيب','التعريف '+(i+1)+'/'+CARDS.length);next();};
+    const go=d=>{const j=i+d;if(j<0)return;if(j>=CARDS.length){finish();return;}i=j;show();};
+    nb.onclick=()=>go(1);zq('zSkip').onclick=finish;
+    let x0=null,y0=0;const box=zq('zCards');
+    box.addEventListener('touchstart',e=>{x0=e.touches[0].clientX;y0=e.touches[0].clientY;},{passive:true});
+    box.addEventListener('touchend',e=>{if(x0==null)return;const dx=e.changedTouches[0].clientX-x0,dy=e.changedTouches[0].clientY-y0;x0=null;
+      if(Math.abs(dx)<40||Math.abs(dx)<Math.abs(dy))return;go((dx<0?1:-1)*sign);},{passive:true});
+    show();
+  }
   // step 1 — location
-  const b=page(1,'📍','مكانك','لكي تُحسب المواقيت واتجاه القبلة لمدينتك.<br>سيسألك الجوال عن <b style="color:#eddba0">«الموقع»</b>.','اسمح بالموقع','عندما تظهر النافذة اختر «السماح».');
+  function stepLoc(){
+  const b=page(1,'📍','لماذا نحتاج موقعك؟','مواقيت الصلاة واتجاه القبلة تختلف من مدينة لأخرى، بل من حيّ لآخر.<br>يُحفظ موقعك على جوالك فقط، ولا يصلنا منه شيء.<br>سيسألك الجوال عن <b style="color:#eddba0">«الموقع»</b>.','اسمح بالموقع','عندما تظهر النافذة اختر «السماح».');
   b.addEventListener('click',()=>{
     b.disabled=true;b.style.opacity='.6';permHint(true);
     try{window.zijWakeAudio&&window.zijWakeAudio();}catch(e){}
@@ -5674,6 +5742,8 @@ function welcome(){
       setTimeout(()=>needMotion?stepMotion():done(),1100);
     },300);
   });
+  }
+  intro(stepLoc);
   return true;
 }
 if(!welcome())refreshLocation(false);
