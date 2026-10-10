@@ -3213,7 +3213,7 @@ class HijriCalendar {
 // ============================================================
 // ===== طرق الحساب، وكل بلد بيستعمل أنهي واحدة (نفس قيم Aladhan) =====
 const ZIJ_METHODS = {
-  UMM_AL_QURA:{fajr:18.5, ishaMin:90, ramadanIsha:120, aladhan:4},
+  UMM_AL_QURA:{fajr:18.5, ishaMin:90, ramadanIsha:120, aladhan:4, uq:true}, // uq: show minutes the way the official Umm al-Qura calendar prints them (see realPrayerTimes)
   EGYPT:{fajr:19.5, isha:17.5, aladhan:5}, MWL:{fajr:18, isha:17, aladhan:3}, ISNA:{fajr:15, isha:15, aladhan:2},
   KARACHI:{fajr:18, isha:18, asr:2, aladhan:1}, DUBAI:{fajr:18.2, isha:18.2, aladhan:16}, KUWAIT:{fajr:18, isha:17.5, aladhan:9},
   QATAR:{fajr:18, ishaMin:90, aladhan:10}, RUSSIA:{fajr:16, isha:15, aladhan:14}, SINGAPORE:{fajr:20, isha:18, aladhan:11},
@@ -3485,6 +3485,14 @@ class Observer {
       if (polar){ est.fajr = est.isha = est.all = true; }
       const A = M.adj || {};   // the method's own fixed minutes (e.g. Diyanet temkin), then the user's mosque offsets
       const withOff = (m,key)=> m + (A[key]||0) + (_off[key]||0)/60;   // times are in minutes; method minutes as is, mosque offsets are stored in seconds
+      // Official Umm al-Qura calendar (checked against its printed table for 13 Saudi cities, 11 Oct 2026):
+      // every prayer is rounded UP to the next minute, sunrise DOWN (so Fajr never looks longer than it is),
+      // and Fajr carries about half a minute of precaution before rounding up. Isha = Maghrib + 90/120 exactly.
+      if (M.uq){
+        const up = x => Math.ceil(x - 1e-6), dn = x => Math.floor(x + 1e-6), mg = up(withOff(ss,'maghrib'));
+        return { fajr: up(withOff(fajr,'fajr') + 0.5), sunrise: dn(sr + (A.sunrise||0)), dhuhr: up(withOff(noon,'dhuhr')), asr: up(withOff(asr,'asr')),
+                 maghrib: mg, isha: ishaMin ? up(mg + ishaMin + (_off.isha||0)/60) : up(withOff(isha,'isha')), noon, est, polar, method:this.activeMethod() };
+      }
       return { fajr: withOff(fajr,'fajr'), sunrise: sr + (A.sunrise||0), dhuhr: withOff(noon,'dhuhr'), asr: withOff(asr,'asr'), maghrib: withOff(ss,'maghrib'), isha: withOff(isha,'isha'), noon, est, polar, method:this.activeMethod() };
     } finally { this.lat = lat0; }
   }
