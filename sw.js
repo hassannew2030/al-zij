@@ -1,6 +1,7 @@
 // الزيج — يشتغل من غير نت. النت هو الأصل: كل مرة بنجيب أحدث نسخة، ولو مفيش نت بنفتح آخر نسخة محفوظة.
-const CACHE_NAME = 'al-zij-v4';
-const FILES_TO_CACHE = ['./', './index.html', './manifest.json', './version.json'];
+const CACHE_NAME = 'al-zij-v5';
+const FONTS = ['./fonts/Amiri-Regular.woff', './fonts/Amiri-Bold.woff', './fonts/EBGaramond.woff'];
+const FILES_TO_CACHE = ['./', './index.html', './manifest.json', './version.json', ...FONTS];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(FILES_TO_CACHE)).catch(() => {}));
@@ -19,6 +20,11 @@ self.addEventListener('fetch', (event) => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
   if (url.origin !== location.origin) return; // weather, fonts, maps: handled by the page itself
+  // fonts never change: take the saved copy first (fast, works offline)
+  if (url.pathname.includes('/fonts/')) {
+    event.respondWith(caches.match(req).then((hit) => hit || fetch(req).then((res) => { if (res && res.ok) { const c = res.clone(); caches.open(CACHE_NAME).then((x) => x.put(req, c)); } return res; })));
+    return;
+  }
   // network first → save a fresh copy → if offline, use the saved copy
   event.respondWith(
     fetch(req, { cache: 'no-cache' }).then((res) => {   // always ask GitHub if there is something newer
