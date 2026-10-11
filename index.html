@@ -5434,7 +5434,12 @@ function tick(){
   $('glMoonTxt').textContent=ph.name;
   const t=document.getElementById('dataTemp'),c=document.getElementById('dataWeatherCondition');
   const tv=t&&t.textContent.replace(/[٠-٩]/g,d=>d.charCodeAt(0)-1632).match(/-?\d+(\.\d+)?/);
-  $('glSkyTxt').textContent=tv?ar(Math.round(+tv[0]))+'°'+(c&&c.textContent&&c.textContent!=='—'?' '+c.textContent.split(/[ (]/)[0]:''):'الشمس';
+  // #17 the sun chip: the next sunrise or sunset (official minutes, from the same prayer times), taking turns with the weather when known (#29: nothing removed)
+  {let ev;if(nm<p.sunrise)ev='الشروق '+fmt(p.sunrise).replace(/ [صم]$/,'');else if(nm<p.maghrib)ev='الغروب '+fmt(p.maghrib).replace(/ [صم]$/,'');
+   else{const tm=new Date(now.getTime()+864e5);ev='الشروق '+fmt(observer.realPrayerTimes(tm,hijriCal.fromGregorian(tm)).sunrise).replace(/ [صم]$/,'');}
+   // too narrow for both: when the weather is known the chip takes turns every 4 s (weather as before ↔ sunrise/sunset)
+   const wx=tv?ar(Math.round(+tv[0]))+'°'+(c&&c.textContent&&c.textContent!=='—'?' '+c.textContent.split(/[ (]/)[0]:''):'';
+   $('glSkyTxt').textContent=wx&&Math.floor(Date.now()/4000)%2?wx:ev;}
   $('glQiblaTxt').textContent=ar(Math.round(observer.computeQiblaBearing(observer.lat,observer.lon)))+'°';
   }catch(e){console.error('home tick',e);}
 }
