@@ -1,5 +1,5 @@
 // الزيج — يشتغل من غير نت. النت هو الأصل: كل مرة بنجيب أحدث نسخة، ولو مفيش نت بنفتح آخر نسخة محفوظة.
-const CACHE_NAME = 'al-zij-v5';
+const CACHE_NAME = 'al-zij-v6';
 const FONTS = ['./fonts/Amiri-Regular.woff', './fonts/Amiri-Bold.woff', './fonts/EBGaramond.woff'];
 const FILES_TO_CACHE = ['./', './index.html', './manifest.json', './version.json', ...FONTS];
 
