@@ -1,0 +1,22 @@
+{
+ "source": "تطبيق تقويم أم القرى الرسمي — صورة شاشة من حسن، مدينة جدة",
+ "date": "2026-10-12",
+ "hijri": "الاثنين ١ جمادى الأولى ١٤٤٨",
+ "jeddah": {
+  "fajr": "05:03",
+  "sunrise": "06:18",
+  "dhuhr": "12:10",
+  "asr": "15:32",
+  "maghrib": "18:02",
+  "isha": "19:32"
+ },
+ "zij": {
+  "fajr": "05:03",
+  "sunrise": "06:17",
+  "dhuhr": "12:10",
+  "asr": "15:32",
+  "maghrib": "18:02",
+  "isha": "19:32"
+ },
+ "note": "5 of 6 match. Sunrise: true sunrise at the Zij's Jeddah point (21.5433, 39.1728) is 06:17:58, two seconds before the minute; official 06:18 implies a city point whose sunrise is at least 2 s later. Same edge pattern as Tabuk on Oct 11."
+}
