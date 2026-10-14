@@ -6877,9 +6877,9 @@ body[data-scr]:not([data-scr="clock"]) #zInsBar{display:none!important}
     return `<text x="${x}" y="${y}" dy=".35em" transform="rotate(${rot} ${x} ${y})" font-family="${FONT}" font-size="${size}" font-weight="${weight||700}" fill="${fill}" text-anchor="middle">${str}</text>`;}
   const lower=a=>{const n=norm(a);return n>90&&n<270;};
   // rings (radii): face | numerals | day & night | moon | prayers | bezel
-  const RF=132,RN=[134,168],RD=[170,202],RM=[204,234],RP=[236,293];
+  const RF=158,RN=[160,192],RD=[194,218],RM=[220,244],RP=[246,293];
   const st=document.createElement('style');
-  st.textContent=`#zDial{display:block;width:min(94vw,440px);margin:6px auto 2px;-webkit-user-select:none;user-select:none;touch-action:manipulation}
+  st.textContent=`#zDial{display:block;width:min(86vw,380px);margin:6px auto 2px;-webkit-user-select:none;user-select:none;touch-action:manipulation}
 #zDial svg{display:block;width:100%;height:auto}
 body:not(.simple-view) #zDial{display:none!important}
 body.simple-view .wrap{display:none!important}`;
@@ -6907,13 +6907,11 @@ body.simple-view .wrap{display:none!important}`;
       [en?'Asr':'العصر',p.asr,p.maghrib],[en?'Maghrib':'المغرب',p.maghrib,p.isha],[en?'Isha':'العشاء',p.isha,p.fajr+1440]];
     SEG.forEach(([n,a,b],i)=>{const a1=ang(a),a2=ang(b),cur=(nm>=a&&nm<b)||(i===5&&nm<p.fajr),fill=cur?'#f3d98a':(i%2?'#e6dabb':'#f1e9d4');
       s+=`<path d="${band(a1,a2,RP[0],RP[1])}" fill="${fill}" stroke="#7c5f30" stroke-width="2"/>`;
-      const mid=(a1+a2)/2,lo=lower(mid),rOut=RP[1]-17,rIn=RP[0]+15;
-      s+=word(mid,lo?rIn:rOut,n,en?16:19,'#2a2416',700)+word(mid,lo?rOut:rIn,f12(a),16,'#4a3a1e',400);});
+      const mid=(a1+a2)/2,lo=lower(mid),rM=(RP[0]+RP[1])/2,arcLen=(a2-a1)*Math.PI/180*rM,one=n+'  '+f12(a);
+      if(arcLen>one.length*11.5+16) s+=word(mid,rM,`${n} <tspan font-weight="400">${f12(a)}</tspan>`,22,'#2a2416',700);   // room for one line
+      else{const rOut=RP[1]-13,rIn=RP[0]+12;s+=word(mid,lo?rIn:rOut,n,en?16:18,'#2a2416',700)+word(mid,lo?rOut:rIn,f12(a),15,'#4a3a1e',700);}});
     /* ③ the Moon's ring — the nights of the Hijri month from 1 at the top, the Moon on tonight */
     s+=`<circle cx="${C}" cy="${C}" r="${(RM[0]+RM[1])/2}" fill="none" stroke="#111a30" stroke-width="${RM[1]-RM[0]}"/>`+sep(RM[1])+sep(RM[0]);
-    for(let d=1;d<=30;d++){const a=(d-1)*12,full=d>=13&&d<=15,[x1,y1]=P(a,RM[1]-1),[x2,y2]=P(a,RM[1]-(d%5===0||d===1?11:6));
-      s+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${full?'#f5e6b4':'#7f7356'}" stroke-width="${d%5===0||d===1?2.4:1.3}"/>`;
-      if(d===1||d===15){const [tx,ty]=P(a,RM[0]+9);s+=`<circle cx="${tx}" cy="${ty}" r="${d===15?3.5:2.5}" fill="${d===15?'#f5e6b4':'#7f7356'}"/>`;}}
     let ph=null;try{ph=Ephemeris.moonPhase(now);}catch(e){}
     {const a=(h.day-1)*12,[mx,my]=P(a,(RM[0]+RM[1])/2),r=11.5;
       s+=`<g id="zdMoon" style="cursor:pointer"><circle cx="${mx}" cy="${my}" r="${r+4}" fill="#080b13" stroke="#c9a35d" stroke-width="1.2"/>`;
@@ -6929,7 +6927,7 @@ body.simple-view .wrap{display:none!important}`;
       s+=`<circle cx="${x}" cy="${y}" r="24" fill="url(#zdGlow)" opacity="${up?1:.35}"/><g transform="translate(${x} ${y})">${Array.from({length:8},(_,k)=>{const q=k*45*Math.PI/180;return `<line x1="${12*Math.sin(q)}" y1="${-12*Math.cos(q)}" x2="${16.5*Math.sin(q)}" y2="${-16.5*Math.cos(q)}" stroke="${up?'#ffd25a':'#c9a35d'}" stroke-width="2.2" stroke-linecap="round"/>`;}).join('')}<circle r="9.5" fill="${up?'url(#zdSun)':'#8a7346'}" stroke="#6f5229" stroke-width="1"/></g>`;}
     /* ① the numerals' ring */
     s+=`<circle cx="${C}" cy="${C}" r="${(RN[0]+RN[1])/2}" fill="none" stroke="#231c10" stroke-width="${RN[1]-RN[0]}"/>`+sep(RN[1]);
-    for(let k=1;k<=12;k++){const [x,y]=P(k*30,(RN[0]+RN[1])/2);s+=`<text x="${x}" y="${y}" dy=".35em" font-family="${FONT}" font-weight="700" font-size="27" fill="#f5e6b4" text-anchor="middle">${dg(k)}</text>`;}
+    for(let k=1;k<=12;k++){const [x,y]=P(k*30,(RN[0]+RN[1])/2);s+=`<text x="${x}" y="${y}" dy=".35em" font-family="${FONT}" font-weight="700" font-size="31" fill="#f5e6b4" text-anchor="middle">${dg(k)}</text>`;}
     /* the face with the minute marks */
     s+=`<circle cx="${C}" cy="${C}" r="${RN[0]}" fill="url(#zdFace)" stroke="#c9a35d" stroke-width="1.6"/>`;
     for(let k=0;k<60;k++){const [x1,y1]=P(k*6,RF-2),[x2,y2]=P(k*6,RF-(k%5?8:15));s+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#c9a35d" stroke-width="${k%5?1.1:2.8}"/>`;}
@@ -6938,11 +6936,15 @@ body.simple-view .wrap{display:none!important}`;
   }
   function drawHands(now){
     const m=localMin(now),hA=(m/60%12)*30,mA=(m%60)*6,sA=Math.floor((m*60)%60)*6;
-    const hand=(a,len,w,tail,col,tip)=>{const [x,y]=P(a,len),[tx,ty]=P(a+180,tail);
-      let o=`<line x1="${tx}" y1="${ty}" x2="${x}" y2="${y}" stroke="#05070c" stroke-width="${w+3}" stroke-linecap="round" opacity=".6"/><line x1="${tx}" y1="${ty}" x2="${x}" y2="${y}" stroke="${col}" stroke-width="${w}" stroke-linecap="round"/>`;
-      if(tip){const [a1,b1]=P(a,len-28),[a2,b2]=P(a,len-5);o+=`<line x1="${a1}" y1="${b1}" x2="${a2}" y2="${b2}" stroke="#fff8dc" stroke-width="${w-5}" stroke-linecap="round"/>`;}return o;};
-    HG.innerHTML=hand(hA,84,12,16,'#e9cf8a',1)+hand(mA,122,8.5,20,'#f3e3ae',1)+hand(sA,128,2.4,30,'#d6453a',0)+
-      `<circle cx="${C}" cy="${C}" r="11" fill="url(#zdGold)" stroke="#6f5229"/><circle cx="${C}" cy="${C}" r="4" fill="#d6453a"/>`;
+    // a tapered sword hand: wide near the centre, narrow at the tip, short tail
+    const sword=(a,len,w,tail,col)=>{const pts=[[a,len],[a+90,w*.28],[a+180,tail],[a-90,w*.28]].map(([q,r])=>{const t=q*Math.PI/180;return [C+r*Math.sin(t),C-r*Math.cos(t)];});
+      const [bl,br]=[P(a-90,w/2),P(a+90,w/2)],[tip]=[P(a,len)],[tl]=[P(a+180,tail)];
+      return `<path d="M${tip[0]} ${tip[1]} L${br[0]} ${br[1]} L${tl[0]} ${tl[1]} L${bl[0]} ${bl[1]}Z" fill="${col}" stroke="#4a3a1e" stroke-width="1.2" stroke-linejoin="round"/>`;};
+    const [sx,sy]=P(sA,150),[cx2,cy2]=P(sA+180,34),[cw,ch]=P(sA+180,26);
+    HG.innerHTML=`<g opacity=".35" transform="translate(3 4)">${sword(hA,100,16,18,'#000')}${sword(mA,150,12,22,'#000')}</g>`+
+      sword(hA,100,16,18,'#e9cf8a')+sword(mA,150,12,22,'#f3e3ae')+
+      `<line x1="${cx2}" y1="${cy2}" x2="${sx}" y2="${sy}" stroke="#d6453a" stroke-width="2.4" stroke-linecap="round"/><circle cx="${cw}" cy="${ch}" r="6" fill="#d6453a"/>`+
+      `<circle cx="${C}" cy="${C}" r="10" fill="url(#zdGold)" stroke="#6f5229"/><circle cx="${C}" cy="${C}" r="3.5" fill="#d6453a"/>`;
   }
   function tick(){const now=new Date(),key=Math.floor(now.getTime()/60000)+'|'+(window.ZIJ_LANG||'')+'|'+(typeof observer!=='undefined'&&observer.lat);
     if(key!==lastKey){lastKey=key;drawStatic(now);}drawHands(now);}
