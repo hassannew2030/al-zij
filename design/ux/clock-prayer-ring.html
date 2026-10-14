@@ -1,0 +1,75 @@
+<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8">
+<style>
+@font-face{font-family:Amiri;src:url('http://localhost:8765/fonts/Amiri-Regular.woff');font-weight:400}
+@font-face{font-family:Amiri;src:url('http://localhost:8765/fonts/Amiri-Bold.woff');font-weight:700}
+body{margin:0;background:#e9e4d8;font-family:Amiri,serif;color:#2a2416}
+.row{display:flex;gap:30px;padding:24px 30px 10px;justify-content:center}
+.c{text-align:center}.c h2{margin:0 0 6px;font-size:28px}.c p{margin:4px 0 0;font-size:19px;color:#5a4a2a}
+svg{width:560px;height:560px;display:block}
+.rule{max-width:1150px;margin:4px auto 24px;background:#fff8e6;border:1.5px solid #c9a35d;border-radius:18px;padding:12px 22px;font-size:20px;line-height:1.8}
+</style></head><body>
+<div class="row">
+ <div class="c"><h2>الساعة ٥:٤٦ عصرًا</h2><svg id="a" viewBox="0 0 600 600"></svg><p>المؤشر الأحمر ثابت فوق، وحلقة الصلاة تدور تحته مع اليوم</p></div>
+ <div class="c"><h2>الساعة ٤:٥٠ قبل الفجر</h2><svg id="b" viewBox="0 0 600 600"></svg><p>نفس الحلقة بعد ١١ ساعة: «الفجر» يقترب من المؤشر</p></div>
+</div>
+<div class="rule"><b>القانون:</b> كل حلقة = فَلَك له بداية ونهاية، والكتابة داخل الحلقة نفسها. ① <b>حلقة الصلاة</b> (فلك اليوم ٢٤ ساعة): كل صلاة قطعة بطول وقتها الحقيقي ولون سمائها، والاسم والوقت مكتوبان داخلها ② <b>العقارب الثلاثة</b> فقط في الوسط ③ <b>قرص القمر</b> (فلك الشهر): طوره الحقيقي في الوسط، والحلقة حوله ليالي الشهر من ١ إلى ٣٠، والمؤشر على الليلة. لا إبر أخرى، ولا كتابة صغيرة، ولا زوم.</div>
+<script>
+const AR='٠١٢٣٤٥٦٧٨٩',ar=s=>String(s).replace(/\d/g,d=>AR[d]);
+const T={fajr:303,sunrise:378,dhuhr:730,asr:931,maghrib:1081,isha:1171};
+const f12=m=>{m=((m%1440)+1440)%1440;let h=Math.floor(m/60);h=h%12||12;return ar(h+':'+String(m%60).padStart(2,'0'));};
+const SEG=[ // name, from, to, fill, ink
+ ['الفجر',T.fajr,T.sunrise,'#4a4f86','#f3ead2'],
+ ['الشروق',T.sunrise,T.dhuhr,'#efe6cf','#2a2416'],
+ ['الظهر',T.dhuhr,T.asr,'#f3dfa0','#2a2416'],
+ ['العصر',T.asr,T.maghrib,'#e6b878','#2a2416'],
+ ['المغرب',T.maghrib,T.isha,'#b9614a','#fff3e0'],
+ ['العشاء',T.isha,T.fajr+1440,'#1c2547','#e9dfc4']];
+function draw(id,now,hijriDay){
+ const NS='http://www.w3.org/2000/svg',s=document.getElementById(id),cx=300,cy=300;
+ const P=(a,r)=>[cx+r*Math.sin(a*Math.PI/180),cy-r*Math.cos(a*Math.PI/180)];
+ const ang=m=>((m-now)/1440*360);
+ const arc=(a1,a2,r,rev)=>{const [x1,y1]=P(a1,r),[x2,y2]=P(a2,r),L=(((a2-a1)%360)+360)%360>180?1:0;return rev?`M${x2} ${y2}A${r} ${r} 0 ${L} 0 ${x1} ${y1}`:`M${x1} ${y1}A${r} ${r} 0 ${L} 1 ${x2} ${y2}`;};
+ const band=(a1,a2,r1,r2)=>{const [a,b]=P(a1,r2),[c,d]=P(a2,r2),[e,f]=P(a2,r1),[g,h]=P(a1,r1),L=(((a2-a1)%360)+360)%360>180?1:0;return `M${a} ${b}A${r2} ${r2} 0 ${L} 1 ${c} ${d}L${e} ${f}A${r1} ${r1} 0 ${L} 0 ${g} ${h}Z`;};
+ let h=`<defs><radialGradient id="face${id}" cx="50%" cy="42%" r="65%"><stop offset="0" stop-color="#1d2538"/><stop offset="1" stop-color="#090c14"/></radialGradient>
+ <linearGradient id="gold${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f3e3ae"/><stop offset=".5" stop-color="#c9a35d"/><stop offset="1" stop-color="#7c5f30"/></linearGradient></defs>
+ <circle cx="300" cy="300" r="296" fill="url(#gold${id})"/><circle cx="300" cy="300" r="286" fill="#0b0e16"/>`;
+ // the prayer ring (the day's orbit)
+ const R1=226,R2=280;
+ SEG.forEach(([n,a,b,fill,ink],i)=>{const a1=ang(a),a2=ang(b);h+=`<path d="${band(a1,a2,R1,R2)}" fill="${fill}" stroke="#0b0e16" stroke-width="2.5"/>`;
+   let mid=(a1+a2)/2;mid=((mid%360)+360)%360;const rev=mid>90&&mid<270,pid=id+'p'+i;
+   const rN=rev?240:263,rT=rev?263:240;
+   h+=`<path id="${pid}n" d="${arc(a1+.5,a2-.5,rN,rev)}" fill="none"/><path id="${pid}t" d="${arc(a1+.5,a2-.5,rT,rev)}" fill="none"/>`;
+   h+=`<text font-family="Amiri" font-weight="700" font-size="21" fill="${ink}" dominant-baseline="middle"><textPath href="#${pid}n" startOffset="50%" text-anchor="middle">${n}</textPath></text>`;
+   h+=`<text font-family="Amiri" font-weight="400" font-size="18" fill="${ink}" opacity=".92" dominant-baseline="middle"><textPath href="#${pid}t" startOffset="50%" text-anchor="middle">${f12(a)}</textPath></text>`;});
+ // hour ticks on the inner edge of the ring
+ for(let k=0;k<24;k++){const a=ang(k*60),[x1,y1]=P(a,R1),[x2,y2]=P(a,R1+(k%6?7:12));h+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#0b0e16" stroke-width="${k%6?1.5:2.5}" opacity=".55"/>`;}
+ // last third of the night: a small star on the ring
+ {const lt=T.maghrib+((T.fajr+1440)-T.maghrib)*2/3,[x,y]=P(ang(lt),R2-9);h+=`<text x="${x}" y="${y}" font-size="15" fill="#f5e6b4" text-anchor="middle" dominant-baseline="middle">✦</text>`;}
+ // the fixed pointer (now) with the sun or the moon on it
+ const day=now>=T.sunrise&&now<T.maghrib;
+ h+=`<path d="M300 34 L287 8 L313 8 Z" fill="#d6453a" stroke="#7a1f18" stroke-width="1.2"/>`;
+ h+=day?`<circle cx="300" cy="253" r="0"/>`:'';
+ // the face
+ h+=`<circle cx="300" cy="300" r="${R1-4}" fill="url(#face${id})" stroke="#c9a35d" stroke-width="2"/>`;
+ for(let k=0;k<60;k++){const a=k*6,[x1,y1]=P(a,R1-10),[x2,y2]=P(a,R1-(k%5?16:24));h+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#c9a35d" stroke-width="${k%5?1.2:3}"/>`;}
+ for(let k=1;k<=12;k++){if(k===6)continue;const [x,y]=P(k*30,R1-48);h+=`<text x="${x}" y="${y}" font-family="Amiri" font-weight="700" font-size="34" fill="#f5e6b4" text-anchor="middle" dominant-baseline="central">${ar(k)}</text>`;}
+ // moon sub-dial (the month's orbit) at six
+ const mx=300,my=410,mr=44,mR=64;
+ h+=`<circle cx="${mx}" cy="${my}" r="${mR+4}" fill="#0b0e16" stroke="#c9a35d" stroke-width="1.5"/>`;
+ for(let d=1;d<=30;d++){const a=(d-1)*12,rad=Math.PI/180*a,x1=mx+(mR-2)*Math.sin(rad),y1=my-(mR-2)*Math.cos(rad),x2=mx+(mR-(d%5?8:13))*Math.sin(rad),y2=my-(mR-(d%5?8:13))*Math.cos(rad);
+   h+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${d===hijriDay?'#d6453a':(d>=13&&d<=15?'#f5e6b4':'#8a7a55')}" stroke-width="${d===hijriDay?4:d%5?1.3:2.4}"/>`;}
+ {const a=(hijriDay-1)*12*Math.PI/180;h+=`<text x="${mx+(mR+14)*Math.sin(a)}" y="${my-(mR+14)*Math.cos(a)}" font-family="Amiri" font-weight="700" font-size="15" fill="#f5e6b4" text-anchor="middle" dominant-baseline="central">${ar(hijriDay)}</text>`;}
+ // the moon itself: waxing crescent ~ day 3 (lit on the right)
+ const ill=(1-Math.cos(2*Math.PI*(hijriDay-0.5)/29.53))/2,kx=mr*(1-2*ill);
+ h+=`<circle cx="${mx}" cy="${my}" r="${mr}" fill="#11141d"/>`;
+ h+=`<path d="M${mx} ${my-mr} A${mr} ${mr} 0 0 1 ${mx} ${my+mr} A${Math.abs(kx)} ${mr} 0 0 ${kx>0?0:1} ${mx} ${my-mr}Z" fill="#e9e2cf"/>`;
+ h+=`<circle cx="${mx}" cy="${my}" r="${mr}" fill="none" stroke="#8a7a55" stroke-width="1"/>`;
+ // the three hands (12-hour)
+ const hh=(now/60)%12,mm=now%60,ss=23;
+ const hand=(a,len,w,col,tail)=>{const [x,y]=P(a,len),[tx,ty]=P(a+180,tail);return `<line x1="${tx}" y1="${ty}" x2="${x}" y2="${y}" stroke="${col}" stroke-width="${w}" stroke-linecap="round"/>`;};
+ h+=hand(hh*30,120,11,'#f3e3ae',22)+hand(mm*6,182,7,'#f3e3ae',28)+hand(ss*6,196,2.2,'#d6453a',40);
+ h+=`<circle cx="300" cy="300" r="12" fill="#c9a35d"/><circle cx="300" cy="300" r="4" fill="#d6453a"/>`;
+ s.innerHTML=h;
+}
+draw('a',17*60+46,3);draw('b',4*60+50,4);
+</script></body></html>
