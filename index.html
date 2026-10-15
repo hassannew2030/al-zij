@@ -6879,7 +6879,7 @@ body[data-scr]:not([data-scr="clock"]) #zInsBar{display:none!important}
   // rings (radii): face | numerals | day & night | moon | prayers | bezel
   const RF=158,RN=[160,192],RD=[194,218],RM=[220,244],RP=[246,293];
   const st=document.createElement('style');
-  st.textContent=`#zDial{display:block;width:min(86vw,380px);margin:6px auto 2px;-webkit-user-select:none;user-select:none;touch-action:manipulation}
+  st.textContent=`#zDial{display:block;width:min(80vw,37vh,330px);margin:6px auto 2px;-webkit-user-select:none;user-select:none;touch-action:manipulation}
 #zDial svg{display:block;width:100%;height:auto}
 body:not(.simple-view) #zDial{display:none!important}
 body.simple-view .wrap{display:none!important}`;
@@ -6956,6 +6956,47 @@ body.simple-view .wrap{display:none!important}`;
     const t=simple?(EN()?'🔭 The Grand Zij (all rings)':'🔭 الزيج الكبرى (كل الحلقات)'):(EN()?'🕰️ Back to the simple clock':'🕰️ رجوع للساعة البسيطة');
     if(b.textContent!==t){b.textContent=t;b.setAttribute('data-notr','');}};
   relabel();new MutationObserver(relabel).observe(document.body,{attributes:true,attributeFilter:['class']});
+
+  /* #54 — the first screen, in order of importance (decided after studying Muslim Pro, Athan, Pillars, مؤذن السعودية, أم القرى:
+     every one of them puts the coming prayer and its countdown first). Al-Zij keeps its own identity — navy and brass, the dial —
+     but the dial comes after the task. Everything fits on one iPhone screen without scrolling. Text ≥ 15px, contrast ≥ 7:1. */
+  (function homeOrder(){
+    const st2=document.createElement('style');st2.id='homeV2';
+    st2.textContent=`
+body.simple-view #hTop{display:flex;flex-direction:column;align-items:center}
+body.simple-view #hCity{order:1}
+body.simple-view #hDate{order:2;margin-top:6px;display:flex;flex-wrap:wrap;justify-content:center;align-items:baseline;gap:2px 8px;font-size:17px;color:#e6dcbd;max-width:100%}
+body.simple-view #hDate .sep{display:none!important}
+body.simple-view #hWd{order:1!important;color:#f5e6b4!important;font-weight:700}
+body.simple-view #hHijri{order:2!important;flex-basis:auto!important;font-size:19px}
+body.simple-view #hDate .brk{order:3;flex-basis:100%;height:0}
+body.simple-view #hGreg{order:4!important;font-weight:400!important;color:#e6dcbd!important}
+body.simple-view #hDate #hClock{order:5;font-size:18px;margin:0 6px 0 0;color:#d8ccaa;display:inline-flex;gap:4px}
+body.simple-view #hDate #hClock .ap{font-size:15px;color:#d8ccaa}
+body:not(.simple-view) #hDate .brk{display:none}
+#zHeroWrap{max-width:520px;margin:8px auto 0;padding-inline:16px;font-family:'Amiri','Geeza Pro',serif;direction:rtl}
+body:not(.simple-view) #zHeroWrap{display:contents}
+body.simple-view #zHeroWrap .hero{margin:0;background:linear-gradient(180deg,#1a2133,#10141f);border:1.5px solid #c9a35d;border-radius:20px;padding:5px 12px 6px;box-shadow:0 6px 18px #0007}
+body.simple-view #zHeroWrap .hero .lbl{font-size:21px;color:#f5e6b4;line-height:1.35}
+body.simple-view #zHeroWrap .hero .cd{font-size:46px;color:#f3e3ae;line-height:1.02}
+body.simple-view #zHeroWrap .hero .sub{font-size:16px;color:#d8ccaa;line-height:1.4}
+body.simple-view #zHeroWrap .hero.now{border-color:#7fb3a8}
+body.simple-view #zHeroWrap #hNote{width:100%;margin:8px 0 0;font-size:16px}
+body.simple-view .pc .pn{font-size:15px;color:#d8ccaa}
+body.simple-view .pc .pt{font-size:18px;color:#f6efdb}
+body.simple-view .pc.minor .pn,body.simple-view .pc.minor .pt{opacity:.85}
+body.simple-view .pc.next{border-color:var(--h-line)}
+body.simple-view .pc.next .pn{color:#d8ccaa}
+body.simple-view .prow{margin-top:8px}
+body.simple-view .glance{margin-top:8px}
+body.simple-view .gl{font-size:16px!important;color:#e6dcbd!important;padding:8px 4px!important}`;
+    document.head.appendChild(st2);
+    const hero=document.getElementById('hHero'),note=document.getElementById('hNote'),dial=document.getElementById('zDial');
+    if(hero&&dial){const w=document.createElement('div');w.id='zHeroWrap';dial.before(w);w.appendChild(hero);if(note)w.appendChild(note);}
+    // the digital time joins the date line (still there, just smaller — #29)
+    const hd=document.getElementById('hDate'),hc=document.getElementById('hClock'),hg=document.getElementById('hGreg');
+    if(hd&&hc&&hg){const br=document.createElement('span');br.className='brk';hg.before(br);hd.appendChild(hc);}
+  })();
 })();
 </script>
 <script id="calendarJs">
