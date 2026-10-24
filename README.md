@@ -1,26 +1,33 @@
-# الزيج — Al-Zij
+# الزيج — مواقيت الصلاة والأذان والقبلة والتقويم الهجري
 
-**مواقيت الصلاة والأذان، واتجاه القبلة، والتقويم الهجري** — مطابق لتقويم أم القرى الرسمي، يُحسب على الجوال بحساب فلكي دقيق، ويعمل دون إنترنت. 🆓 مجاني، بلا إعلانات ولا تسجيل، ولا يجمع أي بيانات.
+الزيج تطبيق وموقع (alzijapp.com) لمواقيت الصلاة: مواقيت مطابقة لتقويم أم القرى الرسمي في السعودية، ومحسوبة بطريقة كل بلد الرسمية خارجها · تنبيه قبل الأذان والأذان والإقامة · تحديد اتجاه القبلة بالبوصلة · التقويم الهجري والميلادي مع محوّل التاريخ ومواقيت الشهر كاملًا · القمر والشمس.
 
-**Prayer times and adhan alerts, the Qibla direction and the Hijri calendar** — matching the official Umm al-Qura calendar, computed on the phone with precise astronomy, working offline. Free, no ads, no sign-up, no data collected.
+كل ذلك بحساب فلكي دقيق على جوالك، ويعمل مع الإنترنت ودونه. بالعربية والإنجليزية، على الآيفون والأندرويد والكمبيوتر.
 
-👉 **https://alzijapp.com**
+خصوصيتك كاملة: لا حساب ولا تسجيل، ولا تتبّع ولا إعلانات، ولا نسألك عن اسمك أو عمرك. كل الحساب يتم على جوالك، وموقعك لا يُرسَل إلينا، ولا نجمع أي بيانات ولا نبيعها.
 
-## What it does (in order of importance)
+للتواصل: alzijapp@gmail.com — مجاني بالكامل.
 
-1. **Prayer times** — in Saudi Arabia from the official Umm al-Qura table for the nearest of 173 cities (matches to the minute); elsewhere the country's official method, chosen automatically.
-2. **Adhan alerts** — before the adhan, the adhan, and the iqama, each adjustable per prayer.
-3. **Qibla** — compass with automatic magnetic declination (NOAA WMM2025).
-4. **Hijri calendar** — Umm al-Qura, date converter, monthly timetable, reminders.
-5. **Sky** — Moon phase, crescent visibility, Sun, eclipses.
-6. **The astronomical clock dial** — the original Al-Zij face.
+> شعار الزيج: هلال ذهبي على شكل بوصلة، في قلبه نجمة ثمانية، وإبرته الحمراء تشير إلى القبلة.
 
-Astronomy is the method, not the purpose: Sun and Moon positions follow Meeus, *Astronomical Algorithms*.
+---
+
+# Al-Zij — Prayer times, adhan, Qibla and Hijri calendar
+
+Al-Zij is a prayer-times app and website (alzijapp.com): prayer times matching the official Umm al-Qura calendar in Saudi Arabia, and calculated with each country's official method elsewhere · alerts before the adhan, at the adhan and for the iqama · Qibla direction by compass · Hijri and Gregorian calendars with a date converter and full monthly timetables · the Moon and the Sun.
+
+All computed with precise astronomy on your phone, working online and offline. In Arabic and English, on iPhone, Android and computer.
+
+Your privacy is complete: no account, no sign-up, no tracking, no ads, and we never ask your name or age. Every calculation happens on your phone, your location is never sent to us, and we collect and sell no data.
+
+Contact: alzijapp@gmail.com — completely free.
+
+> The Al-Zij logo: a golden crescent shaped as a compass, an eight-pointed star at its heart, and a red needle pointing to the Qibla.
 
 ## Links
 
 - App: https://alzijapp.com
 - About / FAQ: https://alzijapp.com/about/
-- Prayer times by city: https://alzijapp.com/mawaqit/
+- Prayer times by city (official Umm al-Qura): https://alzijapp.com/mawaqit/
 - Support: alzijapp@gmail.com · https://alzijapp.com/support/
 - Privacy: https://alzijapp.com/privacy/

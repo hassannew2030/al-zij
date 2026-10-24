@@ -52,9 +52,9 @@ def page(title, desc, canon, body, ld=None):
     return ('<!doctype html>\n<html lang="ar" dir="rtl">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">\n'
             '<title>%s</title>\n<meta name="description" content="%s">\n<link rel="canonical" href="%s">\n<meta name="theme-color" content="#0a0c12">\n'
             '<link rel="icon" href="/icons/favicon-32.png">\n<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">\n%s\n%s\n</head>\n<body>\n<div class="wrap">\n'
-            '<header><a href="/"><img src="/icons/icon-192.png" alt="الزيج"></a><div class="name">الزيج</div><div class="sub">مواقيت الصلاة والقبلة والتقويم الهجري — 🆓 مجاني</div>'
+            '<header><a href="/"><img src="/icons/icon-192.png" alt="شعار الزيج: هلال ذهبي على شكل بوصلة، في قلبه نجمة ثمانية، وإبرته الحمراء تشير إلى القبلة. — The Al-Zij logo: a golden crescent shaped as a compass, an eight-pointed star at its heart, and a red needle pointing to the Qibla."></a><div class="name">الزيج</div><div class="sub">مواقيت الصلاة والأذان والقبلة والتقويم الهجري — مجاني</div>'
             '<nav><a href="/">افتح الزيج</a><a href="/mawaqit/">مواقيت المدن</a><a href="/support/">الدعم</a><a href="/privacy/">الخصوصية</a></nav></header>\n%s'
-            '<footer>الزيج — 🆓 مجاني · <a href="https://alzijapp.com">alzijapp.com</a></footer>\n</div>\n</body>\n</html>\n') % (
+            '<footer>الزيج — Al-Zij · مجاني · <a href="https://alzijapp.com">alzijapp.com</a></footer>\n</div>\n</body>\n</html>\n') % (
             html.escape(title), html.escape(desc), canon, style,
             ('<script type="application/ld+json">%s</script>' % json.dumps(ld, ensure_ascii=False)) if ld else '', body)
 first, last = days[0], days[-1]
