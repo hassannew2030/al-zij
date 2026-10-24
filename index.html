@@ -12,7 +12,15 @@
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
 <meta name="theme-color" content="#0a0c12">
-<title>الزيج</title>
+<title>الزيج — مواقيت الصلاة والقبلة والتقويم الهجري</title>
+<meta name="description" content="الزيج: مواقيت الصلاة والأذان واتجاه القبلة والتقويم الهجري، مطابقة لتقويم أم القرى الرسمي، محسوبة على جوالك بحساب فلكي دقيق، وتعمل دون إنترنت. مجاني، بلا إعلانات ولا تسجيل.">
+<meta property="og:title" content="الزيج — مواقيت الصلاة والقبلة والتقويم الهجري">
+<meta property="og:description" content="الزيج: مواقيت الصلاة والأذان واتجاه القبلة والتقويم الهجري، مطابقة لتقويم أم القرى الرسمي، محسوبة على جوالك بحساب فلكي دقيق، وتعمل دون إنترنت. مجاني، بلا إعلانات ولا تسجيل.">
+<meta property="og:url" content="https://alzijapp.com/">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://alzijapp.com/icons/icon-512.png">
+<link rel="canonical" href="https://alzijapp.com/">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "الزيج — Al-Zij", "url": "https://alzijapp.com/", "applicationCategory": "LifestyleApplication", "operatingSystem": "iOS, Android, Web", "inLanguage": ["ar", "en"], "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "SAR"}, "description": "Prayer times, adhan alerts, Qibla direction and the Hijri calendar — matching the official Umm al-Qura calendar in Saudi Arabia and each country's official method elsewhere. Computed on the phone with precise astronomy (Sun, Moon) and works offline. Free, no ads, no sign-up, no data collected.", "featureList": ["Prayer times (official Umm al-Qura in Saudi Arabia)", "Adhan, pre-adhan and iqama alerts", "Qibla compass", "Hijri and Gregorian calendar with converter", "Monthly prayer timetable", "Moon phase, Sun and sky", "Works offline"]}</script>
 <style id="zijFF">@font-face{font-family:'Amiri';src:url('fonts/Amiri-Regular.woff') format('woff');font-weight:400;font-display:swap}
 @font-face{font-family:'Amiri';src:url('fonts/Amiri-Bold.woff') format('woff');font-weight:700;font-display:swap}
 @font-face{font-family:'EB Garamond';src:url('fonts/EBGaramond.woff') format('woff');font-weight:400 800;font-display:swap}</style><style id="zijTone"></style>
@@ -109,6 +117,7 @@
 </script>
 </head>
 <body>
+<noscript><div style="padding:24px;font:18px/1.8 serif;color:#e8e0c8;background:#0a0c12" dir="rtl"><h1>الزيج — مواقيت الصلاة والقبلة والتقويم الهجري</h1><p>مواقيت الصلاة الخمس والشروق مطابقة لتقويم أم القرى الرسمي داخل السعودية، وبطريقة كل بلد الرسمية خارجها · تنبيه قبل الأذان والأذان والإقامة · اتجاه القبلة بالبوصلة · التقويم الهجري والميلادي مع محوّل التاريخ · مواقيت الشهر كاملًا · القمر والشمس والسماء.</p><p>كل ذلك يُحسب على جوالك بحساب فلكي دقيق (الشمس والقمر)، ويعمل دون إنترنت. مجاني، بلا إعلانات ولا تسجيل، ولا يجمع أي بيانات.</p><p>يحتاج الزيج تشغيل JavaScript. <a href="/support/">الدعم</a> · <a href="/privacy/">الخصوصية</a></p></div></noscript>
 <script>window.ZIJ_EN={
 "⚙️ إعداداتي": "⚙️ My settings",
 "📖 مساعدة": "📖 Help",
@@ -4618,8 +4627,8 @@ function zijCopyText(text, okMsg){ // clipboard → old copy trick → show the 
 }
 function shareClock(){
   const EN = window.ZIJ_LANG === 'en';
-  const shareData = EN ? { title: 'Al-Zij', text: 'Al-Zij — a real astronomical clock: the time, the Qibla, prayer times, and the Hijri and Gregorian calendars.\n🆓 Completely free — no subscription, no fees, no ads, no sign-up. It keeps no information about you.\nOfficial link: ' + ZIJ_OFFICIAL_URL, url: ZIJ_OFFICIAL_URL }
-                       : { title: 'الزّيج', text: 'الزّيج — ساعة فلكية حقيقية: الوقت، والقبلة، ومواقيت الصلاة، والتقويمان الهجري والميلادي.\n🆓 مجاني بالكامل، بلا اشتراك ولا رسوم ولا إعلانات ولا تسجيل، ولا يحتفظ بأي معلومات عنك.\nالرابط الرسمي: ' + ZIJ_OFFICIAL_URL, url: ZIJ_OFFICIAL_URL };
+  const shareData = EN ? { title: 'Al-Zij', text: 'Al-Zij — prayer times, adhan alerts, the Qibla direction and the Hijri calendar, computed with precise astronomy and matching the official Umm al-Qura calendar.\n🆓 Completely free — no subscription, no fees, no ads, no sign-up. It keeps no information about you.\nOfficial link: ' + ZIJ_OFFICIAL_URL, url: ZIJ_OFFICIAL_URL }
+                       : { title: 'الزّيج', text: 'الزّيج — مواقيت الصلاة والأذان واتجاه القبلة والتقويم الهجري، بحساب فلكي دقيق مطابق لتقويم أم القرى.\n🆓 مجاني بالكامل، بلا اشتراك ولا رسوم ولا إعلانات ولا تسجيل، ولا يحتفظ بأي معلومات عنك.\nالرابط الرسمي: ' + ZIJ_OFFICIAL_URL, url: ZIJ_OFFICIAL_URL };
   if (navigator.share){
     navigator.share(shareData).catch(()=>{});
   } else {
