@@ -1,0 +1,29 @@
+{
+ "vsop, no lag rule": {
+  "fajr": 96.952,
+  "sunrise": 97.236,
+  "dhuhr": 98.732,
+  "asr": 98.04,
+  "maghrib": 97.051,
+  "isha": 97.051,
+  "all": 97.51
+ },
+ "app engine (Meeus ch.25, fajr dec@23/eot@10), lag rule ON": {
+  "fajr": 96.565,
+  "sunrise": 97.41,
+  "dhuhr": 98.305,
+  "asr": 92.049,
+  "maghrib": 98.243,
+  "isha": 98.243,
+  "all": 96.802
+ },
+ "app engine as shipped (no lag rule)": {
+  "fajr": 94.167,
+  "sunrise": 95.078,
+  "dhuhr": 97.235,
+  "asr": 90.897,
+  "maghrib": 95.669,
+  "isha": 95.669,
+  "all": 94.786
+ }
+}

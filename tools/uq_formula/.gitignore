@@ -1,0 +1,7 @@
+*.pkl
+*.npy
+!results/*.npy
+obs.npz
+__pycache__/
+frac.txt
+!frac_best.npy
