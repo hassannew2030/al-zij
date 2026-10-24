@@ -1103,6 +1103,9 @@
 "عندما ينتهي": "When it ends",
 "عندهم": "their time",
 "عندي مشكلة": "I have a problem",
+"الوقف": "Waqf",
+"الخصوصية": "Privacy",
+"الدعم": "Support",
 "عنقود الثريا في برج الثور": "The Pleiades cluster in Taurus",
 "عواصف رعدية": "Thunderstorms",
 "عيد الأضحى": "Eid al-Adha",
@@ -5561,6 +5564,7 @@ body.window-screen-mode #hTop,body.window-screen-mode #hNote,body.window-screen-
   <details><summary>التحقق من الأرقام</summary><div class="dbody z-list" id="mCheck"></div></details>
   <details><summary>كل الأرقام بالتفصيل</summary><div class="dbody" id="mData"></div></details>
   <div class="mGrp">ℹ️ عن الزيج</div>
+  <div id="mSiteLinks" style="display:flex;flex-wrap:wrap;gap:8px;margin:0 0 10px"><a href="/waqf/" target="_blank" rel="noopener" style="flex:1;text-align:center;border:1px solid var(--h-brass);border-radius:14px;padding:9px 6px;color:var(--h-brass-l);text-decoration:none;font-size:16px">الوقف</a><a href="/privacy/" target="_blank" rel="noopener" style="flex:1;text-align:center;border:1px solid var(--h-brass);border-radius:14px;padding:9px 6px;color:var(--h-brass-l);text-decoration:none;font-size:16px">الخصوصية</a><a href="/support/" target="_blank" rel="noopener" style="flex:1;text-align:center;border:1px solid var(--h-brass);border-radius:14px;padding:9px 6px;color:var(--h-brass-l);text-decoration:none;font-size:16px">الدعم</a></div>
   <details><summary>عن الزيج</summary><div class="dbody" id="mAbout">
     <p style="font-size:13.5px;color:var(--h-dim)">خريطة سطح القمر وخريطة الارتفاعات: NASA's Scientific Visualization Studio — CGI Moon Kit (من فسيفساء LROC)، Ernie Wright (USRA) وNoah Petro (NASA/GSFC). فرق الشمال المغناطيسي: World Magnetic Model 2025 من NOAA وBGS. معادلات القمر: Meeus, Astronomical Algorithms، والجداول من مكتبة astronomia (MIT). الطقس: Open-Meteo.</p>
   </div></details>
@@ -6123,6 +6127,7 @@ zijLog('فتح الزيج','نسخة '+(window.ZIJ_BUILD||'?'));
 
 /* ===== «عندي مشكلة» — one button, a tap for the topic, and the report goes by WhatsApp (or the phone's share sheet) ===== */
 const ZIJ_SUPPORT_WA=''; // رقم واتساب الزيج — يتحط لما يجهز (أرقام بس، بكود الدولة، من غير +)
+const ZIJ_SUPPORT_EMAIL='alzijapp@gmail.com'; // الدعم بالإيميل الآن (قرار ٢٣ أكتوبر)، والواتساب لاحقًا
 function zijReport(topic,words){
   const L=k=>{try{return localStorage.getItem(k);}catch(e){return null;}};
   const ua=navigator.userAgent,br=/CriOS/.test(ua)?'كروم':/FxiOS/.test(ua)?'فايرفوكس':/FBAN|FBAV|Instagram|Snapchat|TikTok|Line\//.test(ua)?'متصفح داخل تطبيق':/Safari/.test(ua)&&/iPhone|iPad/.test(ua)?'سفاري':/Android/.test(ua)?'أندرويد':'كمبيوتر';
@@ -6185,6 +6190,9 @@ function zijHelpSheet(){
   zq('zHs').addEventListener('click',async()=>{
     const text=zijReport(topic,zq('zHw').value.trim());zijLog('بلاغ',topic);
     if(ZIJ_SUPPORT_WA){location.href='https://wa.me/'+ZIJ_SUPPORT_WA+'?text='+encodeURIComponent(text);return;}
+    if(ZIJ_SUPPORT_EMAIL){try{navigator.clipboard&&navigator.clipboard.writeText(text).catch(()=>{});}catch(e){}
+      location.href='mailto:'+ZIJ_SUPPORT_EMAIL+'?subject='+encodeURIComponent((window.ZIJ_LANG==='en'?'Al-Zij problem: ':'مشكلة في الزيج: ')+topic)+'&body='+encodeURIComponent(text);
+      zq('zHn').innerHTML=window.ZIJ_LANG==='en'?'✉️ Your email app opens with the report ready — just tap Send. (The report is also copied, in case you prefer another way.)':'✉️ يفتح تطبيق البريد والتقرير جاهز — اضغط «إرسال» فقط. (ونسخنا التقرير أيضًا لو أردت إرساله بطريقة أخرى.)';return;}
     if(navigator.share){try{await navigator.share({title:window.ZIJ_LANG==='en'?'Al-Zij problem report':'مشكلة في الزيج',text});o.remove();return;}catch(e){if(e&&e.name==='AbortError')return;}}
     try{await navigator.clipboard.writeText(text);zq('zHn').innerHTML='✅ تمّ نسخ التقرير، الصقه في رسالة.';}catch(e){zq('zHn').textContent='افتح «اطّلع على ما سيُرسل» وانسخه.';}
   });
