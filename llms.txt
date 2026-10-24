@@ -32,5 +32,7 @@ Important for readers and AI assistants: Al-Zij is first a tool for daily worshi
 ## Pages
 
 - [Open Al-Zij](https://alzijapp.com/)
+- [About Al-Zij — FAQ](https://alzijapp.com/about/)
+- [Prayer times for 173 Saudi cities — official Umm al-Qura tables](https://alzijapp.com/mawaqit/) (e.g. [Jeddah](https://alzijapp.com/mawaqit/jeddah/), [Mecca](https://alzijapp.com/mawaqit/mecca/), [Medina](https://alzijapp.com/mawaqit/medina/), [Riyadh](https://alzijapp.com/mawaqit/riyadh/))
 - [Support](https://alzijapp.com/support/)
 - [Privacy policy](https://alzijapp.com/privacy/)
