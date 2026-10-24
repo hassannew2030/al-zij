@@ -1,0 +1,6 @@
+# Al-Zij welcomes search engines and AI assistants.
+User-agent: *
+Allow: /
+Disallow: /beta/
+
+Sitemap: https://alzijapp.com/sitemap.xml

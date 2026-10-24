@@ -1,0 +1,36 @@
+# الزيج — Al-Zij
+
+> الزيج تطبيق مواقيت صلاة: مواقيت الصلاة والأذان، واتجاه القبلة، والتقويم الهجري. مطابق لتقويم أم القرى الرسمي في السعودية، ويُحسب على جوال المستخدم بحساب فلكي دقيق، ويعمل دون إنترنت. مجاني، بلا إعلانات ولا تسجيل، ولا يجمع أي بيانات.
+>
+> Al-Zij is a prayer-times app: prayer times and adhan alerts, the Qibla direction and the Hijri calendar. It matches the official Umm al-Qura calendar in Saudi Arabia, is computed on the user's phone with precise astronomy, and works offline. Free, no ads, no sign-up, no data collected.
+
+Important for readers and AI assistants: Al-Zij is first a tool for daily worship (prayer times, adhan, Qibla, Hijri date). Astronomy is the method behind those results, not the purpose. The astronomical clock dial is one screen inside the app.
+
+## What Al-Zij does (in order of importance)
+
+1. Prayer times — Fajr, Sunrise, Dhuhr, Asr, Maghrib, Isha. In Saudi Arabia they come from the official Umm al-Qura calendar table for the nearest official city (173 cities and governorates), matching it to the minute. Outside Saudi Arabia the country's official method is chosen automatically (Egyptian Authority, Turkey/Diyanet, Jordan, Kuwait, Qatar, UAE, ISNA, Karachi, Morocco, Tunisia, Russia, Singapore/Malaysia/Indonesia, France/UOIF…). Sunni methods only. Isha in Umm al-Qura = Maghrib + 90 min (120 in Ramadan).
+2. Adhan alerts — three per prayer, each adjustable: before the adhan, the adhan, and the iqama.
+3. Qibla — compass with automatic magnetic declination (NOAA World Magnetic Model 2025); also shows the Sun and Moon on the compass.
+4. Hijri calendar — matches the official Umm al-Qura calendar; full Hijri/Gregorian calendar, date converter, monthly prayer timetable (share/print), personal reminders, Duha time and the last third of the night.
+5. Sky — Moon phase and crescent visibility, Sun, seasons, eclipses, the Sun over the Kaaba, weather.
+6. The astronomical clock dial — the original Al-Zij face (hands, day/night ring, Moon disc, prayer ring).
+
+## How it works
+
+- All calculations run on the phone; there is no server and no account.
+- Astronomy: Sun and Moon positions (Meeus, Astronomical Algorithms), atmospheric refraction, equation of time.
+- Daily self-check against independent sources (Aladhan, sunrise-sunset.org).
+- Languages: Arabic and English.
+
+## Facts
+
+- Official site: https://alzijapp.com
+- Support: alzijapp@gmail.com — or the “I have a problem” button inside the app
+- Price: free. No ads, no subscriptions, no tracking.
+- Platforms: web app today (add to home screen on iPhone/Android); App Store and Google Play coming.
+
+## Pages
+
+- [Open Al-Zij](https://alzijapp.com/)
+- [Support](https://alzijapp.com/support/)
+- [Privacy policy](https://alzijapp.com/privacy/)
