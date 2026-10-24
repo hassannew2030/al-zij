@@ -1,0 +1,148 @@
+# Al-Zij iPhone app — builds on GitHub's Mac machines (Hassan has no Mac).
+# Runs on every push to the ios-app branch that touches app/ or the web app.
+# TestFlight: push a tag named ios-v<version>-<n> (e.g. ios-v1.0.0-1) — works from this branch, no merge to main needed.
+# (The «Run workflow» button only appears once this file is also on the default branch.)
+# It never deploys the website and never touches main.
+name: iOS build
+
+on:
+  push:
+    branches: [ios-app]
+    tags: ['ios-v*']
+    paths: ['app/**', 'index.html', 'data/uq/**', 'fonts/**', 'icons/**', '.github/workflows/ios-build.yml']
+  workflow_dispatch:
+    inputs:
+      testflight:
+        description: 'Also sign and upload to TestFlight (needs the App Store Connect secrets — see app/README.md)'
+        type: boolean
+        default: false
+
+concurrency:
+  group: ios-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Alert planner tests (Linux)
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: app } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm install --no-audit --no-fund
+      - run: npm test
+      - name: Bundle the web app into app/www
+        run: npm run bundle
+        env: { CI: '1' }
+      - name: End-to-end check of the bridge in the real page (Chromium)
+        run: |
+          npm install --no-save --no-audit --no-fund playwright@1.63.0
+          npx playwright install --with-deps chromium
+          npm run test:e2e
+
+  ios-simulator:
+    name: Build for the iOS simulator (unsigned)
+    needs: test
+    runs-on: macos-26
+    defaults: { run: { working-directory: app } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: xcodebuild -version
+      - run: npm install --no-audit --no-fund
+      - name: Bundle the web app
+        run: npm run bundle
+        env: { CI: '1' }
+      - name: Create the iOS project (generated fresh each time; app/ios is not kept in git)
+        run: npx cap add ios
+      - name: Apply Al-Zij native settings (name, icon, sounds, privacy manifest, iPhone only)
+        run: bash ios-config/configure-ios.sh
+        env:
+          ZIJ_BUILD_NUMBER: ${{ github.run_number }}
+      - run: npx cap sync ios
+      - name: Build (simulator, no signing)
+        run: |
+          if [ -d ios/App/App.xcworkspace ]; then SRC="-workspace ios/App/App.xcworkspace"; else SRC="-project ios/App/App.xcodeproj"; fi
+          set -o pipefail
+          xcodebuild $SRC -scheme App -configuration Release \
+            -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build CODE_SIGNING_ALLOWED=NO build | tail -n 60
+      - name: Check the built app
+        run: |
+          APPB=$(find build/Build/Products -name 'App.app' -maxdepth 3 | head -1)
+          echo "built: $APPB"
+          test -f "$APPB/public/index.html"
+          grep -q 'zij-native' "$APPB/public/index.html"
+          test -f "$APPB/public/data/uq/c/74.json"
+          test -f "$APPB/PrivacyInfo.xcprivacy"
+          ls "$APPB"/*.wav
+          /usr/libexec/PlistBuddy -c 'Print :CFBundleDisplayName' "$APPB/Info.plist"
+          du -sh "$APPB"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: al-zij-simulator-app
+          path: app/build/Build/Products/Release-iphonesimulator/App.app
+          retention-days: 14
+
+  # ---------------------------------------------------------------------------------------------------------
+  # TODO (needs Hassan's Apple Developer account): signed build → TestFlight.
+  # Add these repository secrets (Settings → Secrets and variables → Actions):
+  #   APPSTORE_KEY_ID, APPSTORE_ISSUER_ID, APPSTORE_KEY_P8 (the .p8 file's text) — App Store Connect → Users and Access → Integrations → Keys (role: App Manager)
+  #   APPLE_TEAM_ID — developer.apple.com → Membership
+  # and create the app record in App Store Connect with the same bundle id (com.alzijapp.app, proposal).
+  # Start it with:  git tag ios-v1.0.0-1 && git push origin ios-v1.0.0-1   (version 1.0.0, build = the run number)
+  # Not run yet: it can only be tested once the account and the secrets exist.
+  # ---------------------------------------------------------------------------------------------------------
+  testflight:
+    name: Sign and upload to TestFlight
+    needs: test
+    if: ${{ (github.event_name == 'workflow_dispatch' && inputs.testflight) || startsWith(github.ref, 'refs/tags/ios-v') }}
+    runs-on: macos-26
+    defaults: { run: { working-directory: app } }
+    env:
+      KEY_ID: ${{ secrets.APPSTORE_KEY_ID }}
+      ISSUER: ${{ secrets.APPSTORE_ISSUER_ID }}
+      TEAM: ${{ secrets.APPLE_TEAM_ID }}
+    steps:
+      - name: Secrets present?
+        run: |
+          for v in KEY_ID ISSUER TEAM; do [ -n "${!v}" ] || { echo "::error::secret for $v is missing — see app/README.md"; exit 1; }; done
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm install --no-audit --no-fund && npm run bundle && npx cap add ios
+        env: { CI: '1' }
+      - name: Apply Al-Zij native settings
+        run: |
+          V="${GITHUB_REF_NAME#ios-v}"; V="${V%%-*}"; case "$V" in [0-9]*) export ZIJ_MARKETING_VERSION="$V";; esac
+          bash ios-config/configure-ios.sh
+        env: { ZIJ_BUILD_NUMBER: '${{ github.run_number }}' }
+      - run: npx cap sync ios
+      - name: API key file
+        run: |
+          mkdir -p ~/private_keys
+          printf '%s' "${{ secrets.APPSTORE_KEY_P8 }}" > ~/private_keys/AuthKey_${KEY_ID}.p8
+      - name: Archive (automatic signing through the API key)
+        run: |
+          if [ -d ios/App/App.xcworkspace ]; then SRC="-workspace ios/App/App.xcworkspace"; else SRC="-project ios/App/App.xcodeproj"; fi
+          xcodebuild $SRC -scheme App -configuration Release -destination 'generic/platform=iOS' \
+            -archivePath build/AlZij.xcarchive DEVELOPMENT_TEAM="$TEAM" CODE_SIGN_STYLE=Automatic \
+            -allowProvisioningUpdates -authenticationKeyPath ~/private_keys/AuthKey_${KEY_ID}.p8 \
+            -authenticationKeyID "$KEY_ID" -authenticationKeyIssuerID "$ISSUER" archive
+      - name: Export and upload to App Store Connect (TestFlight)
+        run: |
+          cat > build/export.plist <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0"><dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>destination</key><string>upload</string>
+            <key>teamID</key><string>${TEAM}</string>
+            <key>signingStyle</key><string>automatic</string>
+          </dict></plist>
+          PLIST
+          xcodebuild -exportArchive -archivePath build/AlZij.xcarchive -exportOptionsPlist build/export.plist -exportPath build/export \
+            -allowProvisioningUpdates -authenticationKeyPath ~/private_keys/AuthKey_${KEY_ID}.p8 \
+            -authenticationKeyID "$KEY_ID" -authenticationKeyIssuerID "$ISSUER"
