@@ -1,0 +1,60 @@
+{
+ "fajr": {
+  "match": 314716,
+  "total": 315898,
+  "pct": 99.626,
+  "early": 801,
+  "late": 381,
+  "maxdiff": 1
+ },
+ "sunrise": {
+  "match": 315027,
+  "total": 315898,
+  "pct": 99.724,
+  "early": 605,
+  "late": 266,
+  "maxdiff": 1
+ },
+ "dhuhr": {
+  "match": 315536,
+  "total": 315898,
+  "pct": 99.885,
+  "early": 299,
+  "late": 63,
+  "maxdiff": 1
+ },
+ "asr": {
+  "match": 314905,
+  "total": 315898,
+  "pct": 99.686,
+  "early": 710,
+  "late": 283,
+  "maxdiff": 1
+ },
+ "maghrib": {
+  "match": 314919,
+  "total": 315898,
+  "pct": 99.69,
+  "early": 617,
+  "late": 362,
+  "maxdiff": 1
+ },
+ "isha": {
+  "match": 314919,
+  "total": 315898,
+  "pct": 99.69,
+  "early": 617,
+  "late": 362,
+  "maxdiff": 1
+ },
+ "all_six_same_day": {
+  "pct": 98.623,
+  "days": 311547,
+  "total": 315898
+ },
+ "all_times": {
+  "match": 1890022,
+  "total": 1895388,
+  "pct": 99.717
+ }
+}
