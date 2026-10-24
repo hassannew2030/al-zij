@@ -4620,8 +4620,8 @@ function zijCopyText(text, okMsg){ // clipboard → old copy trick → show the 
 }
 function shareClock(){
   const EN = window.ZIJ_LANG === 'en';
-  const shareData = EN ? { title: 'Al-Zij', text: 'Al-Zij — a real astronomical clock: the time, the Qibla, prayer times, and the Hijri and Gregorian calendars.\n🆓 Completely free — no subscription, no fees, no ads, no sign-up. It keeps no information about you.\nOfficial link: ' + ZIJ_OFFICIAL_URL, url: ZIJ_OFFICIAL_URL }
-                       : { title: 'الزّيج', text: 'الزّيج — ساعة فلكية حقيقية: الوقت، والقبلة، ومواقيت الصلاة، والتقويمان الهجري والميلادي.\n🆓 مجاني بالكامل، بلا اشتراك ولا رسوم ولا إعلانات ولا تسجيل، ولا يحتفظ بأي معلومات عنك.\nالرابط الرسمي: ' + ZIJ_OFFICIAL_URL, url: ZIJ_OFFICIAL_URL };
+  const shareData = EN ? { title: 'Al-Zij', text: 'Al-Zij — Prayer times, adhan, Qibla and Hijri calendar\n🆓 Completely free — no subscription, no fees, no ads, no sign-up. It keeps no information about you.\nOfficial link: ' + ZIJ_OFFICIAL_URL, url: ZIJ_OFFICIAL_URL }
+                       : { title: 'الزّيج', text: 'الزيج — مواقيت الصلاة والأذان والقبلة والتقويم الهجري\n🆓 مجاني بالكامل، بلا اشتراك ولا رسوم ولا إعلانات ولا تسجيل، ولا يحتفظ بأي معلومات عنك.\nالرابط الرسمي: ' + ZIJ_OFFICIAL_URL, url: ZIJ_OFFICIAL_URL };
   if (navigator.share){
     navigator.share(shareData).catch(()=>{});
   } else {
