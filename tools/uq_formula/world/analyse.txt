@@ -1,0 +1,140 @@
+toronto ISNA polarButReal 0 None maxalt-transit {'n': 365, 'median': 10.13, 'p99': 15.81, 'max': 15.83} DSTmismatch 0 noRise/Set 0 noFajrAngle 0 noIshaAngle 0 estF 0 estI 0 polar 0
+   sunrise  NOAA {'n': 365, 'median': 0.76, 'p99': 2.95, 'max': 3.03} | uq {'n': 365, 'median': 0.2, 'p99': 0.2, 'max': 0.2} | app {'n': 365, 'median': 1.73, 'p99': 3.05, 'max': 3.1}
+   dhuhr    NOAA {'n': 365, 'median': 0.78, 'p99': 2.95, 'max': 3.02} | uq {'n': 365, 'median': 0.2, 'p99': 0.2, 'max': 0.2} | app {'n': 365, 'median': 1.64, 'p99': 2.29, 'max': 2.33}
+   maghrib  NOAA {'n': 365, 'median': 0.75, 'p99': 2.96, 'max': 3.01} | uq {'n': 365, 'median': 0.2, 'p99': 0.2, 'max': 0.2} | app {'n': 365, 'median': 1.44, 'p99': 2.62, 'max': 2.71}
+   conv fajr     {'app_vs_aladhan_s': {'n': 365, 'median': 1.52, 'p99': 2.51, 'max': 2.51}, 'minute_match_pct': 98.08, 'app_vs_VSOP_real_days_s': {'n': 365, 'median': 1.68, 'p99': 3.34, 'max': 3.37}}
+   conv sunrise  {'app_vs_aladhan_s': {'n': 365, 'median': 1.53, 'p99': 2.49, 'max': 2.49}, 'minute_match_pct': 96.71}
+   conv dhuhr    {'app_vs_aladhan_s': {'n': 365, 'median': 1.52, 'p99': 1.69, 'max': 1.69}, 'minute_match_pct': 97.81}
+   conv asr      {'app_vs_aladhan_s': {'n': 365, 'median': 1.3, 'p99': 1.6, 'max': 1.6}, 'minute_match_pct': 98.63, 'app_vs_VSOP_real_days_s': {'n': 365, 'median': 6.44, 'p99': 10.33, 'max': 10.37}}
+   conv maghrib  {'app_vs_aladhan_s': {'n': 365, 'median': 1.31, 'p99': 1.69, 'max': 1.7}, 'minute_match_pct': 97.81}
+   conv isha     {'app_vs_aladhan_s': {'n': 365, 'median': 1.35, 'p99': 1.92, 'max': 1.92}, 'minute_match_pct': 97.26, 'app_vs_VSOP_real_days_s': {'n': 365, 'median': 1.49, 'p99': 2.62, 'max': 2.68}}
+montreal ISNA polarButReal 0 None maxalt-transit {'n': 365, 'median': 10.8, 'p99': 16.72, 'max': 16.73} DSTmismatch 0 noRise/Set 0 noFajrAngle 0 noIshaAngle 0 estF 0 estI 0 polar 0
+   sunrise  NOAA {'n': 365, 'median': 0.76, 'p99': 2.95, 'max': 3.03} | uq {'n': 365, 'median': 0.2, 'p99': 0.2, 'max': 0.2} | app {'n': 365, 'median': 1.75, 'p99': 3.11, 'max': 3.17}
+   dhuhr    NOAA {'n': 365, 'median': 0.78, 'p99': 2.95, 'max': 3.02} | uq {'n': 365, 'median': 0.2, 'p99': 0.2, 'max': 0.2} | app {'n': 365, 'median': 1.64, 'p99': 2.29, 'max': 2.33}
+   maghrib  NOAA {'n': 365, 'median': 0.75, 'p99': 2.96, 'max': 3.0} | uq {'n': 365, 'median': 0.2, 'p99': 0.2, 'max': 0.2} | app {'n': 365, 'median': 1.44, 'p99': 2.68, 'max': 2.76}
+   conv fajr     {'app_vs_aladhan_s': {'n': 365, 'median': 1.52, 'p99': 2.57, 'max': 2.57}, 'minute_match_pct': 98.63, 'app_vs_VSOP_real_days_s': {'n': 365, 'median': 1.7, 'p99': 3.5, 'max': 3.54}}
+   conv sunrise  {'app_vs_aladhan_s': {'n': 365, 'median': 1.53, 'p99': 2.54, 'max': 2.54}, 'minute_match_pct': 98.36}
+   conv dhuhr    {'app_vs_aladhan_s': {'n': 365, 'median': 1.52, 'p99': 1.69, 'max': 1.69}, 'minute_match_pct': 98.9}
+   conv asr      {'app_vs_aladhan_s': {'n': 365, 'median': 1.29, 'p99': 1.62, 'max': 1.62}, 'minute_match_pct': 97.53, 'app_vs_VSOP_real_days_s': {'n': 365, 'median': 6.75, 'p99': 10.82, 'max': 10.85}}
+   conv maghrib  {'app_vs_aladhan_s': {'n': 365, 'median': 1.33, 'p99': 1.72, 'max': 1.72}, 'minute_match_pct': 97.81}
+   conv isha     {'app_vs_aladhan_s': {'n': 365, 'median': 1.37, 'p99': 2.01, 'max': 2.01}, 'minute_match_pct': 96.16, 'app_vs_VSOP_real_days_s': {'n': 365, 'median': 1.48, 'p99': 2.67, 'max': 2.72}}
+vancouver ISNA polarButReal 0 None maxalt-transit {'n': 365, 'median': 12.45, 'p99': 18.78, 'max': 18.83} DSTmismatch 127 noRise/Set 0 noFajrAngle 0 noIshaAngle 0 estF 61 estI 62 polar 0
+   sunrise  NOAA {'n': 365, 'median': 0.73, 'p99': 2.95, 'max': 3.04} | uq {'n': 365, 'median': 0.2, 'p99': 0.2, 'max': 0.2} | app {'n': 365, 'median': 1.76, 'p99': 3.26, 'max': 3.32}
+   dhuhr    NOAA {'n': 365, 'median': 0.78, 'p99': 2.96, 'max': 3.02} | uq {'n': 365, 'median': 0.2, 'p99': 0.2, 'max': 0.2} | app {'n': 365, 'median': 1.65, 'p99': 2.29, 'max': 2.33}
+   maghrib  NOAA {'n': 365, 'median': 0.76, 'p99': 2.96, 'max': 3.0} | uq {'n': 365, 'median': 0.2, 'p99': 0.2, 'max': 0.2} | app {'n': 365, 'median': 1.41, 'p99': 2.8, 'max': 2.88}
+   conv fajr     {'app_vs_aladhan_s': {'n': 365, 'median': 1.52, 'p99': 2.71, 'max': 2.71}, 'minute_match_pct': 98.63, 'app_vs_VSOP_real_days_s': {'n': 304, 'median': 1.45, 'p99': 3.89, 'max': 3.96}}
+   conv sunrise  {'app_vs_aladhan_s': {'n': 365, 'median': 1.53, 'p99': 2.67, 'max': 2.67}, 'minute_match_pct': 97.81}
+   conv dhuhr    {'app_vs_aladhan_s': {'n': 365, 'median': 1.52, 'p99': 1.69, 'max': 1.69}, 'minute_match_pct': 98.63}
+   conv asr      {'app_vs_aladhan_s': {'n': 365, 'median': 1.29, 'p99': 1.66, 'max': 1.66}, 'minute_match_pct': 97.26, 'app_vs_VSOP_real_days_s': {'n': 365, 'median': 7.59, 'p99': 12.03, 'max': 12.07}}
+   conv maghrib  {'app_vs_aladhan_s': {'n': 365, 'median': 1.37, 'p99': 1.79, 'max': 1.79}, 'minute_match_pct': 98.36}
+   conv isha     {'app_vs_aladhan_s': {'n': 365, 'median': 1.44, 'p99': 2.19, 'max': 2.25}, 'minute_match_pct': 98.36, 'app_vs_VSOP_real_days_s': {'n': 303, 'median': 1.57, 'p99': 2.77, 'max': 2.81}}
+calgary ISNA polarButReal 0 None maxalt-transit {'n': 365, 'median': 13.26, 'p99': 19.87, 'max': 19.88} DSTmismatch 127 noRise/Set 0 noFajrAngle 0 noIshaAngle 0 estF 77 estI 78 polar 0
+   sunrise  NOAA {'n': 365, 'median': 0.72, 'p99': 2.95, 'max': 3.04} | uq {'n': 365, 'median': 0.2, 'p99': 0.2, 'max': 0.2} | app {'n': 365, 'median': 1.77, 'p99': 3.34, 'max': 3.4}
+   dhuhr    NOAA {'n': 365, 'median': 0.78, 'p99': 2.96, 'max': 3.02} | uq {'n': 365, 'median': 0.2, 'p99': 0.2, 'max': 0.2} | app {'n': 365, 'median': 1.65, 'p99': 2.29, 'max': 2.33}
+   maghrib  NOAA {'n': 365, 'median': 0.77, 'p99': 2.96, 'max': 3.0} | uq {'n': 365, 'median': 0.2, 'p99': 0.2, 'max': 0.2} | app {'n': 365, 'median': 1.38, 'p99': 2.86, 'max': 2.95}
+   conv fajr     {'app_vs_aladhan_s': {'n': 365, 'median': 1.52, 'p99': 2.79, 'max': 2.79}, 'minute_match_pct': 96.16, 'app_vs_VSOP_real_days_s': {'n': 288, 'median': 1.38, 'p99': 3.29, 'max': 3.78}}
+   conv sunrise  {'app_vs_aladhan_s': {'n': 365, 'median': 1.53, 'p99': 2.73, 'max': 2.73}, 'minute_match_pct': 97.81}
+   conv dhuhr    {'app_vs_aladhan_s': {'n': 365, 'median': 1.52, 'p99': 1.69, 'max': 1.69}, 'minute_match_pct': 96.99}
+   conv asr      {'app_vs_aladhan_s': {'n': 365, 'median': 1.29, 'p99': 1.68, 'max': 1.68}, 'minute_match_pct': 98.08, 'app_vs_VSOP_real_days_s': {'n': 365, 'median': 8.03, 'p99': 12.71, 'max': 12.75}}
+   conv maghrib  {'app_vs_aladhan_s': {'n': 365, 'median': 1.4, 'p99': 1.83, 'max': 1.84}, 'minute_match_pct': 96.99}
+   conv isha     {'app_vs_aladhan_s': {'n': 365, 'median': 1.47, 'p99': 2.18, 'max': 2.28}, 'minute_match_pct': 98.36, 'app_vs_VSOP_real_days_s': {'n': 287, 'median': 1.64, 'p99': 2.82, 'max': 2.86}}
+edmonton ISNA polarButReal 0 None maxalt-transit {'n': 365, 'median': 14.57, 'p99': 21.56, 'max': 21.58} DSTmismatch 127 noRise/Set 0 noFajrAngle 48 noIshaAngle 48 estF 97 estI 96 polar 0
+   sunrise  NOAA {'n': 365, 'median': 0.72, 'p99': 2.95, 'max': 3.04} | uq {'n': 365, 'median': 0.2, 'p99': 0.2, 'max': 0.2} | app {'n': 365, 'median': 1.76, 'p99': 3.48, 'max': 3.54}
+   dhuhr    NOAA {'n': 365, 'median': 0.78, 'p99': 2.95, 'max': 3.02} | uq {'n': 365, 'median': 0.2, 'p99': 0.2, 'max': 0.2} | app {'n': 365, 'median': 1.65, 'p99': 2.29, 'max': 2.33}
+   maghrib  NOAA {'n': 365, 'median': 0.75, 'p99': 2.96, 'max': 3.0} | uq {'n': 365, 'median': 0.2, 'p99': 0.2, 'max': 0.2} | app {'n': 365, 'median': 1.38, 'p99': 2.97, 'max': 3.06}
+   conv fajr     {'app_vs_aladhan_s': {'n': 365, 'median': 1.52, 'p99': 2.97, 'max': 2.99}, 'minute_match_pct': 97.81, 'app_vs_VSOP_real_days_s': {'n': 268, 'median': 1.32, 'p99': 3.43, 'max': 3.48}}
+   conv sunrise  {'app_vs_aladhan_s': {'n': 365, 'median': 1.53, 'p99': 2.83, 'max': 2.83}, 'minute_match_pct': 95.34}
+   conv dhuhr    {'app_vs_aladhan_s': {'n': 365, 'median': 1.52, 'p99': 1.69, 'max': 1.69}, 'minute_match_pct': 98.08}
+   conv asr      {'app_vs_aladhan_s': {'n': 365, 'median': 1.29, 'p99': 1.71, 'max': 1.71}, 'minute_match_pct': 98.63, 'app_vs_VSOP_real_days_s': {'n': 365, 'median': 8.79, 'p99': 13.85, 'max': 13.89}}
+   conv maghrib  {'app_vs_aladhan_s': {'n': 365, 'median': 1.45, 'p99': 1.91, 'max': 1.91}, 'minute_match_pct': 98.08}
+   conv isha     {'app_vs_aladhan_s': {'n': 365, 'median': 1.46, 'p99': 2.17, 'max': 2.3}, 'minute_match_pct': 96.99, 'app_vs_VSOP_real_days_s': {'n': 269, 'median': 1.71, 'p99': 2.91, 'max': 2.93}}
+winnipeg ISNA polarButReal 0 None maxalt-transit {'n': 365, 'median': 12.64, 'p99': 19.15, 'max': 19.17} DSTmismatch 127 noRise/Set 0 noFajrAngle 0 noIshaAngle 0 estF 67 estI 68 polar 0
+   sunrise  NOAA {'n': 365, 'median': 0.73, 'p99': 2.95, 'max': 3.03} | uq {'n': 365, 'median': 0.2, 'p99': 0.2, 'max': 0.2} | app {'n': 365, 'median': 1.77, 'p99': 3.28, 'max': 3.35}
+   dhuhr    NOAA {'n': 365, 'median': 0.77, 'p99': 2.95, 'max': 3.02} | uq {'n': 365, 'median': 0.2, 'p99': 0.2, 'max': 0.2} | app {'n': 365, 'median': 1.65, 'p99': 2.29, 'max': 2.33}
+   maghrib  NOAA {'n': 365, 'median': 0.76, 'p99': 2.96, 'max': 3.0} | uq {'n': 365, 'median': 0.2, 'p99': 0.2, 'max': 0.2} | app {'n': 365, 'median': 1.4, 'p99': 2.82, 'max': 2.9}
+   conv fajr     {'app_vs_aladhan_s': {'n': 365, 'median': 1.52, 'p99': 2.74, 'max': 2.74}, 'minute_match_pct': 96.44, 'app_vs_VSOP_real_days_s': {'n': 298, 'median': 1.42, 'p99': 3.91, 'max': 4.07}}
+   conv sunrise  {'app_vs_aladhan_s': {'n': 365, 'median': 1.53, 'p99': 2.69, 'max': 2.69}, 'minute_match_pct': 98.08}
+   conv dhuhr    {'app_vs_aladhan_s': {'n': 365, 'median': 1.52, 'p99': 1.69, 'max': 1.69}, 'minute_match_pct': 98.9}
+   conv asr      {'app_vs_aladhan_s': {'n': 365, 'median': 1.29, 'p99': 1.66, 'max': 1.66}, 'minute_match_pct': 98.08, 'app_vs_VSOP_real_days_s': {'n': 365, 'median': 7.74, 'p99': 12.26, 'max': 12.29}}
+   conv maghrib  {'app_vs_aladhan_s': {'n': 365, 'median': 1.38, 'p99': 1.81, 'max': 1.81}, 'minute_match_pct': 98.36}
+   conv isha     {'app_vs_aladhan_s': {'n': 365, 'median': 1.45, 'p99': 2.18, 'max': 2.26}, 'minute_match_pct': 97.81, 'app_vs_VSOP_real_days_s': {'n': 297, 'median': 1.59, 'p99': 2.78, 'max': 2.83}}
+halifax ISNA polarButReal 0 None maxalt-transit {'n': 365, 'median': 10.48, 'p99': 16.28, 'max': 16.32} DSTmismatch 0 noRise/Set 0 noFajrAngle 0 noIshaAngle 0 estF 0 estI 0 polar 0
+   sunrise  NOAA {'n': 365, 'median': 0.77, 'p99': 2.95, 'max': 3.03} | uq {'n': 365, 'median': 0.2, 'p99': 0.2, 'max': 0.2} | app {'n': 365, 'median': 1.74, 'p99': 3.08, 'max': 3.14}
+   dhuhr    NOAA {'n': 365, 'median': 0.78, 'p99': 2.95, 'max': 3.02} | uq {'n': 365, 'median': 0.2, 'p99': 0.2, 'max': 0.2} | app {'n': 365, 'median': 1.64, 'p99': 2.29, 'max': 2.33}
+   maghrib  NOAA {'n': 365, 'median': 0.75, 'p99': 2.96, 'max': 3.01} | uq {'n': 365, 'median': 0.2, 'p99': 0.2, 'max': 0.2} | app {'n': 365, 'median': 1.44, 'p99': 2.65, 'max': 2.74}
+   conv fajr     {'app_vs_aladhan_s': {'n': 365, 'median': 1.52, 'p99': 2.54, 'max': 2.54}, 'minute_match_pct': 98.9, 'app_vs_VSOP_real_days_s': {'n': 365, 'median': 1.69, 'p99': 3.42, 'max': 3.44}}
+   conv sunrise  {'app_vs_aladhan_s': {'n': 365, 'median': 1.53, 'p99': 2.52, 'max': 2.52}, 'minute_match_pct': 98.36}
+   conv dhuhr    {'app_vs_aladhan_s': {'n': 365, 'median': 1.52, 'p99': 1.69, 'max': 1.69}, 'minute_match_pct': 97.81}
+   conv asr      {'app_vs_aladhan_s': {'n': 365, 'median': 1.29, 'p99': 1.61, 'max': 1.61}, 'minute_match_pct': 97.81, 'app_vs_VSOP_real_days_s': {'n': 365, 'median': 6.59, 'p99': 10.59, 'max': 10.62}}
+   conv maghrib  {'app_vs_aladhan_s': {'n': 365, 'median': 1.32, 'p99': 1.71, 'max': 1.71}, 'minute_match_pct': 98.63}
+   conv isha     {'app_vs_aladhan_s': {'n': 365, 'median': 1.36, 'p99': 1.96, 'max': 1.96}, 'minute_match_pct': 98.36, 'app_vs_VSOP_real_days_s': {'n': 365, 'median': 1.49, 'p99': 2.65, 'max': 2.71}}
+yellowknife ISNA polarButReal 0 None maxalt-transit {'n': 365, 'median': 20.88, 'p99': 29.83, 'max': 29.87} DSTmismatch 127 noRise/Set 0 noFajrAngle 118 noIshaAngle 118 estF 150 estI 151 polar 0
+   sunrise  NOAA {'n': 365, 'median': 0.73, 'p99': 3.01, 'max': 3.05} | uq {'n': 365, 'median': 0.2, 'p99': 0.2, 'max': 0.2} | app {'n': 365, 'median': 1.82, 'p99': 4.7, 'max': 4.8}
+   dhuhr    NOAA {'n': 365, 'median': 0.78, 'p99': 2.96, 'max': 3.02} | uq {'n': 365, 'median': 0.2, 'p99': 0.2, 'max': 0.2} | app {'n': 365, 'median': 1.65, 'p99': 2.29, 'max': 2.33}
+   maghrib  NOAA {'n': 365, 'median': 0.78, 'p99': 2.96, 'max': 2.99} | uq {'n': 365, 'median': 0.2, 'p99': 0.2, 'max': 0.2} | app {'n': 365, 'median': 1.32, 'p99': 3.63, 'max': 3.91}
+   conv fajr     {'app_vs_aladhan_s': {'n': 365, 'median': 1.52, 'p99': 3.91, 'max': 4.06}, 'minute_match_pct': 97.81, 'app_vs_VSOP_real_days_s': {'n': 215, 'median': 0.95, 'p99': 3.11, 'max': 3.15}}
+   conv sunrise  {'app_vs_aladhan_s': {'n': 365, 'median': 1.53, 'p99': 3.33, 'max': 3.33}, 'minute_match_pct': 96.99}
+   conv dhuhr    {'app_vs_aladhan_s': {'n': 365, 'median': 1.52, 'p99': 1.69, 'max': 1.69}, 'minute_match_pct': 98.36}
+   conv asr      {'app_vs_aladhan_s': {'n': 365, 'median': 1.38, 'p99': 1.86, 'max': 1.86}, 'minute_match_pct': 98.63, 'app_vs_VSOP_real_days_s': {'n': 365, 'median': 13.46, 'p99': 20.38, 'max': 20.42}}
+   conv maghrib  {'app_vs_aladhan_s': {'n': 365, 'median': 1.49, 'p99': 2.46, 'max': 2.46}, 'minute_match_pct': 98.08}
+   conv isha     {'app_vs_aladhan_s': {'n': 365, 'median': 1.38, 'p99': 2.2, 'max': 2.35}, 'minute_match_pct': 98.63, 'app_vs_VSOP_real_days_s': {'n': 214, 'median': 1.95, 'p99': 3.3, 'max': 3.33}}
+iqaluit ISNA polarButReal 0 None maxalt-transit {'n': 365, 'median': 22.02, 'p99': 31.46, 'max': 31.51} DSTmismatch 0 noRise/Set 0 noFajrAngle 126 noIshaAngle 126 estF 158 estI 157 polar 0
+   sunrise  NOAA {'n': 365, 'median': 0.74, 'p99': 3.04, 'max': 3.07} | uq {'n': 365, 'median': 0.2, 'p99': 0.2, 'max': 0.2} | app {'n': 365, 'median': 1.84, 'p99': 5.41, 'max': 5.52}
+   dhuhr    NOAA {'n': 365, 'median': 0.78, 'p99': 2.95, 'max': 3.02} | uq {'n': 365, 'median': 0.2, 'p99': 0.2, 'max': 0.2} | app {'n': 365, 'median': 1.64, 'p99': 2.29, 'max': 2.33}
+   maghrib  NOAA {'n': 365, 'median': 0.79, 'p99': 2.95, 'max': 2.99} | uq {'n': 365, 'median': 0.2, 'p99': 0.2, 'max': 0.2} | app {'n': 365, 'median': 1.28, 'p99': 3.88, 'max': 4.23}
+   conv fajr     {'app_vs_aladhan_s': {'n': 365, 'median': 1.51, 'p99': 4.03, 'max': 4.2}, 'minute_match_pct': 97.81, 'app_vs_VSOP_real_days_s': {'n': 207, 'median': 0.89, 'p99': 3.2, 'max': 3.25}}
+   conv sunrise  {'app_vs_aladhan_s': {'n': 365, 'median': 1.52, 'p99': 3.43, 'max': 3.43}, 'minute_match_pct': 97.81}
+   conv dhuhr    {'app_vs_aladhan_s': {'n': 365, 'median': 1.52, 'p99': 1.69, 'max': 1.69}, 'minute_match_pct': 97.26}
+   conv asr      {'app_vs_aladhan_s': {'n': 365, 'median': 1.41, 'p99': 1.89, 'max': 1.89}, 'minute_match_pct': 98.36, 'app_vs_VSOP_real_days_s': {'n': 365, 'median': 14.49, 'p99': 21.83, 'max': 21.87}}
+   conv maghrib  {'app_vs_aladhan_s': {'n': 365, 'median': 1.48, 'p99': 2.67, 'max': 2.68}, 'minute_match_pct': 96.99}
+   conv isha     {'app_vs_aladhan_s': {'n': 365, 'median': 1.37, 'p99': 2.25, 'max': 2.41}, 'minute_match_pct': 97.81, 'app_vs_VSOP_real_days_s': {'n': 208, 'median': 2.01, 'p99': 3.38, 'max': 3.41}}
+oslo MWL polarButReal 0 None maxalt-transit {'n': 365, 'median': 18.69, 'p99': 27.01, 'max': 27.05} DSTmismatch 0 noRise/Set 0 noFajrAngle 121 noIshaAngle 115 estF 144 estI 141 polar 0
+   sunrise  NOAA {'n': 365, 'median': 0.73, 'p99': 2.97, 'max': 3.05} | uq {'n': 365, 'median': 0.2, 'p99': 0.2, 'max': 0.2} | app {'n': 365, 'median': 1.8, 'p99': 4.09, 'max': 4.13}
+   dhuhr    NOAA {'n': 365, 'median': 0.78, 'p99': 2.95, 'max': 3.02} | uq {'n': 365, 'median': 0.2, 'p99': 0.2, 'max': 0.2} | app {'n': 365, 'median': 1.65, 'p99': 2.29, 'max': 2.33}
+   maghrib  NOAA {'n': 365, 'median': 0.76, 'p99': 2.95, 'max': 2.99} | uq {'n': 365, 'median': 0.2, 'p99': 0.2, 'max': 0.2} | app {'n': 365, 'median': 1.39, 'p99': 3.37, 'max': 3.55}
+   conv fajr     {'app_vs_aladhan_s': {'n': 365, 'median': 1.52, 'p99': 4.01, 'max': 4.26}, 'minute_match_pct': 96.71, 'app_vs_VSOP_real_days_s': {'n': 221, 'median': 1.07, 'p99': 3.06, 'max': 3.09}}
+   conv sunrise  {'app_vs_aladhan_s': {'n': 365, 'median': 1.52, 'p99': 3.16, 'max': 3.16}, 'minute_match_pct': 97.53}
+   conv dhuhr    {'app_vs_aladhan_s': {'n': 365, 'median': 1.52, 'p99': 1.69, 'max': 1.69}, 'minute_match_pct': 98.36}
+   conv asr      {'app_vs_aladhan_s': {'n': 365, 'median': 1.35, 'p99': 1.81, 'max': 1.81}, 'minute_match_pct': 97.26, 'app_vs_VSOP_real_days_s': {'n': 365, 'median': 11.79, 'p99': 17.99, 'max': 18.03}}
+   conv maghrib  {'app_vs_aladhan_s': {'n': 365, 'median': 1.51, 'p99': 2.21, 'max': 2.21}, 'minute_match_pct': 98.08}
+   conv isha     {'app_vs_aladhan_s': {'n': 365, 'median': 1.37, 'p99': 2.26, 'max': 2.46}, 'minute_match_pct': 98.36, 'app_vs_VSOP_real_days_s': {'n': 224, 'median': 1.84, 'p99': 3.16, 'max': 3.18}}
+bergen MWL polarButReal 0 None maxalt-transit {'n': 365, 'median': 19.12, 'p99': 27.53, 'max': 27.54} DSTmismatch 0 noRise/Set 0 noFajrAngle 124 noIshaAngle 118 estF 146 estI 144 polar 0
+   sunrise  NOAA {'n': 365, 'median': 0.74, 'p99': 2.98, 'max': 3.05} | uq {'n': 365, 'median': 0.2, 'p99': 0.2, 'max': 0.2} | app {'n': 365, 'median': 1.8, 'p99': 4.16, 'max': 4.22}
+   dhuhr    NOAA {'n': 365, 'median': 0.78, 'p99': 2.95, 'max': 3.02} | uq {'n': 365, 'median': 0.2, 'p99': 0.2, 'max': 0.2} | app {'n': 365, 'median': 1.65, 'p99': 2.29, 'max': 2.33}
+   maghrib  NOAA {'n': 365, 'median': 0.77, 'p99': 2.95, 'max': 2.99} | uq {'n': 365, 'median': 0.2, 'p99': 0.2, 'max': 0.2} | app {'n': 365, 'median': 1.38, 'p99': 3.41, 'max': 3.6}
+   conv fajr     {'app_vs_aladhan_s': {'n': 365, 'median': 1.52, 'p99': 4.08, 'max': 4.35}, 'minute_match_pct': 96.44, 'app_vs_VSOP_real_days_s': {'n': 219, 'median': 1.05, 'p99': 3.09, 'max': 3.13}}
+   conv sunrise  {'app_vs_aladhan_s': {'n': 365, 'median': 1.52, 'p99': 3.19, 'max': 3.19}, 'minute_match_pct': 98.36}
+   conv dhuhr    {'app_vs_aladhan_s': {'n': 365, 'median': 1.52, 'p99': 1.69, 'max': 1.69}, 'minute_match_pct': 98.08}
+   conv asr      {'app_vs_aladhan_s': {'n': 365, 'median': 1.35, 'p99': 1.82, 'max': 1.82}, 'minute_match_pct': 98.9, 'app_vs_VSOP_real_days_s': {'n': 365, 'median': 12.09, 'p99': 18.4, 'max': 18.44}}
+   conv maghrib  {'app_vs_aladhan_s': {'n': 365, 'median': 1.51, 'p99': 2.25, 'max': 2.25}, 'minute_match_pct': 99.18}
+   conv isha     {'app_vs_aladhan_s': {'n': 365, 'median': 1.37, 'p99': 2.28, 'max': 2.49}, 'minute_match_pct': 98.63, 'app_vs_VSOP_real_days_s': {'n': 221, 'median': 1.87, 'p99': 3.18, 'max': 3.21}}
+trondheim MWL polarButReal 0 None maxalt-transit {'n': 365, 'median': 21.78, 'p99': 31.05, 'max': 31.1} DSTmismatch 0 noRise/Set 0 noFajrAngle 141 noIshaAngle 136 estF 163 estI 161 polar 0
+   sunrise  NOAA {'n': 365, 'median': 0.74, 'p99': 3.04, 'max': 3.06} | uq {'n': 365, 'median': 0.2, 'p99': 0.2, 'max': 0.2} | app {'n': 365, 'median': 1.85, 'p99': 5.2, 'max': 5.29}
+   dhuhr    NOAA {'n': 365, 'median': 0.78, 'p99': 2.95, 'max': 3.02} | uq {'n': 365, 'median': 0.2, 'p99': 0.2, 'max': 0.2} | app {'n': 365, 'median': 1.65, 'p99': 2.29, 'max': 2.33}
+   maghrib  NOAA {'n': 365, 'median': 0.77, 'p99': 2.95, 'max': 2.98} | uq {'n': 365, 'median': 0.2, 'p99': 0.2, 'max': 0.2} | app {'n': 365, 'median': 1.27, 'p99': 3.83, 'max': 4.15}
+   conv fajr     {'app_vs_aladhan_s': {'n': 365, 'median': 1.52, 'p99': 4.34, 'max': 4.66}, 'minute_match_pct': 96.71, 'app_vs_VSOP_real_days_s': {'n': 202, 'median': 0.9, 'p99': 3.36, 'max': 3.4}}
+   conv sunrise  {'app_vs_aladhan_s': {'n': 365, 'median': 1.52, 'p99': 3.4, 'max': 3.41}, 'minute_match_pct': 96.99}
+   conv dhuhr    {'app_vs_aladhan_s': {'n': 365, 'median': 1.52, 'p99': 1.69, 'max': 1.69}, 'minute_match_pct': 98.36}
+   conv asr      {'app_vs_aladhan_s': {'n': 365, 'median': 1.4, 'p99': 1.89, 'max': 1.89}, 'minute_match_pct': 98.08, 'app_vs_VSOP_real_days_s': {'n': 365, 'median': 14.25, 'p99': 21.46, 'max': 21.5}}
+   conv maghrib  {'app_vs_aladhan_s': {'n': 365, 'median': 1.49, 'p99': 2.61, 'max': 2.61}, 'minute_match_pct': 98.63}
+   conv isha     {'app_vs_aladhan_s': {'n': 365, 'median': 1.32, 'p99': 2.32, 'max': 2.51}, 'minute_match_pct': 97.81, 'app_vs_VSOP_real_days_s': {'n': 204, 'median': 2.0, 'p99': 3.35, 'max': 3.38}}
+bodo MWL polarButReal 36 {'sunrise': {'n': 36, 'median': 66.97, 'p99': 82.88, 'max': 82.91}, 'maghrib': {'n': 36, 'median': 67.02, 'p99': 82.95, 'max': 82.98}, 'dates': ['2027-01-01', '2027-12-31']} maxalt-transit {'n': 365, 'median': 26.04, 'p99': 36.82, 'max': 36.84} DSTmismatch 0 noRise/Set 44 noFajrAngle 163 noIshaAngle 157 estF 219 estI 217 polar 80
+   sunrise  NOAA {'n': 322, 'median': 0.92, 'p99': 3.17, 'max': 4.08} | uq {'n': 322, 'median': 0.2, 'p99': 0.2, 'max': 0.2} | app {'n': 285, 'median': 1.8, 'p99': 7.96, 'max': 12.49}
+   dhuhr    NOAA {'n': 365, 'median': 0.78, 'p99': 2.95, 'max': 3.02} | uq {'n': 365, 'median': 0.2, 'p99': 0.2, 'max': 0.2} | app {'n': 285, 'median': 1.61, 'p99': 2.23, 'max': 2.24}
+   maghrib  NOAA {'n': 322, 'median': 0.96, 'p99': 2.97, 'max': 5.88} | uq {'n': 322, 'median': 0.2, 'p99': 0.2, 'max': 0.2} | app {'n': 285, 'median': 1.5, 'p99': 4.84, 'max': 10.75}
+   conv fajr     {'app_vs_aladhan_s': {'n': 365, 'median': 1.52, 'p99': 4.74, 'max': 5.13}, 'minute_match_pct': 96.99, 'app_vs_VSOP_real_days_s': {'n': 146, 'median': 0.75, 'p99': 3.88, 'max': 4.06}}
+   conv sunrise  {'app_vs_aladhan_s': {'n': 365, 'median': 1.8, 'p99': 4.21, 'max': 6.01}, 'minute_match_pct': 95.89}
+   conv dhuhr    {'app_vs_aladhan_s': {'n': 365, 'median': 1.52, 'p99': 1.69, 'max': 1.69}, 'minute_match_pct': 96.99}
+   conv asr      {'app_vs_aladhan_s': {'n': 365, 'median': 1.49, 'p99': 1.99, 'max': 1.99}, 'minute_match_pct': 97.53, 'app_vs_VSOP_real_days_s': {'n': 285, 'median': 19.81, 'p99': 26.91, 'max': 26.94}}
+   conv maghrib  {'app_vs_aladhan_s': {'n': 365, 'median': 1.51, 'p99': 5.09, 'max': 14.45}, 'minute_match_pct': 96.71}
+   conv isha     {'app_vs_aladhan_s': {'n': 365, 'median': 1.33, 'p99': 3.04, 'max': 8.93}, 'minute_match_pct': 96.99, 'app_vs_VSOP_real_days_s': {'n': 148, 'median': 1.93, 'p99': 3.63, 'max': 3.65}}
+tromso MWL polarButReal 14 {'sunrise': {'n': 14, 'median': 99.35, 'p99': 131.74, 'max': 131.78}, 'maghrib': {'n': 14, 'median': 99.41, 'p99': 131.7, 'max': 131.71}, 'dates': ['2027-01-15', '2027-11-27']} maxalt-transit {'n': 365, 'median': 29.53, 'p99': 41.41, 'max': 41.47} DSTmismatch 0 noRise/Set 118 noFajrAngle 175 noIshaAngle 169 estF 259 estI 256 polar 132
+   sunrise  NOAA {'n': 248, 'median': 1.05, 'p99': 3.37, 'max': 5.69} | uq {'n': 248, 'median': 0.2, 'p99': 0.2, 'max': 0.2} | app {'n': 233, 'median': 1.75, 'p99': 9.84, 'max': 17.36}
+   dhuhr    NOAA {'n': 365, 'median': 0.78, 'p99': 2.95, 'max': 3.02} | uq {'n': 365, 'median': 0.2, 'p99': 0.2, 'max': 0.2} | app {'n': 233, 'median': 1.59, 'p99': 2.13, 'max': 2.21}
+   maghrib  NOAA {'n': 248, 'median': 1.27, 'p99': 3.04, 'max': 4.2} | uq {'n': 248, 'median': 0.2, 'p99': 0.2, 'max': 0.21} | app {'n': 233, 'median': 1.4, 'p99': 5.83, 'max': 8.12}
+   conv fajr     {'app_vs_aladhan_s': {'n': 365, 'median': 1.52, 'p99': 4.96, 'max': 5.29}, 'minute_match_pct': 96.99, 'app_vs_VSOP_real_days_s': {'n': 106, 'median': 0.72, 'p99': 2.72, 'max': 2.86}}
+   conv sunrise  {'app_vs_aladhan_s': {'n': 365, 'median': 1.82, 'p99': 5.43, 'max': 8.62}, 'minute_match_pct': 95.34}
+   conv dhuhr    {'app_vs_aladhan_s': {'n': 365, 'median': 1.52, 'p99': 1.69, 'max': 1.69}, 'minute_match_pct': 97.53}
+   conv asr      {'app_vs_aladhan_s': {'n': 365, 'median': 1.51, 'p99': 2.07, 'max': 2.07}, 'minute_match_pct': 98.36, 'app_vs_VSOP_real_days_s': {'n': 233, 'median': 24.94, 'p99': 31.58, 'max': 31.6}}
+   conv maghrib  {'app_vs_aladhan_s': {'n': 365, 'median': 1.76, 'p99': 5.14, 'max': 14.38}, 'minute_match_pct': 97.53}
+   conv isha     {'app_vs_aladhan_s': {'n': 365, 'median': 1.38, 'p99': 2.98, 'max': 8.74}, 'minute_match_pct': 96.99, 'app_vs_VSOP_real_days_s': {'n': 109, 'median': 1.83, 'p99': 3.86, 'max': 3.87}}

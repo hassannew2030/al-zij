@@ -5,3 +5,5 @@ obs.npz
 __pycache__/
 frac.txt
 !frac_best.npy
+world/world.json
+world/app.json

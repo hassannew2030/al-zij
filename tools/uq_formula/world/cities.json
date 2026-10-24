@@ -1,0 +1,17 @@
+{"year":2027,
+ "cities":[
+ {"id":"toronto","n":"Toronto","cc":"CA","lat":43.6532,"lon":-79.3832,"zone":"America/Toronto"},
+ {"id":"montreal","n":"Montreal","cc":"CA","lat":45.5019,"lon":-73.5674,"zone":"America/Toronto"},
+ {"id":"vancouver","n":"Vancouver","cc":"CA","lat":49.2827,"lon":-123.1207,"zone":"America/Vancouver"},
+ {"id":"calgary","n":"Calgary","cc":"CA","lat":51.0447,"lon":-114.0719,"zone":"America/Edmonton"},
+ {"id":"edmonton","n":"Edmonton","cc":"CA","lat":53.5461,"lon":-113.4938,"zone":"America/Edmonton"},
+ {"id":"winnipeg","n":"Winnipeg","cc":"CA","lat":49.8951,"lon":-97.1384,"zone":"America/Winnipeg"},
+ {"id":"halifax","n":"Halifax","cc":"CA","lat":44.6488,"lon":-63.5752,"zone":"America/Halifax"},
+ {"id":"yellowknife","n":"Yellowknife","cc":"CA","lat":62.4540,"lon":-114.3718,"zone":"America/Yellowknife"},
+ {"id":"iqaluit","n":"Iqaluit","cc":"CA","lat":63.7467,"lon":-68.5170,"zone":"America/Iqaluit"},
+ {"id":"oslo","n":"Oslo","cc":"NO","lat":59.9139,"lon":10.7522,"zone":"Europe/Oslo"},
+ {"id":"bergen","n":"Bergen","cc":"NO","lat":60.3913,"lon":5.3221,"zone":"Europe/Oslo"},
+ {"id":"trondheim","n":"Trondheim","cc":"NO","lat":63.4305,"lon":10.3951,"zone":"Europe/Oslo"},
+ {"id":"bodo","n":"Bodø","cc":"NO","lat":67.2804,"lon":14.4049,"zone":"Europe/Oslo"},
+ {"id":"tromso","n":"Tromsø","cc":"NO","lat":69.6492,"lon":18.9553,"zone":"Europe/Oslo"}
+ ]}

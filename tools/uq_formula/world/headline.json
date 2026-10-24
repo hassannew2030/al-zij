@@ -1,0 +1,534 @@
+{
+ "CA": {
+  "physics_sunrise": {
+   "uq_vs_VSOP": {
+    "median": 0.2,
+    "max": 0.2
+   },
+   "app_vs_VSOP": {
+    "median": 1.76,
+    "max": 5.52
+   },
+   "NOAA_vs_VSOP": {
+    "median": 0.73,
+    "max": 3.07
+   }
+  },
+  "physics_dhuhr": {
+   "uq_vs_VSOP": {
+    "median": 0.2,
+    "max": 0.2
+   },
+   "app_vs_VSOP": {
+    "median": 1.65,
+    "max": 2.33
+   },
+   "NOAA_vs_VSOP": {
+    "median": 0.78,
+    "max": 3.02
+   }
+  },
+  "physics_maghrib": {
+   "uq_vs_VSOP": {
+    "median": 0.2,
+    "max": 0.2
+   },
+   "app_vs_VSOP": {
+    "median": 1.4,
+    "max": 4.23
+   },
+   "NOAA_vs_VSOP": {
+    "median": 0.76,
+    "max": 3.01
+   }
+  },
+  "conv_fajr": {
+   "minute_match_vs_aladhan_pct": 97.81,
+   "max_s_vs_aladhan": 4.2,
+   "real_event_max_s_vs_VSOP": 4.07
+  },
+  "conv_sunrise": {
+   "minute_match_vs_aladhan_pct": 97.47,
+   "max_s_vs_aladhan": 3.43,
+   "real_event_max_s_vs_VSOP": null
+  },
+  "conv_dhuhr": {
+   "minute_match_vs_aladhan_pct": 98.08,
+   "max_s_vs_aladhan": 1.69,
+   "real_event_max_s_vs_VSOP": null
+  },
+  "conv_asr": {
+   "minute_match_vs_aladhan_pct": 98.11,
+   "max_s_vs_aladhan": 1.89,
+   "real_event_max_s_vs_VSOP": 21.87
+  },
+  "conv_maghrib": {
+   "minute_match_vs_aladhan_pct": 97.9,
+   "max_s_vs_aladhan": 2.68,
+   "real_event_max_s_vs_VSOP": null
+  },
+  "conv_isha": {
+   "minute_match_vs_aladhan_pct": 97.75,
+   "max_s_vs_aladhan": 2.41,
+   "real_event_max_s_vs_VSOP": 3.41
+  },
+  "rule_days": {
+   "toronto": {
+    "no_sunrise_sunset": 0,
+    "fajr_angle_not_reached": 0,
+    "isha_angle_not_reached": 0,
+    "app_estimated_fajr": 0,
+    "app_estimated_isha": 0,
+    "app_polar_65": 0,
+    "app_polar_although_sun_rises": 0,
+    "fajr_rule_replaced_real": 0,
+    "isha_rule_replaced_real": 0,
+    "fajr_rule_vs_real_min": null,
+    "isha_rule_vs_real_min": null,
+    "clock_offset_differs_days": 0
+   },
+   "montreal": {
+    "no_sunrise_sunset": 0,
+    "fajr_angle_not_reached": 0,
+    "isha_angle_not_reached": 0,
+    "app_estimated_fajr": 0,
+    "app_estimated_isha": 0,
+    "app_polar_65": 0,
+    "app_polar_although_sun_rises": 0,
+    "fajr_rule_replaced_real": 0,
+    "isha_rule_replaced_real": 0,
+    "fajr_rule_vs_real_min": null,
+    "isha_rule_vs_real_min": null,
+    "clock_offset_differs_days": 0
+   },
+   "vancouver": {
+    "no_sunrise_sunset": 0,
+    "fajr_angle_not_reached": 0,
+    "isha_angle_not_reached": 0,
+    "app_estimated_fajr": 61,
+    "app_estimated_isha": 62,
+    "app_polar_65": 0,
+    "app_polar_although_sun_rises": 0,
+    "fajr_rule_replaced_real": 61,
+    "isha_rule_replaced_real": 62,
+    "fajr_rule_vs_real_min": {
+     "n": 61,
+     "median": 23.62,
+     "p99": 33.98,
+     "max": 34.01
+    },
+    "isha_rule_vs_real_min": {
+     "n": 62,
+     "median": 23.11,
+     "p99": 33.92,
+     "max": 33.93
+    },
+    "clock_offset_differs_days": 127
+   },
+   "calgary": {
+    "no_sunrise_sunset": 0,
+    "fajr_angle_not_reached": 0,
+    "isha_angle_not_reached": 0,
+    "app_estimated_fajr": 77,
+    "app_estimated_isha": 78,
+    "app_polar_65": 0,
+    "app_polar_although_sun_rises": 0,
+    "fajr_rule_replaced_real": 77,
+    "isha_rule_replaced_real": 78,
+    "fajr_rule_vs_real_min": {
+     "n": 77,
+     "median": 42.57,
+     "p99": 71.83,
+     "max": 71.88
+    },
+    "isha_rule_vs_real_min": {
+     "n": 78,
+     "median": 41.83,
+     "p99": 71.78,
+     "max": 71.81
+    },
+    "clock_offset_differs_days": 127
+   },
+   "edmonton": {
+    "no_sunrise_sunset": 0,
+    "fajr_angle_not_reached": 48,
+    "isha_angle_not_reached": 48,
+    "app_estimated_fajr": 97,
+    "app_estimated_isha": 96,
+    "app_polar_65": 0,
+    "app_polar_although_sun_rises": 0,
+    "fajr_rule_replaced_real": 49,
+    "isha_rule_replaced_real": 48,
+    "fajr_rule_vs_real_min": {
+     "n": 49,
+     "median": 34.27,
+     "p99": 101.33,
+     "max": 105.7
+    },
+    "isha_rule_vs_real_min": {
+     "n": 48,
+     "median": 35.04,
+     "p99": 101.32,
+     "max": 105.04
+    },
+    "clock_offset_differs_days": 127
+   },
+   "winnipeg": {
+    "no_sunrise_sunset": 0,
+    "fajr_angle_not_reached": 0,
+    "isha_angle_not_reached": 0,
+    "app_estimated_fajr": 67,
+    "app_estimated_isha": 68,
+    "app_polar_65": 0,
+    "app_polar_although_sun_rises": 0,
+    "fajr_rule_replaced_real": 67,
+    "isha_rule_replaced_real": 68,
+    "fajr_rule_vs_real_min": {
+     "n": 67,
+     "median": 29.28,
+     "p99": 43.97,
+     "max": 43.99
+    },
+    "isha_rule_vs_real_min": {
+     "n": 68,
+     "median": 28.89,
+     "p99": 43.91,
+     "max": 43.92
+    },
+    "clock_offset_differs_days": 127
+   },
+   "halifax": {
+    "no_sunrise_sunset": 0,
+    "fajr_angle_not_reached": 0,
+    "isha_angle_not_reached": 0,
+    "app_estimated_fajr": 0,
+    "app_estimated_isha": 0,
+    "app_polar_65": 0,
+    "app_polar_although_sun_rises": 0,
+    "fajr_rule_replaced_real": 0,
+    "isha_rule_replaced_real": 0,
+    "fajr_rule_vs_real_min": null,
+    "isha_rule_vs_real_min": null,
+    "clock_offset_differs_days": 0
+   },
+   "yellowknife": {
+    "no_sunrise_sunset": 0,
+    "fajr_angle_not_reached": 118,
+    "isha_angle_not_reached": 118,
+    "app_estimated_fajr": 150,
+    "app_estimated_isha": 151,
+    "app_polar_65": 0,
+    "app_polar_although_sun_rises": 0,
+    "fajr_rule_replaced_real": 32,
+    "isha_rule_replaced_real": 33,
+    "fajr_rule_vs_real_min": {
+     "n": 32,
+     "median": 35.28,
+     "p99": 110.69,
+     "max": 111.47
+    },
+    "isha_rule_vs_real_min": {
+     "n": 33,
+     "median": 33.42,
+     "p99": 110.17,
+     "max": 110.23
+    },
+    "clock_offset_differs_days": 127
+   },
+   "iqaluit": {
+    "no_sunrise_sunset": 0,
+    "fajr_angle_not_reached": 126,
+    "isha_angle_not_reached": 126,
+    "app_estimated_fajr": 158,
+    "app_estimated_isha": 157,
+    "app_polar_65": 0,
+    "app_polar_although_sun_rises": 0,
+    "fajr_rule_replaced_real": 32,
+    "isha_rule_replaced_real": 31,
+    "fajr_rule_vs_real_min": {
+     "n": 32,
+     "median": 34.2,
+     "p99": 108.55,
+     "max": 110.78
+    },
+    "isha_rule_vs_real_min": {
+     "n": 31,
+     "median": 35.14,
+     "p99": 109.12,
+     "max": 112.14
+    },
+    "clock_offset_differs_days": 0
+   }
+  }
+ },
+ "NO": {
+  "physics_sunrise": {
+   "uq_vs_VSOP": {
+    "median": 0.2,
+    "max": 0.2
+   },
+   "app_vs_VSOP": {
+    "median": 1.8,
+    "max": 17.36
+   },
+   "NOAA_vs_VSOP": {
+    "median": 0.74,
+    "max": 5.69
+   }
+  },
+  "physics_dhuhr": {
+   "uq_vs_VSOP": {
+    "median": 0.2,
+    "max": 0.2
+   },
+   "app_vs_VSOP": {
+    "median": 1.65,
+    "max": 2.33
+   },
+   "NOAA_vs_VSOP": {
+    "median": 0.78,
+    "max": 3.02
+   }
+  },
+  "physics_maghrib": {
+   "uq_vs_VSOP": {
+    "median": 0.2,
+    "max": 0.21
+   },
+   "app_vs_VSOP": {
+    "median": 1.39,
+    "max": 10.75
+   },
+   "NOAA_vs_VSOP": {
+    "median": 0.77,
+    "max": 5.88
+   }
+  },
+  "conv_fajr": {
+   "minute_match_vs_aladhan_pct": 96.77,
+   "max_s_vs_aladhan": 5.29,
+   "real_event_max_s_vs_VSOP": 4.06
+  },
+  "conv_sunrise": {
+   "minute_match_vs_aladhan_pct": 96.82,
+   "max_s_vs_aladhan": 8.62,
+   "real_event_max_s_vs_VSOP": null
+  },
+  "conv_dhuhr": {
+   "minute_match_vs_aladhan_pct": 97.86,
+   "max_s_vs_aladhan": 1.69,
+   "real_event_max_s_vs_VSOP": null
+  },
+  "conv_asr": {
+   "minute_match_vs_aladhan_pct": 98.03,
+   "max_s_vs_aladhan": 2.07,
+   "real_event_max_s_vs_VSOP": 31.6
+  },
+  "conv_maghrib": {
+   "minute_match_vs_aladhan_pct": 98.03,
+   "max_s_vs_aladhan": 14.45,
+   "real_event_max_s_vs_VSOP": null
+  },
+  "conv_isha": {
+   "minute_match_vs_aladhan_pct": 97.76,
+   "max_s_vs_aladhan": 8.93,
+   "real_event_max_s_vs_VSOP": 3.87
+  },
+  "rule_days": {
+   "oslo": {
+    "no_sunrise_sunset": 0,
+    "fajr_angle_not_reached": 121,
+    "isha_angle_not_reached": 115,
+    "app_estimated_fajr": 144,
+    "app_estimated_isha": 141,
+    "app_polar_65": 0,
+    "app_polar_although_sun_rises": 0,
+    "fajr_rule_replaced_real": 23,
+    "isha_rule_replaced_real": 26,
+    "fajr_rule_vs_real_min": {
+     "n": 23,
+     "median": 30.01,
+     "p99": 91.6,
+     "max": 94.1
+    },
+    "isha_rule_vs_real_min": {
+     "n": 26,
+     "median": 31.68,
+     "p99": 95.44,
+     "max": 97.74
+    },
+    "clock_offset_differs_days": 0
+   },
+   "bergen": {
+    "no_sunrise_sunset": 0,
+    "fajr_angle_not_reached": 124,
+    "isha_angle_not_reached": 118,
+    "app_estimated_fajr": 146,
+    "app_estimated_isha": 144,
+    "app_polar_65": 0,
+    "app_polar_although_sun_rises": 0,
+    "fajr_rule_replaced_real": 22,
+    "isha_rule_replaced_real": 26,
+    "fajr_rule_vs_real_min": {
+     "n": 22,
+     "median": 30.89,
+     "p99": 94.38,
+     "max": 98.54
+    },
+    "isha_rule_vs_real_min": {
+     "n": 26,
+     "median": 31.24,
+     "p99": 99.59,
+     "max": 104.89
+    },
+    "clock_offset_differs_days": 0
+   },
+   "trondheim": {
+    "no_sunrise_sunset": 0,
+    "fajr_angle_not_reached": 141,
+    "isha_angle_not_reached": 136,
+    "app_estimated_fajr": 163,
+    "app_estimated_isha": 161,
+    "app_polar_65": 0,
+    "app_polar_although_sun_rises": 0,
+    "fajr_rule_replaced_real": 22,
+    "isha_rule_replaced_real": 25,
+    "fajr_rule_vs_real_min": {
+     "n": 22,
+     "median": 31.83,
+     "p99": 96.79,
+     "max": 98.56
+    },
+    "isha_rule_vs_real_min": {
+     "n": 25,
+     "median": 32.72,
+     "p99": 99.64,
+     "max": 105.06
+    },
+    "clock_offset_differs_days": 0
+   },
+   "bodo": {
+    "no_sunrise_sunset": 44,
+    "fajr_angle_not_reached": 163,
+    "isha_angle_not_reached": 157,
+    "app_estimated_fajr": 219,
+    "app_estimated_isha": 217,
+    "app_polar_65": 80,
+    "app_polar_although_sun_rises": 36,
+    "fajr_rule_replaced_real": 56,
+    "isha_rule_replaced_real": 60,
+    "fajr_rule_vs_real_min": {
+     "n": 56,
+     "median": 6.96,
+     "p99": 82.93,
+     "max": 83.87
+    },
+    "isha_rule_vs_real_min": {
+     "n": 60,
+     "median": 8.05,
+     "p99": 97.26,
+     "max": 97.71
+    },
+    "clock_offset_differs_days": 0
+   },
+   "tromso": {
+    "no_sunrise_sunset": 118,
+    "fajr_angle_not_reached": 175,
+    "isha_angle_not_reached": 169,
+    "app_estimated_fajr": 259,
+    "app_estimated_isha": 256,
+    "app_polar_65": 132,
+    "app_polar_although_sun_rises": 14,
+    "fajr_rule_replaced_real": 84,
+    "isha_rule_replaced_real": 87,
+    "fajr_rule_vs_real_min": {
+     "n": 84,
+     "median": 14.06,
+     "p99": 91.14,
+     "max": 91.93
+    },
+    "isha_rule_vs_real_min": {
+     "n": 87,
+     "median": 16.51,
+     "p99": 107.37,
+     "max": 111.34
+    },
+    "clock_offset_differs_days": 0
+   }
+  }
+ },
+ "why_bodo": {
+  "noon_alt_deg_range": [
+   -0.72,
+   0.49
+  ],
+  "asr_minus_noon_min": [
+   0.0,
+   6.9
+  ],
+  "days": [
+   "2027-01-01",
+   "2027-01-02",
+   "2027-01-03",
+   "2027-01-04",
+   "2027-01-05",
+   "2027-01-06",
+   "2027-01-07",
+   "2027-01-08",
+   "2027-12-04",
+   "2027-12-05",
+   "2027-12-06",
+   "2027-12-07",
+   "2027-12-08",
+   "2027-12-09",
+   "2027-12-10",
+   "2027-12-11",
+   "2027-12-12",
+   "2027-12-13",
+   "2027-12-14",
+   "2027-12-15",
+   "2027-12-16",
+   "2027-12-17",
+   "2027-12-18",
+   "2027-12-19",
+   "2027-12-20",
+   "2027-12-21",
+   "2027-12-22",
+   "2027-12-23",
+   "2027-12-24",
+   "2027-12-25",
+   "2027-12-26",
+   "2027-12-27",
+   "2027-12-28",
+   "2027-12-29",
+   "2027-12-30",
+   "2027-12-31"
+  ]
+ },
+ "why_tromso": {
+  "noon_alt_deg_range": [
+   -0.77,
+   0.45
+  ],
+  "asr_minus_noon_min": [
+   0.0,
+   8.1
+  ],
+  "days": [
+   "2027-01-15",
+   "2027-01-16",
+   "2027-01-17",
+   "2027-01-18",
+   "2027-01-19",
+   "2027-01-20",
+   "2027-01-21",
+   "2027-11-21",
+   "2027-11-22",
+   "2027-11-23",
+   "2027-11-24",
+   "2027-11-25",
+   "2027-11-26",
+   "2027-11-27"
+  ]
+ }
+}
