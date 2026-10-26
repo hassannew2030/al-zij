@@ -54,7 +54,49 @@
     } catch (e) { return false; }
   }
   function voiceName() { var v = voice || pickVoice(); return v ? v.name : ''; }
-  window.zijVoiceClock = { speak: speak, text: text, slots: SLOTS, voiceName: voiceName };
+
+  /* ---- صوت «كريم» المسجّل مسبقًا: ملفات قصيرة تُركّب منها الجملة (دون إنترنت) ---- */
+  var VKEY = 'zijVoiceEngine'; // 'clips' (default) | 'tts'
+  function engine() { try { return localStorage.getItem(VKEY) || 'clips'; } catch (e) { return 'clips'; } }
+  function setEngine(v) { try { localStorage.setItem(VKEY, v); } catch (e) {} }
+  var AC = null, BUF = {};
+  function ctx() { if (!AC) { var C = window.AudioContext || window.webkitAudioContext; if (C) AC = new C(); } return AC; }
+  function load(id) {
+    if (BUF[id]) return BUF[id];
+    BUF[id] = fetch('beta/voice/' + id + '.m4a').then(function (r) { if (!r.ok) throw 0; return r.arrayBuffer(); })
+      .then(function (a) { return new Promise(function (ok, no) { ctx().decodeAudioData(a, ok, no); }); });
+    return BUF[id];
+  }
+  function parts(d) {
+    var hp = {}, gp = { d: d.getDate(), m: d.getMonth() + 1, y: d.getFullYear() };
+    try { new Intl.DateTimeFormat('en-u-ca-islamic-umalqura-nu-latn', { day: 'numeric', month: 'numeric', year: 'numeric' }).formatToParts(d)
+      .forEach(function (x) { if (x.type === 'day') hp.d = +x.value; if (x.type === 'month') hp.m = +x.value; if (x.type === 'year') hp.y = parseInt(x.value, 10); }); } catch (e) {}
+    return { w: d.getDay(), h: hp, g: gp };
+  }
+  function seq(slot, d) {
+    var p = parts(d), date = ['today', 'w' + p.w, 'd' + p.h.d, 'min', 'h' + p.h.m, 'hy' + p.h.y, 'muwafiq', 'd' + p.g.d, 'min', 'g' + p.g.m, 'gy' + p.g.y];
+    var T = { noon: 't12n', asr3: 't3a', eve9: 't9m' };
+    if (slot.id === 'newday') return ['newday'].concat(date, ['now', 't12l']);
+    return ['now', T[slot.id]].concat(date);
+  }
+  function playClips(ids) {
+    var c = ctx(); if (!c) return Promise.reject();
+    if (c.state === 'suspended') c.resume();
+    return Promise.all(ids.map(load)).then(function (bufs) {
+      var t = c.currentTime + 0.08, GAP = 0.12;
+      bufs.forEach(function (b) { var s = c.createBufferSource(); s.buffer = b; s.connect(c.destination); s.start(t); t += b.duration + GAP; });
+      return true;
+    });
+  }
+  function announce(slot, d) {
+    if (engine() === 'clips') {
+      return playClips(seq(slot, d)).catch(function () { speak(text(slot, d)); });
+    }
+    speak(text(slot, d));
+  }
+  // unlock audio on the first tap anywhere (iPhone needs a touch before sound)
+  document.addEventListener('touchend', function u() { try { var c = ctx(); c && c.resume(); } catch (e) {} document.removeEventListener('touchend', u); }, { once: true });
+  window.zijVoiceClock = { speak: speak, text: text, slots: SLOTS, voiceName: voiceName, seq: seq, announce: announce };
 
   function check() {
     if (!on()) return;
@@ -62,7 +104,7 @@
     SLOTS.forEach(function (sl) {
       if (H === sl.h && M === sl.m && S >= sl.s && S < sl.s + 30) {
         var k = d.toDateString() + '|' + sl.id;
-        if (!done(k)) { mark(k); speak(text(sl, d)); }
+        if (!done(k)) { mark(k); announce(sl, d); }
       }
     });
   }
@@ -80,6 +122,9 @@
       '<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">' +
       '<button type="button" class="z-btn" id="zVoiceTgl"></button>' +
       '<button type="button" class="z-btn" id="zVoiceTry">▶︎ جرّب الآن</button></div>' +
+      '<div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;align-items:center"><span style="color:var(--h-dim);font-size:14px">الصوت:</span>' +
+      '<button type="button" class="z-btn" data-eng="clips" data-lbl="كريم (مسجّل)"></button>' +
+      '<button type="button" class="z-btn" data-eng="tts" data-lbl="صوت الجوال"></button></div>' +
       '<div id="zVoiceNote" style="color:var(--h-dim);font-size:13px;margin-top:8px">' +
       '<div style="color:var(--h-ink);font-size:14px;margin-bottom:6px">🔊 لصوت أوضح: الإعدادات ← تسهيلات الاستخدام ← المحتوى المنطوق ← الأصوات ← العربية ← نزّل <b>«ماجد (محسّن)»</b>. الصوت الحالي: <span id="zVoiceNm">—</span></div>' +
       (hasVoice ? 'يعمل على جوالك دون إنترنت ما دام الزيج مفتوحًا. والإعلان والجوال مقفول يأتي مع تطبيق الزيج في المتجر قريبًا.' : 'هذا المتصفح لا يدعم الصوت.') + '</div>';
@@ -87,8 +132,11 @@
     (box && box.parentNode ? box.parentNode : host.parentNode).insertBefore(c, box ? box.nextSibling : host.nextSibling);
     var tgl = c.querySelector('#zVoiceTgl');
     function paint() { tgl.textContent = on() ? '✅ مفعّلة — اضغط للإيقاف' : '⭕ متوقفة — اضغط للتفعيل'; tgl.style.borderColor = on() ? 'var(--h-brass)' : ''; }
-    tgl.onclick = function () { setOn(!on()); paint(); if (on()) speak('تم تفعيل الساعة الناطقة'); };
-    c.querySelector('#zVoiceTry').onclick = function () { speak(text(SLOTS[0], new Date())); };
+    tgl.onclick = function () { setOn(!on()); paint(); if (on()) { try { ctx() && ctx().resume(); } catch (e) {} } };
+    c.querySelector('#zVoiceTry').onclick = function () { announce(SLOTS[0], new Date()); };
+    c.querySelectorAll('[data-eng]').forEach(function (b) { b.onclick = function () { setEngine(b.dataset.eng); paintEng(); }; });
+    function paintEng() { c.querySelectorAll('[data-eng]').forEach(function (b) { var on2 = b.dataset.eng === engine(); b.style.borderColor = on2 ? 'var(--h-brass)' : ''; b.style.color = on2 ? 'var(--h-brass-l)' : ''; b.textContent = (on2 ? '● ' : '○ ') + b.dataset.lbl; }); }
+    paintEng();
     paint();
     var nm = c.querySelector('#zVoiceNm'); var upd = function () { nm.textContent = voiceName() || 'غير متوفر'; }; upd(); setTimeout(upd, 1500);
   }
