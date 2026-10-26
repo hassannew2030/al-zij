@@ -17,6 +17,8 @@ head = ('<base href="/">\n<meta name="robots" content="noindex,nofollow">\n'
         '<style id="betaRibbon">body::before{content:"نسخة تجربة · BETA";position:fixed;top:0;left:50%;transform:translateX(-50%);'
         'z-index:99999;background:#c9a35d;color:#1a140a;font:700 12px/1 Georgia,serif;padding:3px 12px 4px;border-radius:0 0 10px 10px;pointer-events:none}</style>\n')
 s = s.replace('<head>', '<head>\n' + head, 1)
+if os.path.exists('beta/variants.js'):
+    s = s.replace('</body>', '<script src="beta/variants.js" defer></script>\n</body>', 1)  # home-layout variants (beta only)
 os.makedirs('beta', exist_ok=True)
 open('beta/index.html', 'w', encoding='utf-8').write(s)
 json.dump({'build': build}, open('beta/version.json', 'w'))
