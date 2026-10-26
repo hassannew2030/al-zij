@@ -125,6 +125,29 @@
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>scaleDoc(document));else scaleDoc(document);
 })();
 </script>
+<script id="prIconsJs">
+/* أيقونات الصلوات: موضع الشمس في كل وقت (الفجر قبل الشروق، الشروق، الظهر في الأعلى، العصر، المغرب، العشاء) — لون النص نفسه */
+window.zijPrIcon=function(k){
+  const H='<path d="M3 17.5h18" stroke-width="1.6"/>';
+  const S={
+    fajr:H+'<path d="M7.5 17.5a4.5 4.5 0 0 1 9 0" stroke-dasharray="1.6 1.9"/><path d="M12 9.5v1.2M6.2 11.6l.8.8M17.8 11.6l-.8.8" stroke-dasharray="1 1.6"/>',
+    sunrise:H+'<path d="M7.5 17.5a4.5 4.5 0 0 1 9 0"/><path d="M12 3.5v6M9.6 5.9 12 3.5l2.4 2.4"/><path d="M4.6 13.6l1.2.7M19.4 13.6l-1.2.7"/>',
+    dhuhr:'<circle cx="12" cy="12" r="4.2"/><path d="M12 2.8v2.2M12 19v2.2M2.8 12h2.2M19 12h2.2M5.5 5.5l1.6 1.6M16.9 16.9l1.6 1.6M5.5 18.5l1.6-1.6M16.9 7.1l1.6-1.6"/>',
+    asr:'<circle cx="12" cy="10.5" r="3.6"/><path d="M12 3.2v1.6M5 10.5h1.6M17.4 10.5H19M7 5.5l1.1 1.1M17 5.5l-1.1 1.1"/><path d="M12 16.2v5M9.8 19 12 21.2l2.2-2.2"/>',
+    maghrib:H+'<path d="M7.5 17.5a4.5 4.5 0 0 1 9 0"/><path d="M12 9.5v-6M9.6 7.1 12 9.5l2.4-2.4"/><path d="M4.6 13.6l1.2.7M19.4 13.6l-1.2.7"/>',
+    isha:'<path d="M15.5 18.6A7.2 7.2 0 0 1 10.3 5.2a7.2 7.2 0 1 0 8.6 10.7 7.2 7.2 0 0 1-3.4 2.7z"/><path d="M17.6 4.2v3M16.1 5.7h3"/>',
+    duha:H+'<circle cx="12" cy="13.2" r="3.2"/><path d="M12 6.8v1.6M6.6 9.1l1.1 1.1M17.4 9.1l-1.1 1.1"/>',
+    night:'<path d="M14.2 19A7 7 0 0 1 9.4 6a7 7 0 1 0 8.2 10.4A7 7 0 0 1 14.2 19z"/><path d="M18 4v2.4M16.8 5.2h2.4M20.4 9.4v1.6M19.6 10.2h1.6"/>'
+  };
+  return '<svg class="pri" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(S[k]||'')+'</svg>';
+};
+</script>
+<style id="prIconsCss">
+.pri{width:20px;height:20px;flex:none;vertical-align:-4px}
+.pc .pri{display:block;margin:0 auto 1px;width:18px;height:18px;opacity:.95}
+.pl .n .pri{width:22px;height:22px;margin-inline-end:8px;vertical-align:-5px}
+.pc.cur .pri,.pl li.cur .pri{color:var(--h-brass-l)}
+</style>
 </head>
 <body>
 <noscript><div style="padding:24px;font:18px/1.8 serif;color:#e8e0c8;background:#0a0c12"><div dir="rtl" lang="ar"><h1>الزيج — مواقيت الصلاة والأذان والقبلة والتقويم الهجري</h1><p>الزيج تطبيق وموقع (alzijapp.com) لمواقيت الصلاة: مواقيت مطابقة لتقويم أم القرى الرسمي في السعودية، ومحسوبة بطريقة كل بلد الرسمية خارجها · تنبيه قبل الأذان والأذان والإقامة · تحديد اتجاه القبلة بالبوصلة · التقويم الهجري والميلادي مع محوّل التاريخ ومواقيت الشهر كاملًا · القمر والشمس.</p><p>كل ذلك بحساب فلكي دقيق على جوالك، ويعمل مع الإنترنت ودونه. بالعربية والإنجليزية، على الآيفون والأندرويد والكمبيوتر.</p><p>خصوصيتك كاملة: لا حساب ولا تسجيل، ولا تتبّع ولا إعلانات، ولا نسألك عن اسمك أو عمرك. كل الحساب يتم على جوالك، وموقعك لا يُرسَل إلينا، ولا نجمع أي بيانات ولا نبيعها.</p><p>للتواصل: alzijapp@gmail.com — مجاني بالكامل.</p></div><div dir="ltr" lang="en"><h2>Al-Zij — Prayer times, adhan, Qibla and Hijri calendar</h2><p>Al-Zij is a prayer-times app and website (alzijapp.com): prayer times matching the official Umm al-Qura calendar in Saudi Arabia, and calculated with each country&#x27;s official method elsewhere · alerts before the adhan, at the adhan and for the iqama · Qibla direction by compass · Hijri and Gregorian calendars with a date converter and full monthly timetables · the Moon and the Sun.</p><p>All computed with precise astronomy on your phone, working online and offline. In Arabic and English, on iPhone, Android and computer.</p><p>Your privacy is complete: no account, no sign-up, no tracking, no ads, and we never ask your name or age. Every calculation happens on your phone, your location is never sent to us, and we collect and sell no data.</p><p>Contact: alzijapp@gmail.com — completely free.</p></div><p><a href="/about/">عن الزيج — About</a> · <a href="/mawaqit/">مواقيت المدن — City prayer times</a> · <a href="/support/">الدعم — Support</a> · <a href="/privacy/">الخصوصية — Privacy</a></p></div></noscript>
@@ -5654,7 +5677,7 @@ function tick(){
   // prayer row
   // the gold box sits on what is coming next; only in the first minutes after an adhan it stays on that prayer
   const focusI=(curIsPrayer&&sinceMin<10)?curI:nextI;
-  $('hRow').innerHTML=list.map((x,i)=>`<div class="pc${x[0]==='sunrise'?' minor':''}${i===focusI?' cur':''}${i===nextI&&i!==focusI?' next':''}"><div class="pn">${x[1]}</div><div class="pt">${fmt(i===nextI?nextMin:p[x[0]]).replace(/ [صم]$/,'')}</div></div>`).join('');
+  $('hRow').innerHTML=list.map((x,i)=>`<div class="pc${x[0]==='sunrise'?' minor':''}${i===focusI?' cur':''}${i===nextI&&i!==focusI?' next':''}">${zijPrIcon(x[0])}<div class="pn">${x[1]}</div><div class="pt">${fmt(i===nextI?nextMin:p[x[0]]).replace(/ [صم]$/,'')}</div></div>`).join('');
   // context note: one line, only when there is something worth saying today
   const ph=Ephemeris.moonPhase(now),notes=[];
   if(ramadan)notes.push('رمضان كريم · اليوم '+ar(h.day)+' من رمضان');
@@ -5854,9 +5877,9 @@ function renderPrayer(){
   const ram=h.month===9,cdTxt=ar((H?H+':':'')+two(M)+':'+two(S));
   const nxWord=ram&&L[nx][0]==='maghrib'?'الإفطار بعد':ram&&L[nx][0]==='fajr'?'الإمساك بعد':'بعد';
   const duha=p.sunrise+15,night=(pt.fajr+1440)-p.maghrib,third=p.maghrib+night*2/3;
-  const rowsP=L.map((x,i)=>`<li class="${x[0]==='sunrise'?'minor':''}${i===cur?' cur':''}${i===nx?' next':''}"><span class="n">${x[1]}${i===cur&&x[0]!=='sunrise'&&i!==nx?'<span class="tag">الآن</span>':''}${i===nx?'<span class="tag cd">'+nxWord+' <b style="font-family:\'EB Garamond\',serif;direction:ltr;unicode-bidi:isolate">'+cdTxt+'</b></span>':''}</span><span class="t">${fmt(i===nx?nmin:p[x[0]])}</span></li>`);
-  rowsP.splice(2,0,`<li class="minor extra"><span class="n">الضحى <small>يبدأ</small></span><span class="t">${fmt(duha)}</span></li>`);
-  rowsP.push(`<li class="minor extra"><span class="n">ثلث الليل الأخير <small>قيام الليل</small></span><span class="t">${fmt(third)}</span></li>`);
+  const rowsP=L.map((x,i)=>`<li class="${x[0]==='sunrise'?'minor':''}${i===cur?' cur':''}${i===nx?' next':''}"><span class="n">${zijPrIcon(x[0])}${x[1]}${i===cur&&x[0]!=='sunrise'&&i!==nx?'<span class="tag">الآن</span>':''}${i===nx?'<span class="tag cd">'+nxWord+' <b style="font-family:\'EB Garamond\',serif;direction:ltr;unicode-bidi:isolate">'+cdTxt+'</b></span>':''}</span><span class="t">${fmt(i===nx?nmin:p[x[0]])}</span></li>`);
+  rowsP.splice(2,0,`<li class="minor extra"><span class="n">${zijPrIcon('duha')}الضحى <small>يبدأ</small></span><span class="t">${fmt(duha)}</span></li>`);
+  rowsP.push(`<li class="minor extra"><span class="n">${zijPrIcon('night')}ثلث الليل الأخير <small>قيام الليل</small></span><span class="t">${fmt(third)}</span></li>`);
   $('pList').innerHTML=rowsP.join('');
   const sel=$('calcMethodSel');
   const estNote=p.polar?'<div style="color:#e8b34a;margin-top:6px">⚠️ الشمس عندك اليوم لا تغيب أو لا تشرق (أو لا ترتفع بما يكفي للعصر)، لذلك حُسبت المواقيت على أقرب خط عرض فيه ليل ونهار (٦٥°).</div>'
