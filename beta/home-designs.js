@@ -11,7 +11,7 @@
   var KEY = 'zijHomeDesign', SEEN = 'zijHomeDesignSeen';
   var MINE = ['d', 'e', 'f'];
   var OPTS = [['d', 'د'], ['e', 'هـ'], ['f', 'و'], ['a', 'أ'], ['b', 'ب'], ['c', 'ج'], ['orig', 'الأصل']];
-  var TITLES = { d: ['الساعة أولًا', 'Time first'], e: ['الأفق', 'Horizon'], f: ['الجملة', 'The sentence'] };
+  var TITLES = { d: ['الساعة أولًا', 'Time first'], e: ['كيرف الشمس', 'Sun curve'], f: ['الجملة', 'The sentence'] };
   var LS = {
     get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
     set: function (k, v) { try { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} }
@@ -81,6 +81,7 @@
     'html[data-lang=en] #zhd .acts .dgt{display:none}',
     '#zhd .note{color:var(--k-dim);text-align:center;margin-top:10px;min-height:0}',
     '#zhd .note:empty{display:none}',
+    '#zhd .sub:empty{display:none}',
     '#zhd .nowmsg{color:var(--k-gold)}',
 
     /* ===== د — الساعة أولًا ===== */
@@ -370,8 +371,9 @@
     var si = root.querySelector('[data-k="secs"]'); if (si && D.se != null) si.style.width = (D.se / 59 * 100).toFixed(1) + '%';
     if (D.nowState || D.left == null) { setK('lbl', D.cd); }
     else { setK('lbl', (cur === 'f' && !EN() && D.lbl ? 'و' : '') + (D.lbl ? D.lbl + ' ' : '') + words(D.left)); }
-    setK('sub', EN() ? D.sub : D.sub.replace(/\s+[صم]$/, '')); // the prayer name already says which half of the day
-    var note = [D.note, D.moon && !/—/.test(D.moon) && D.note.indexOf(D.moon) < 0 ? T('القمر: ', 'Moon: ') + D.moon : ''].filter(Boolean).join(' · ');
+    // «كيرف الشمس»: the adhan time and the Moon are already drawn on the curve, so they are not repeated in text
+    setK('sub', cur === 'e' ? '' : (EN() ? D.sub : D.sub.replace(/\s+[صم]$/, ''))); // the prayer name already says which half of the day
+    var note = cur === 'e' ? D.note : [D.note, D.moon && !/—/.test(D.moon) && D.note.indexOf(D.moon) < 0 ? T('القمر: ', 'Moon: ') + D.moon : ''].filter(Boolean).join(' · ');
     setK('note', note);
     var dt = root.querySelector('[data-k="dgt"]'); if (dt) { var en = digitsEn(); if (dt.dataset.m !== String(en)) { dt.dataset.m = String(en); dt.innerHTML = '<b class="' + (en ? '' : 'on') + '">١٢٣</b><i>|</i><b class="' + (en ? 'on' : '') + '">123</b>'; } }
     var lb = root.querySelector('.next .l'); if (lb) lb.classList.toggle('nowmsg', D.nowState);
