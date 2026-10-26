@@ -306,12 +306,41 @@
       o += '<text x="' + L.c.toFixed(1) + '" y="' + (y1 + 18) + '" text-anchor="middle" fill="' + col + '"' + fw + halo + '>' + esc(L.name) + '</text>';
       o += '<text class="t" x="' + L.c.toFixed(1) + '" y="' + (y1 + 39) + '" text-anchor="middle" fill="' + col + '"' + fw + halo + '>' + esc(L.time) + '</text>';
     });
+    // the Moon with its real phase, in the empty sky on the side away from the upper labels (tap → Sky ▸ Moon)
+    try {
+      if (typeof Ephemeris !== 'undefined' && Ephemeris.moonPhase) {
+        var ph = Ephemeris.moonPhase(new Date()), R = 24, my = top + 34;
+        var tops = lab.filter(function (L) { return L.top; }).map(function (L) { return L.c; });
+        // choose the spot: far from the upper labels and clear of the Sun's path and the red «now» line
+        var tAt = function (x) { return now + (rtl ? (cx - x) : (x - cx)) / W * 1440; };
+        var cand = [], f;
+        for (f = 0.12; f <= 0.885; f += 0.0375) {
+          var x = W * f, dl = tops.length ? Math.min.apply(null, tops.map(function (c) { return Math.abs(c - x); })) : 999;
+          var clear = 999, k2; for (k2 = -R - 10; k2 <= R + 10; k2 += 4) { clear = Math.min(clear, Math.abs(Y(tAt(x + k2)) - my)); }
+          var hitNow = Math.abs(x - cx) < R + 14;
+          cand.push({ x: x, sc: (clear > R + 8 ? 1000 : clear * 10) + Math.min(dl, 200) - (hitNow ? 5000 : 0) });
+        }
+        cand.sort(function (a, b) { return b.sc - a.sc; });
+        var mx = Math.max(R + 6, Math.min(W - R - 6, cand[0].x));
+        var dk = Ephemeris.moonDarkPath(R, ph.illum, ph.waxing);
+        var pct = Math.round(ph.illum * 100), nm = (Ephemeris.PHASE_NAMES && Ephemeris.PHASE_NAMES[ph.idx]) || '';
+        o += '<g class="zmoon" style="cursor:pointer" transform="translate(' + mx.toFixed(1) + ',' + my.toFixed(1) + ')">' +
+          '<circle r="' + (R + 9) + '" fill="#e9e2cf" opacity="' + (night ? '.05' : '.07') + '"/>' +
+          '<circle r="' + R + '" fill="#e9e2cf"/>' +
+          (pct >= 99 ? '' : '<path d="' + dk.d + '" fill="' + C.bg + '" fill-opacity=".92"' + (dk.flip ? ' transform="scale(-1,1)"' : '') + '/>') +
+          '<circle r="' + R + '" fill="none" stroke="' + C.brass + '" stroke-opacity=".5" stroke-width="1"/>' +
+          '<text y="' + (R + 22) + '" text-anchor="middle" fill="' + C.ink + '" stroke="' + C.bg + '" stroke-width="5" paint-order="stroke">' + esc(T('القمر', 'Moon') + (nm && !EN() ? ' · ' + nm : '')) + '</text>' +
+          '<text class="t" y="' + (R + 42) + '" text-anchor="middle" fill="' + C.past + '" stroke="' + C.bg + '" stroke-width="5" paint-order="stroke">' + esc(dg(pct) + '٪') + '</text>' +
+          '</g>';
+      }
+    } catch (e) {}
     // the Sun on the index (a hollow ring when it is below the horizon)
     var ys = Y(now), up = ys <= yH;
     if (up) o += '<circle cx="' + cx + '" cy="' + ys.toFixed(1) + '" r="16" fill="' + C.sun + '" opacity=".22"/><circle cx="' + cx + '" cy="' + ys.toFixed(1) + '" r="8.5" fill="' + C.sun + '"/>';
     else o += '<circle cx="' + cx + '" cy="' + ys.toFixed(1) + '" r="7.5" fill="' + C.bg + '" stroke="' + C.sun + '" stroke-width="2"/>';
     o += '</svg>';
     box.innerHTML = o;
+    var mg = box.querySelector('.zmoon'); if (mg) mg.addEventListener('click', function () { var t = document.querySelector('[data-go="sky"]'); if (t) t.click(); });
   }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 
