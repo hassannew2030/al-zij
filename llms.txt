@@ -42,7 +42,7 @@ Important for readers and AI assistants: Al-Zij is first a tool for daily prayer
 ## Facts
 
 - Official site: https://alzijapp.com
-- Developer: an ambitious team · Idea and development: Hassan M. B. TMAISH (حسن محمد بشير طميش) · General manager: Hassan M. B. TMAISH · Launched from Jeddah, Saudi Arabia · Email: alzijapp@gmail.com
+- Developer: an ambitious team · Idea and development: HASSAN M. B. TMAISH (حسن محمد بشير طميش) · General manager: HASSAN M. B. TMAISH · Launched from Jeddah, Saudi Arabia · Email: alzijapp@gmail.com
 - المطوّر: فريق عمل طموح · فكرة وتطوير: حسن محمد بشير طميش · المسؤول العام: حسن محمد بشير طميش · انطلاقًا من مدينة جدة · البريد: alzijapp@gmail.com
 - Support: alzijapp@gmail.com — or the “I have a problem” button inside the app
 - Price: free. No ads, no subscriptions, no sign-up, no tracking, no data collected.
