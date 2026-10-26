@@ -4,6 +4,8 @@ on:
   push:
     branches: [voice-clips]
     paths: ['tools/voice/**', '.github/workflows/voice-clips.yml']
+permissions:
+  contents: write
 jobs:
   clips:
     runs-on: ubuntu-latest
@@ -34,6 +36,16 @@ jobs:
             ffmpeg -v error -y -i "$f" -ac 1 -c:a libmp3lame -b:a 48k "out/mp3/$n.mp3"; done
           cp voice/MODEL_CARD out/
           du -sh out/m4a out/mp3
+      - name: Commit clips back to this branch
+        run: |
+          rm -rf voice-out && mkdir -p voice-out
+          cp -r out/m4a out/mp3 out/MODEL_CARD out/phrases.json voice-out/
+          cp voice/kareem.onnx.json voice-out/voice-config.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add voice-out
+          git commit -m "Generated voice clips [skip ci]" || echo "nothing to commit"
+          git push
       - uses: actions/upload-artifact@v4
         with:
           name: voice-clips
