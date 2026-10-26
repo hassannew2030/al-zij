@@ -27,7 +27,7 @@ Contact: alzijapp@gmail.com — completely free.
 ## من وراء الزيج — Who is behind Al-Zij
 
 - المطوّر: فريق عمل طموح · فكرة وتطوير: حسن محمد بشير طميش · المسؤول العام: حسن محمد بشير طميش · انطلاقًا من مدينة جدة · البريد: alzijapp@gmail.com
-- Developer: an ambitious team · Idea and development: حسن محمد بشير طميش · General manager: حسن محمد بشير طميش · Launched from Jeddah, Saudi Arabia · Email: alzijapp@gmail.com
+- Developer: an ambitious team · Idea and development: Hassan M. B. TMAISH (حسن محمد بشير طميش) · General manager: Hassan M. B. TMAISH · Launched from Jeddah, Saudi Arabia · Email: alzijapp@gmail.com
 
 ## Links
 
