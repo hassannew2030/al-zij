@@ -1122,6 +1122,8 @@
 "عندما ينتهي": "When it ends",
 "عندهم": "their time",
 "عندي مشكلة": "I have a problem",
+"الزيج الكبرى — الساعة الفلكية الكاملة · التاريخ الهجري مطابق لتقويم أم القرى الرسمي": "The Grand Zij — the full astronomical clock · Hijri date matches the official Umm al-Qura calendar",
+"بوصلة الجوال (مغناطيسي + تسارعي + جيروسكوب معاً) تحدد اتجاه القبلة لحظياً وباستمرار، مع تصحيح الشمال المغناطيسي تلقائياً حسب موقعك.": "The phone's compass (magnetometer + accelerometer + gyroscope together) finds the Qibla continuously, correcting for magnetic north automatically for your location.",
 "الزيج — مواقيت الصلاة والأذان والقبلة والتقويم الهجري": "Al-Zij — Prayer times, adhan, Qibla and Hijri calendar",
 "الخصوصية": "Privacy",
 "الدعم": "Support",
@@ -3104,7 +3106,7 @@ body{background:var(--h-bg)!important;padding-bottom:calc(92px + env(safe-area-i
     </div>
     <div class="legend-item">
       <h3><span class="mark" style="background:var(--ink-dim)"></span>القبلة</h3>
-      <p>حساس بوصلة معوَّض الميل (مغناطيسي + تسارعي + جيروسكوب معاً) يحدد الاتجاه الصحيح لحظياً وباستمرار، ومحرك صغير يحرك السهم تلقائياً — بدون أي تدخل يدوي وقت التركيب، وبدون الحاجة لرِجل قابلة للطي أو قفل ميكانيكي.</p>
+      <p>بوصلة الجوال (مغناطيسي + تسارعي + جيروسكوب معاً) تحدد اتجاه القبلة لحظياً وباستمرار، مع تصحيح الشمال المغناطيسي تلقائياً حسب موقعك.</p>
     </div>
     <div class="legend-item">
       <h3><span class="mark" style="background:var(--verdigris-light)"></span>الانقلابان والاعتدالان</h3>
@@ -3127,7 +3129,7 @@ body{background:var(--h-bg)!important;padding-bottom:calc(92px + env(safe-area-i
 
   <div class="signature">
     <div class="line"></div>
-    تصوّر مفاهيمي لساعة حائط — القطر المقترح 60–100 سم · التاريخ الهجري تقريبي بالحساب الجدولي، لا الرؤية الفعلية للهلال
+    الزيج الكبرى — الساعة الفلكية الكاملة · التاريخ الهجري مطابق لتقويم أم القرى الرسمي
   </div>
 </div>
 
@@ -7072,7 +7074,7 @@ html[data-lang=en] .zSh .sh{font-family:'EB Garamond',Amiri,serif}
       <div class="f2"><div class="f"><label>${L('التكرار','Repeat')}</label><select id="zTkRep"><option value="none">${L('مرة واحدة','Once')}</option><option value="year">${L('كل سنة','Every year')}</option><option value="month">${L('كل شهر','Every month')}</option></select></div>
         <div class="f"><label>${L('التنبيه','Alert')}</label><select id="zTkPre"><option value="0">${L('في يومه','On the day')}</option><option value="1">${L('في يومه وقبله بيوم','On the day and a day before')}</option></select></div></div>
       <div class="acts"><button type="button" class="bt go" data-save>${L('حفظ','Save')}</button><button type="button" class="bt" data-cancel>${L('إلغاء','Cancel')}</button></div>
-      <div class="ds" style="font-size:14.5px">${L('يظهر لك كرت تنبيه من الزيج في وقته ما دام الزيج مفتوحًا، والتنبيه والجوال مقفول يأتي مع تطبيق المتجر.','An Al-Zij alert card appears at its time while Al-Zij is open; alerts with the phone locked come with the store app.')}</div>`;}
+      <div class="ds" style="font-size:14.5px">${L('يظهر لك كرت تنبيه من الزيج في وقته ما دام الزيج مفتوحًا، والتنبيه والجوال مقفول يأتي مع تطبيق الزيج في المتجر قريبًا.','An Al-Zij alert card appears at its time while Al-Zij is open; alerts with the phone locked come with the Al-Zij store app, coming soon.')}</div>`;}
   function saveForm(b){const t=(b.querySelector('#zTkT').value||'').trim();if(!t){b.querySelector('#zTkT').focus();return;}
     const D=S.sel,cal=b.querySelector('#zTkCal').value,o=cal==='h'?hj(D):(x=>({y:x.y,m:x.m,d:x.d}))(g(D));
     const a=tasks();a.push({id:'t'+Date.now().toString(36),t,cal,y:o.y,m:o.m,d:o.d,time:b.querySelector('#zTkTime').value||'',rep:b.querySelector('#zTkRep').value,pre:+b.querySelector('#zTkPre').value});
@@ -7383,7 +7385,7 @@ html[data-lang=en] .zSh .sh{font-family:'EB Garamond',Amiri,serif}
     const h3=box.parentElement&&box.parentElement.querySelector('h3');if(h3)h3.textContent=T('التنبيهات','Alerts');
     const canNotif='Notification' in window&&Notification.permission==='default';
     box.innerHTML=`<div id="zAl"><div class="m"><button type="button" class="mb${S.on?'':' off'}" id="zAlMaster">${S.on?T('🔔 التنبيهات مفعّلة','🔔 Alerts are on'):T('🔕 التنبيهات متوقفة','🔕 Alerts are off')}</button></div>
-<div class="note">${T('لكل صلاة ثلاثة تنبيهات تعدّلها كما تحب: قبل الأذان، والأذان، والإقامة. تعمل ما دام الزّيج مفتوحًا على جوالك، والتنبيه والجوال مقفول يأتي مع تطبيق الزّيج في المتجر.','Each prayer has three alerts you can set as you like: before the adhan, the adhan, and the iqamah. They work while Al-Zij is open on your phone; alerts with the phone locked come with the Al-Zij app in the stores.')}</div>
+<div class="note">${T('لكل صلاة ثلاثة تنبيهات تعدّلها كما تحب: قبل الأذان، والأذان، والإقامة. تعمل ما دام الزّيج مفتوحًا على جوالك، والتنبيه والجوال مقفول يأتي مع تطبيق الزّيج في المتجر قريبًا.','Each prayer has three alerts you can set as you like: before the adhan, the adhan, and the iqamah. They work while Al-Zij is open on your phone; alerts with the phone locked come with the Al-Zij store app, coming soon.')}</div>
 ${canNotif?`<button type="button" class="try" id="zAlNotif" style="margin-bottom:6px">${T('اسمح بإشعارات المتصفح','Allow browser notifications')}</button>`:''}
 <details id="zAlCust"${custOpen?' open':''}><summary class="cs">⚙️ ${T('تخصيص تنبيه كل صلاة','Customise each prayer’s alerts')}<small>${T('قبل الأذان · الأذان · الإقامة','Before · Adhan · Iqamah')}</small></summary><div class="${S.on?'':'dim'}">${P.map(([k])=>{const c=S.p[k];return `<details data-p="${k}"${openK===k?' open':''}><summary><b>${pname(k)}</b><span class="chips">${chips(c)}</span></summary>
 <div class="blk"><div class="bh"><span>① ${T('قبل الأذان','Before the adhan')}<small>${T('تذكير يسبق الأذان','A reminder ahead of the adhan')}</small></span>${sw(k+'.pre.on',c.pre.on)}</div>
