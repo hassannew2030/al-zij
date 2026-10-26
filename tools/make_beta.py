@@ -21,6 +21,8 @@ if os.path.exists('beta/variants.js'):
     s = s.replace('</body>', '<script src="beta/variants.js" defer></script>\n</body>', 1)  # home-layout variants (beta only)
 if os.path.exists('beta/voice.js'):
     s = s.replace('</body>', '<script src="beta/voice.js" defer></script>\n</body>', 1)  # talking clock (beta only)
+if os.path.exists('beta/home-designs.js'):
+    s = s.replace('</body>', '<script src="beta/home-designs.js" defer></script>\n</body>', 1)  # home designs د هـ و (beta only)
 os.makedirs('beta', exist_ok=True)
 open('beta/index.html', 'w', encoding='utf-8').write(s)
 json.dump({'build': build}, open('beta/version.json', 'w'))
