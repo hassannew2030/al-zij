@@ -24,6 +24,9 @@ if os.path.exists('beta/voice.js'):
 if os.path.exists('beta/home-designs.js'):
     s = s.replace('</body>', '<script src="beta/home-designs.js" defer></script>\n</body>', 1)  # home designs د هـ و (beta only)
 os.makedirs('beta', exist_ok=True)
+# guard: the beta clock (#zDial, added to beta only) must never be lost by building from a source without it
+if os.path.exists('beta/index.html') and 'zDial' in open('beta/index.html', encoding='utf-8').read() and 'zDial' not in s:
+    sys.exit('STOP: the source has no beta clock (#zDial). Build from the current beta/index.html instead.')
 open('beta/index.html', 'w', encoding='utf-8').write(s)
 json.dump({'build': build}, open('beta/version.json', 'w'))
 print('beta built', build, len(s))
