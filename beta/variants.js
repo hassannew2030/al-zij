@@ -14,10 +14,10 @@
   var css = document.createElement('style');
   css.id = 'zVarCss';
   css.textContent = [
-    '#zVarBar{position:fixed;top:calc(30px + env(safe-area-inset-top,0px));left:8px;z-index:9998;display:flex;gap:4px;background:rgba(17,20,29,.92);border:1px solid #c9a35d;border-radius:16px;padding:3px;font-family:Amiri,serif}',
+    '#zVarBar{position:fixed;top:calc(30px + env(safe-area-inset-top,0px));left:8px;z-index:40;display:flex;gap:4px;background:rgba(17,20,29,.92);border:1px solid #c9a35d;border-radius:16px;padding:3px;font-family:Amiri,serif}',
     '#zVarBar button{border:0;background:none;color:#cfc4a4;font:700 14px Amiri,serif;padding:3px 9px;border-radius:12px;cursor:pointer}',
     '#zVarBar button.on{background:#c9a35d;color:#1a140a}',
-    'body[data-scr]:not([data-scr="clock"]) #zToday,body[data-scr]:not([data-scr="clock"]) #zTiles{display:none!important}',
+    'body[data-scr]:not([data-scr="clock"]) #zVarBar,body[data-scr]:not([data-scr="clock"]) #zToday,body[data-scr]:not([data-scr="clock"]) #zTiles{display:none!important}',
     /* shared: reorder home blocks with flex order (fixed elements are unaffected) */
     'body.zv-a,body.zv-b,body.zv-c{display:flex;flex-direction:column}',
     'body.zv-a>*,body.zv-b>*,body.zv-c>*{order:5}',
