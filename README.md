@@ -24,6 +24,11 @@ Contact: alzijapp@gmail.com — completely free.
 
 > The Al-Zij logo: a golden crescent shaped as a compass, an eight-pointed star at its heart, and a red needle pointing to the Qibla.
 
+## من وراء الزيج — Who is behind Al-Zij
+
+- المطوّر: فريق عمل طموح · فكرة وتطوير: حسن محمد بشير طميش · المسؤول العام: حسن محمد بشير طميش · البريد: alzijapp@gmail.com
+- Developer: an ambitious team · Idea and development: حسن محمد بشير طميش · General manager: حسن محمد بشير طميش · Email: alzijapp@gmail.com
+
 ## Links
 
 - App: https://alzijapp.com
