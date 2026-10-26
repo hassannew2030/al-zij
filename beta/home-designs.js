@@ -8,9 +8,9 @@
    مقياس الخط ثلاثة أحجام فقط من النسبة الذهبية: ١٨ × φ⁰ ، ١٨ × φ ≈ ٢٩ ، ١٨ × φ³ ≈ ٧٦. */
 (function () {
   if (!/\/beta\//.test(location.pathname)) return;
-  var KEY = 'zijHomeDesign', SEEN = 'zijHomeDesignSeen';
+  var KEY = 'zijHomeDesign', SEEN = 'zijHomeDesignSeen2';
   var MINE = ['d', 'e', 'h', 'g', 'f'];
-  var OPTS = [['d', 'د'], ['e', 'هـ'], ['g', 'ز'], ['f', 'و'], ['a', 'أ'], ['b', 'ب'], ['c', 'ج'], ['orig', 'الأصل']];
+  var OPTS = [['d', 'د'], ['e', 'هـ'], ['h', 'ح'], ['g', 'ز'], ['f', 'و'], ['a', 'أ'], ['b', 'ب'], ['c', 'ج'], ['orig', 'الأصل']];
   var TITLES = { d: ['الساعة أولًا', 'Time first'], e: ['كيرف الشمس', 'Sun curve'], g: ['السماء الحقيقية', 'The real sky'], h: ['كيرف القمر', 'Moon curve'], f: ['الجملة', 'The sentence'] };
   var LS = {
     get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
@@ -100,10 +100,12 @@
     '#zhd.d .next{margin-top:16px}',
     '#zhd.d .next .l{color:var(--k-gold)}',
     '#zhd.d .next .sub{color:var(--k-dim)}',
-    '#zhd.d .tbl{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:repeat(3,auto);grid-auto-flow:column;column-gap:22px;row-gap:2px;margin-top:4px}',
-    '#zhd.d .tbl .r{display:flex;align-items:baseline;gap:6px;padding:6px 8px 6px 0;border-inline-start:3px solid transparent;color:var(--k-ink)}',
+    '#zhd.d .tbl{display:flex;flex-direction:column;gap:0;margin-top:4px}', // one column, top to bottom, like the official timetable
+    '#zhd.d .tbl .r{display:flex;align-items:baseline;gap:10px;padding:9px 10px;border-inline-start:3px solid transparent;color:var(--k-ink)}',
     '#zhd.d .tbl .r .ld{flex:1;border-bottom:2px dotted var(--k-line);transform:translateY(-6px);min-width:8px}',
     '#zhd.d .tbl .r.past{color:var(--k-past)}',
+    '#zhd.d .tbl .r.foc{padding-inline-start:10px}',
+    '@media (max-height:720px){#zhd.d .tbl .r{padding-top:3px;padding-bottom:3px;line-height:1.45}#zhd.d .day{margin-top:2px}#zhd.d .g1,#zhd.d .g2{max-height:14px}#zhd.d .next{margin-top:8px}}',
     '#zhd.d .tbl .r.foc{border-inline-start-color:var(--k-brass);color:var(--k-gold);font-weight:700;padding-inline-start:8px;background:linear-gradient(90deg,transparent,rgba(201,163,93,.10))}',
     'html[data-lang=en] #zhd.d .tbl .r.foc{background:linear-gradient(270deg,transparent,rgba(201,163,93,.10))}',
 
@@ -488,7 +490,7 @@
     if (D.nowState || D.left == null) { setK('lbl', D.cd); }
     else { setK('lbl', (cur === 'f' && !EN() && D.lbl ? 'و' : '') + (D.lbl ? D.lbl + ' ' : '') + words(D.left)); }
     // «كيرف الشمس»: the adhan time and the Moon are already drawn on the curve, so they are not repeated in text
-    setK('sub', (cur === 'e' || cur === 'g' || cur === 'h') ? '' : (EN() ? D.sub : D.sub.replace(/\s+[صم]$/, ''))); // the prayer name already says which half of the day
+    setK('sub', (cur === 'd' || cur === 'e' || cur === 'g' || cur === 'h') ? '' : (EN() ? D.sub : D.sub.replace(/\s+[صم]$/, ''))); // the prayer name already says which half of the day
     var note = (cur === 'e' || cur === 'g' || cur === 'h') ? D.note : [D.note, D.moon && !/—/.test(D.moon) && D.note.indexOf(D.moon) < 0 ? T('القمر: ', 'Moon: ') + D.moon : ''].filter(Boolean).join(' · ');
     setK('note', note);
     var dt = root.querySelector('[data-k="dgt"]'); if (dt) { var en = digitsEn(); if (dt.dataset.m !== String(en)) { dt.dataset.m = String(en); dt.innerHTML = '<b class="' + (en ? '' : 'on') + '">١٢٣</b><i>|</i><b class="' + (en ? 'on' : '') + '">123</b>'; } }
@@ -564,7 +566,7 @@
     // leaving home closes the clock view
     document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('.htab')) document.body.classList.remove('zhd-dial'); }, true);
     var saved = LS.get(KEY);
-    if (!saved && !LS.get(SEEN)) { saved = 'd'; LS.set(SEEN, '1'); } // first visit after this build: show the new design once
+    if (!LS.get(SEEN)) { saved = 'd'; LS.set(SEEN, '1'); } // «د» is the default home: everyone lands on it once, then their own choice stays
     if (MINE.indexOf(saved) >= 0) choose(saved); else paintBar();
     setInterval(update, 500);
     var rz; window.addEventListener('resize', function () { clearTimeout(rz); rz = setTimeout(function () { hzKey = ''; update(); }, 150); });
