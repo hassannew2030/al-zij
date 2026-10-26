@@ -9,9 +9,9 @@
 (function () {
   if (!/\/beta\//.test(location.pathname)) return;
   var KEY = 'zijHomeDesign', SEEN = 'zijHomeDesignSeen';
-  var MINE = ['d', 'e', 'g', 'f'];
+  var MINE = ['d', 'e', 'h', 'g', 'f'];
   var OPTS = [['d', 'د'], ['e', 'هـ'], ['g', 'ز'], ['f', 'و'], ['a', 'أ'], ['b', 'ب'], ['c', 'ج'], ['orig', 'الأصل']];
-  var TITLES = { d: ['الساعة أولًا', 'Time first'], e: ['كيرف الشمس', 'Sun curve'], g: ['السماء الحقيقية', 'The real sky'], f: ['الجملة', 'The sentence'] };
+  var TITLES = { d: ['الساعة أولًا', 'Time first'], e: ['كيرف الشمس', 'Sun curve'], g: ['السماء الحقيقية', 'The real sky'], h: ['كيرف القمر', 'Moon curve'], f: ['الجملة', 'The sentence'] };
   var LS = {
     get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
     set: function (k, v) { try { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} }
@@ -263,11 +263,12 @@
     var s = function (t) { return Math.cos(2 * Math.PI * (t - noon) / 1440); };
     var Y = function (t) { var v = s(t); return v >= c0 ? yH - kD * (v - c0) : yH + kN * (c0 - v); };
     // «السماء الحقيقية» (ز): the Sun's and the Moon's REAL altitude in degrees for your place, from the app's own ephemeris
+    var realSun = (cur === 'g' || cur === 'e') && typeof Ephemeris !== 'undefined' && window.observer && isFinite(observer.lat);
     var real = cur === 'g' && typeof Ephemeris !== 'undefined' && window.observer && isFinite(observer.lat);
     var tDate = function (t) { return new Date(Date.now() + (t - now) * 60000); };
     var altOf = function (body, t) { var d = tDate(t), q = body === 'm' ? Ephemeris.moon(d) : Ephemeris.sun(d); return Ephemeris.altAz(q.ra, q.dec, d, observer.lat, observer.lon).alt; };
     var Ya = function (a) { return a >= 0 ? yH - a * (yH - top) / 90 : yH - Math.max(a, -30) * 50 / 30; };
-    if (real) { Y = function (t) { return Ya(altOf('s', t) + 0.833); }; } // +0.833°: the refraction and the Sun's radius, so the curve meets the horizon at the real sunrise and sunset
+    if (realSun) { Y = function (t) { return Ya(altOf('s', t) + 0.833); }; } // +0.833°: the refraction and the Sun's radius, so the curve meets the horizon at the real sunrise and sunset
     var X = function (t) { var dx = (t - now) / 1440 * W; return rtl ? cx - dx : cx + dx; };
     var pts = [], i;
     for (i = 0; i <= 96; i++) { var tt = now - 720 + i * 15; pts.push(X(tt).toFixed(1) + ',' + Y(tt).toFixed(1)); }
@@ -343,18 +344,18 @@
     var altsLine = '';
     if (real) try {
       var mpts = [], mi, mt;
-      for (mi = 0; mi <= 96; mi++) { mt = now - 720 + mi * 15; mpts.push(X(mt).toFixed(1) + ',' + Ya(altOf('m', mt) + 0.13).toFixed(1)); }
+      for (mi = 0; mi <= 96; mi++) { mt = now - 720 + mi * 15; mpts.push(X(mt).toFixed(1) + ',' + Ya(altOf('m', mt) - 0.125).toFixed(1)); }
       var mcurve = 'M' + mpts.join('L');
       o += '<path d="' + mcurve + '" fill="none" stroke="#cfd6e6" stroke-opacity=".28" stroke-width="1.3" stroke-dasharray="2 4"/>';
       o += '<path d="' + mcurve + '" fill="none" stroke="#cfd6e6" stroke-opacity=".8" stroke-width="2" clip-path="url(#zhdUp)"/>';
-      var ph2 = Ephemeris.moonPhase(new Date()), Rm = 13, ym = Ya(altOf('m', now) + 0.13), dk2 = Ephemeris.moonDarkPath(Rm, ph2.illum, ph2.waxing), up2 = ym <= yH;
+      var ph2 = Ephemeris.moonPhase(new Date()), Rm = 13, ym = Ya(altOf('m', now) - 0.125), dk2 = Ephemeris.moonDarkPath(Rm, ph2.illum, ph2.waxing), up2 = ym <= yH;
       var pct2 = Math.round(ph2.illum * 100), nm2 = (Ephemeris.PHASE_NAMES && Ephemeris.PHASE_NAMES[ph2.idx]) || '';
       o += '<g class="zmoon" style="cursor:pointer" transform="translate(' + cx + ',' + ym.toFixed(1) + ')" opacity="' + (up2 ? 1 : .55) + '">' +
         '<circle r="' + (Rm + 7) + '" fill="#e9e2cf" opacity=".10"/><circle r="' + Rm + '" fill="#e9e2cf"/>' +
         (pct2 >= 99 ? '' : '<path d="' + dk2.d + '" fill="' + C.bg + '" fill-opacity=".92"' + (dk2.flip ? ' transform="scale(-1,1)"' : '') + '/>') +
         '<text x="' + (rtl ? -(Rm + 10) : (Rm + 10)) + '" y="5" text-anchor="start" fill="' + C.ink + '" stroke="' + C.bg + '" stroke-width="5" paint-order="stroke">' +
         (up2 ? esc(T('القمر', 'Moon') + (nm2 && !EN() ? ' · ' + nm2 : '')) : '') + '</text></g>';
-      var sa = altOf('s', now) + 0.833, ma = altOf('m', now) + 0.13;
+      var sa = altOf('s', now) + 0.833, ma = altOf('m', now) - 0.125;
       var word = function (a) { var n = dg(Math.abs(Math.round(a))) + '°'; return a >= 0 ? T(n + ' فوق الأفق', n + ' above the horizon') : T(n + ' تحت الأفق', n + ' below the horizon'); };
       altsLine = T('الشمس ', 'Sun ') + word(sa) + ' · ' + T('القمر ', 'Moon ') + word(ma) + ' · ' + dg(pct2) + '٪';
     } catch (e) {}
@@ -394,6 +395,70 @@
     box.innerHTML = o + (altsLine ? '<div class="alts s1">' + esc(altsLine) + '</div>' : '');
     var mg = box.querySelector('.zmoon'); if (mg) mg.addEventListener('click', function () { var t = document.querySelector('[data-go="sky"]'); if (t) t.click(); });
   }
+
+  /* ---------- كيرف القمر (ح): the Moon's real path today, its real phase, moonrise · highest · moonset ---------- */
+  var mcKey = '';
+  function drawMoonCurve(box, D) {
+    if (!box || D.now == null || typeof Ephemeris === 'undefined' || !window.observer || !isFinite(observer.lat)) return;
+    var W = Math.max(280, Math.round(box.clientWidth || 358)), night = document.body.classList.contains('zhd-night');
+    var key = [W, Math.floor(D.now), digitsEn(), night].join('|'); if (key === mcKey) return; mcKey = key;
+    var rtl = !EN(), cx = W / 2, now = D.now, rowH = 46, top = rowH + 26, yH = 176, Hh = yH + 50 + 18 + rowH;
+    var tDate = function (t) { return new Date(Date.now() + (t - now) * 60000); };
+    var alt = function (t) { var d = tDate(t), q = Ephemeris.moon(d); return Ephemeris.altAz(q.ra, q.dec, d, observer.lat, observer.lon).alt - 0.125; };
+    var Ya = function (a) { return a >= 0 ? yH - a * (yH - top) / 90 : yH - Math.max(a, -30) * 50 / 30; };
+    var X = function (t) { var dx = (t - now) / 1440 * W; return rtl ? cx - dx : cx + dx; };
+    var C = { brass: night ? '#a8813f' : '#c9a35d', ink: night ? '#f0cf94' : '#fbf4e2', gold: night ? '#e6c287' : '#f5e6b4', past: night ? '#b09872' : '#b9b09a',
+      red: night ? '#b8594f' : '#e0796d', bg: night ? '#030406' : '#0a0c12', moon: '#dfe4ee' };
+    var pts = [], A = [], i, t;
+    for (i = 0; i <= 288; i++) { t = now - 720 + i * 5; var a = alt(t); A.push([t, a]); if (i % 3 === 0) pts.push(X(t).toFixed(1) + ',' + Ya(a).toFixed(1)); }
+    var curve = 'M' + pts.join('L');
+    // events within the window: rise, highest point, set (refined to the minute)
+    var ev = [], hm = function (tt) { var m = ((Math.round(tt) % 1440) + 1440) % 1440, h = Math.floor(m / 60), mi = m % 60, h12 = h % 12 || 12;
+      return dg(h12) + ':' + dg(two(mi)) + (EN() ? (h < 12 ? ' am' : ' pm') : ''); };
+    for (i = 1; i < A.length; i++) {
+      var a0 = A[i - 1][1], a1 = A[i][1], t0 = A[i - 1][0];
+      if (a0 < 0 && a1 >= 0) ev.push({ k: 'rise', t: t0 + 5 * (-a0) / (a1 - a0) });
+      if (a0 >= 0 && a1 < 0) ev.push({ k: 'set', t: t0 + 5 * a0 / (a0 - a1) });
+      if (i < A.length - 1 && a1 > 0 && a1 >= a0 && a1 >= A[i + 1][1]) ev.push({ k: 'top', t: A[i][0], a: a1 });
+    }
+    var NAMES = { rise: T('طلوع القمر', 'Moonrise'), top: T('أعلى ارتفاع', 'Highest'), set: T('غروب القمر', 'Moonset') };
+    var o = '<svg viewBox="0 0 ' + W + ' ' + Hh + '" height="' + Hh + '" role="img" aria-label="' + T('مسار القمر اليوم', 'The Moon\'s path today') + '">' +
+      '<defs><linearGradient id="zmcSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + C.moon + '" stop-opacity="' + (night ? '.14' : '.20') + '"/><stop offset="1" stop-color="' + C.moon + '" stop-opacity="0"/></linearGradient>' +
+      '<clipPath id="zmcUp"><rect x="0" y="0" width="' + W + '" height="' + yH + '"/></clipPath>' +
+      '<linearGradient id="zmcPast" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="' + C.bg + '" stop-opacity="' + (rtl ? '0' : '.55') + '"/><stop offset="1" stop-color="' + C.bg + '" stop-opacity="' + (rtl ? '.55' : '0') + '"/></linearGradient></defs>';
+    o += '<path d="M' + pts[0].split(',')[0] + ',' + yH + 'L' + pts.join('L') + 'L' + pts[pts.length - 1].split(',')[0] + ',' + yH + 'Z" fill="url(#zmcSky)" clip-path="url(#zmcUp)"/>';
+    o += '<line x1="0" x2="' + W + '" y1="' + yH + '" y2="' + yH + '" stroke="' + C.brass + '" stroke-opacity=".55" stroke-width="1"/>';
+    o += '<path d="' + curve + '" fill="none" stroke="' + C.moon + '" stroke-opacity=".35" stroke-width="1.5" stroke-dasharray="3 4"/>';
+    o += '<path d="' + curve + '" fill="none" stroke="' + C.moon + '" stroke-width="2.5" clip-path="url(#zmcUp)"/>';
+    o += '<rect x="' + (rtl ? cx : 0) + '" y="0" width="' + cx + '" height="' + Hh + '" fill="url(#zmcPast)"/>';
+    o += '<line x1="' + cx + '" x2="' + cx + '" y1="0" y2="' + Hh + '" stroke="' + C.red + '" stroke-width="1.6"/>';
+    o += '<path d="M' + (cx - 7) + ',' + (rowH + 2) + 'L' + (cx + 7) + ',' + (rowH + 2) + 'L' + cx + ',' + (rowH + 11) + 'Z" fill="' + C.red + '"/>';
+    // labels: the highest point above, rise/set below; never on the red line or on each other
+    var lab = ev.map(function (e) { var nm = NAMES[e.k], tm = hm(e.t); return { k: e.k, x: X(e.t), y: e.k === 'top' ? Ya(e.a) : yH, t: e.t, name: nm, time: tm,
+      past: e.t < now, top: e.k === 'top', w: Math.max(nm.length, tm.length) * 9.5 + 12 }; });
+    [true, false].forEach(function (tp) {
+      var row = lab.filter(function (L) { return L.top === tp; }).sort(function (u, v) { return u.x - v.x; }), gap = 13, k;
+      row.forEach(function (L) { L.c = Math.min(W - L.w / 2, Math.max(L.w / 2, L.x)); var half = L.w / 2 + gap, side = L.x < cx ? -1 : 1; if (Math.abs(L.c - cx) < half) L.c = cx + side * half; });
+      for (k = 1; k < row.length; k++) { var need = (row[k].w + row[k - 1].w) / 2 + 6; if (row[k].c - row[k - 1].c < need) row[k].c = row[k - 1].c + need; }
+      row.forEach(function (L) { L.c = Math.min(W - L.w / 2, Math.max(L.w / 2, L.c)); });
+    });
+    lab.forEach(function (L) {
+      var col = L.past ? C.past : C.ink, ly = L.top ? rowH : Hh - rowH, y1 = L.top ? 0 : Hh - rowH, halo = ' stroke="' + C.bg + '" stroke-width="5" paint-order="stroke" stroke-linejoin="round"';
+      o += '<line x1="' + L.x.toFixed(1) + '" y1="' + L.y.toFixed(1) + '" x2="' + L.c.toFixed(1) + '" y2="' + ly + '" stroke="' + col + '" stroke-opacity=".45" stroke-width="1"/>';
+      o += '<circle cx="' + L.x.toFixed(1) + '" cy="' + L.y.toFixed(1) + '" r="4" fill="' + col + '"/>';
+      o += '<text x="' + L.c.toFixed(1) + '" y="' + (y1 + 18) + '" text-anchor="middle" fill="' + col + '"' + halo + '>' + esc(L.name) + '</text>';
+      o += '<text class="t" x="' + L.c.toFixed(1) + '" y="' + (y1 + 39) + '" text-anchor="middle" fill="' + col + '"' + halo + '>' + esc(L.time) + '</text>';
+    });
+    // the Moon itself, with its real phase, on the red «now» line at its real height
+    var ph = Ephemeris.moonPhase(new Date()), R = 17, an = alt(now), ym = Ya(an), up = an >= 0, dk = Ephemeris.moonDarkPath(R, ph.illum, ph.waxing), pct = Math.round(ph.illum * 100);
+    o += '<g class="zmoon" style="cursor:pointer" transform="translate(' + cx + ',' + ym.toFixed(1) + ')" opacity="' + (up ? 1 : .6) + '"><circle r="' + (R + 10) + '" fill="' + C.moon + '" opacity=".12"/><circle r="' + R + '" fill="#e9e2cf"/>' +
+      (pct >= 99 ? '' : '<path d="' + dk.d + '" fill="' + C.bg + '" fill-opacity=".92"' + (dk.flip ? ' transform="scale(-1,1)"' : '') + '/>') + '</g>';
+    o += '</svg>';
+    var nm = (Ephemeris.PHASE_NAMES && Ephemeris.PHASE_NAMES[ph.idx]) || '', hd = (D.hj || '').match(/^\s*([0-9٠-٩]+)/);
+    var line = (EN() ? 'Moon ' + pct + '%' : (hd ? 'الليلة ' + hd[1] + ' من الشهر · ' : '') + (nm ? nm + ' · ' : '') + dg(pct) + '٪') + (up ? '' : T(' · تحت الأفق الآن', ' · below the horizon now'));
+    box.innerHTML = o + '<div class="alts s1">' + esc(line) + '</div>';
+    var mg = box.querySelector('.zmoon'); if (mg) mg.addEventListener('click', function () { var tb = document.querySelector('[data-go="sky"]'); if (tb) tb.click(); });
+  }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 
   /* ---------- render ---------- */
@@ -407,7 +472,7 @@
       if (anchor && anchor.parentNode) anchor.parentNode.insertBefore(root, anchor); else document.body.prepend(root);
       root.addEventListener('click', onAct);
     }
-    root.className = v === 'g' ? 'e g' : v; root.innerHTML = TPL[v === 'g' ? 'e' : v](); listKey = ''; hzKey = '';
+    root.className = (v === 'g' || v === 'h') ? 'e ' + v : v; root.innerHTML = TPL[(v === 'g' || v === 'h') ? 'e' : v](); listKey = ''; hzKey = '';
     update();
   }
   function update() {
@@ -423,8 +488,8 @@
     if (D.nowState || D.left == null) { setK('lbl', D.cd); }
     else { setK('lbl', (cur === 'f' && !EN() && D.lbl ? 'و' : '') + (D.lbl ? D.lbl + ' ' : '') + words(D.left)); }
     // «كيرف الشمس»: the adhan time and the Moon are already drawn on the curve, so they are not repeated in text
-    setK('sub', (cur === 'e' || cur === 'g') ? '' : (EN() ? D.sub : D.sub.replace(/\s+[صم]$/, ''))); // the prayer name already says which half of the day
-    var note = (cur === 'e' || cur === 'g') ? D.note : [D.note, D.moon && !/—/.test(D.moon) && D.note.indexOf(D.moon) < 0 ? T('القمر: ', 'Moon: ') + D.moon : ''].filter(Boolean).join(' · ');
+    setK('sub', (cur === 'e' || cur === 'g' || cur === 'h') ? '' : (EN() ? D.sub : D.sub.replace(/\s+[صم]$/, ''))); // the prayer name already says which half of the day
+    var note = (cur === 'e' || cur === 'g' || cur === 'h') ? D.note : [D.note, D.moon && !/—/.test(D.moon) && D.note.indexOf(D.moon) < 0 ? T('القمر: ', 'Moon: ') + D.moon : ''].filter(Boolean).join(' · ');
     setK('note', note);
     var dt = root.querySelector('[data-k="dgt"]'); if (dt) { var en = digitsEn(); if (dt.dataset.m !== String(en)) { dt.dataset.m = String(en); dt.innerHTML = '<b class="' + (en ? '' : 'on') + '">١٢٣</b><i>|</i><b class="' + (en ? 'on' : '') + '">123</b>'; } }
     var lb = root.querySelector('.next .l'); if (lb) lb.classList.toggle('nowmsg', D.nowState);
@@ -442,7 +507,8 @@
         }).join('');
       }
     }
-    if (cur === 'e' || cur === 'g') drawHorizon(root.querySelector('[data-k="hz"]'), D);
+    if (cur === 'h') drawMoonCurve(root.querySelector('[data-k="hz"]'), D);
+    else if (cur === 'e' || cur === 'g') drawHorizon(root.querySelector('[data-k="hz"]'), D);
   }
 
   /* ---------- actions ---------- */
