@@ -31,22 +31,30 @@
   function pickVoice() {
     if (!('speechSynthesis' in window)) return null;
     var vs = speechSynthesis.getVoices().filter(function (v) { return /^ar/i.test(v.lang); });
-    var male = vs.filter(function (v) { return /maged|majed|tarik|hamed|naayf|shakir|male|رجل/i.test(v.name); });
-    voice = male[0] || vs.filter(function (v) { return /SA/i.test(v.lang); })[0] || vs[0] || null;
+    var score = function (v) { var n = v.name; return (/enhanced|premium|محسّن|محسن|siri/i.test(n) ? 10 : 0) + (/maged|majed|tarik|hamed|naayf|shakir|male/i.test(n) ? 5 : 0) + (/SA/i.test(v.lang) ? 2 : 0) + (v.localService ? 1 : 0); };
+    vs.sort(function (a, b) { return score(b) - score(a); });
+    voice = vs[0] || null;
     return voice;
   }
   if ('speechSynthesis' in window) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+  // short sentences, natural speed and pitch: iPhone voices stutter on long utterances and sound robotic when the pitch is changed
   function speak(t) {
     if (!('speechSynthesis' in window)) return false;
     try {
-      speechSynthesis.cancel();
-      var u = new SpeechSynthesisUtterance(t);
-      u.lang = 'ar-SA'; if (voice || pickVoice()) u.voice = voice;
-      u.rate = 0.92; u.pitch = 0.85;
-      speechSynthesis.speak(u); return true;
+      if (speechSynthesis.speaking || speechSynthesis.pending) speechSynthesis.cancel();
+      var v = voice || pickVoice();
+      var parts = String(t).split(/(?<=[.،:])\s+/).map(function (x) { return x.trim(); }).filter(Boolean);
+      parts.forEach(function (p) {
+        var u = new SpeechSynthesisUtterance(p);
+        u.lang = (v && v.lang) || 'ar-SA'; if (v) u.voice = v;
+        u.rate = 1; u.pitch = 1; u.volume = 1;
+        speechSynthesis.speak(u);
+      });
+      return true;
     } catch (e) { return false; }
   }
-  window.zijVoiceClock = { speak: speak, text: text, slots: SLOTS };
+  function voiceName() { var v = voice || pickVoice(); return v ? v.name : ''; }
+  window.zijVoiceClock = { speak: speak, text: text, slots: SLOTS, voiceName: voiceName };
 
   function check() {
     if (!on()) return;
@@ -73,6 +81,7 @@
       '<button type="button" class="z-btn" id="zVoiceTgl"></button>' +
       '<button type="button" class="z-btn" id="zVoiceTry">▶︎ جرّب الآن</button></div>' +
       '<div id="zVoiceNote" style="color:var(--h-dim);font-size:13px;margin-top:8px">' +
+      '<div style="color:var(--h-ink);font-size:14px;margin-bottom:6px">🔊 لصوت أوضح: الإعدادات ← تسهيلات الاستخدام ← المحتوى المنطوق ← الأصوات ← العربية ← نزّل <b>«ماجد (محسّن)»</b>. الصوت الحالي: <span id="zVoiceNm">—</span></div>' +
       (hasVoice ? 'يعمل على جوالك دون إنترنت ما دام الزيج مفتوحًا. والإعلان والجوال مقفول يأتي مع تطبيق الزيج في المتجر قريبًا.' : 'هذا المتصفح لا يدعم الصوت.') + '</div>';
     var box = host.closest('.z-card');
     (box && box.parentNode ? box.parentNode : host.parentNode).insertBefore(c, box ? box.nextSibling : host.nextSibling);
@@ -81,6 +90,7 @@
     tgl.onclick = function () { setOn(!on()); paint(); if (on()) speak('تم تفعيل الساعة الناطقة'); };
     c.querySelector('#zVoiceTry').onclick = function () { speak(text(SLOTS[0], new Date())); };
     paint();
+    var nm = c.querySelector('#zVoiceNm'); var upd = function () { nm.textContent = voiceName() || 'غير متوفر'; }; upd(); setTimeout(upd, 1500);
   }
   var tries = 0, t = setInterval(function () { card(); if (document.getElementById('zVoiceCard') || ++tries > 40) clearInterval(t); }, 500);
 })();
