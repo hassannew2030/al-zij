@@ -297,13 +297,38 @@
         for (k = row.length - 2; k >= 0; k--) { var nd = (row[k].w + row[k + 1].w) / 2 + 6; if (row[k + 1].c - row[k].c < nd) row[k].c = row[k + 1].c - nd; }
       }
     });
+    // keep every name off the red «now» line: labels move to the side their dot is on, then spread outwards
+    [true, false].forEach(function (top) {
+      var row = lab.filter(function (L) { return L.top === top; }), gap = 13;
+      row.forEach(function (L) { var half = L.w / 2 + gap, side = (L.x < cx || (L.x === cx && rtl)) ? -1 : 1;
+        if (Math.abs(L.c - cx) < half) L.c = cx + side * half; });
+      // a side too crowded to fit: the oldest past names give way (their dots stay on the curve)
+      var fit = function (arr, room) { var need = function () { return arr.filter(function (L) { return !L.hide; }).reduce(function (a, L) { return a + L.w + 6; }, gap); };
+        var past = arr.filter(function (L) { return L.past; }).sort(function (u, v) { return u.t - v.t; });
+        while (need() > room && past.length) past.shift().hide = true; };
+      fit(row.filter(function (L) { return L.c < cx; }), cx); fit(row.filter(function (L) { return L.c >= cx; }), W - cx);
+      var left = row.filter(function (L) { return L.c < cx && !L.hide; }).sort(function (u, v) { return v.c - u.c; });
+      var right = row.filter(function (L) { return L.c >= cx && !L.hide; }).sort(function (u, v) { return u.c - v.c; }), k;
+      for (k = 1; k < left.length; k++) { var nl = (left[k].w + left[k - 1].w) / 2 + 6; if (left[k - 1].c - left[k].c < nl) left[k].c = left[k - 1].c - nl; }
+      for (k = 1; k < right.length; k++) { var nr = (right[k].w + right[k - 1].w) / 2 + 6; if (right[k].c - right[k - 1].c < nr) right[k].c = right[k - 1].c + nr; }
+      // if a side runs past the screen edge, pack it back from the edge inwards (labels never overlap each other)
+      if (left.length && left[left.length - 1].c < left[left.length - 1].w / 2) {
+        left[left.length - 1].c = left[left.length - 1].w / 2;
+        for (k = left.length - 2; k >= 0; k--) { var bl = (left[k].w + left[k + 1].w) / 2 + 6; if (left[k].c - left[k + 1].c < bl) left[k].c = left[k + 1].c + bl; }
+      }
+      if (right.length && right[right.length - 1].c > W - right[right.length - 1].w / 2) {
+        right[right.length - 1].c = W - right[right.length - 1].w / 2;
+        for (k = right.length - 2; k >= 0; k--) { var br = (right[k].w + right[k + 1].w) / 2 + 6; if (right[k + 1].c - right[k].c < br) right[k].c = right[k + 1].c - br; }
+      }
+    });
     lab.forEach(function (L) {
       var col = L.foc ? C.gold : (L.past ? C.past : C.ink), fw = L.foc ? ' font-weight="700"' : '';
       var ly = L.top ? rowH : Hh - rowH, halo = ' stroke="' + C.bg + '" stroke-width="5" paint-order="stroke" stroke-linejoin="round"';
-      o += '<line x1="' + L.x.toFixed(1) + '" y1="' + L.y.toFixed(1) + '" x2="' + L.c.toFixed(1) + '" y2="' + ly + '" stroke="' + col + '" stroke-opacity=".45" stroke-width="1"/>';
+      if (!L.hide) o += '<line x1="' + L.x.toFixed(1) + '" y1="' + L.y.toFixed(1) + '" x2="' + L.c.toFixed(1) + '" y2="' + ly + '" stroke="' + col + '" stroke-opacity=".45" stroke-width="1"/>';
       o += '<circle cx="' + L.x.toFixed(1) + '" cy="' + L.y.toFixed(1) + '" r="' + (L.foc ? 6.5 : 4) + '" fill="' + col + '"' + (L.foc ? ' stroke="' + C.bg + '" stroke-width="2"' : '') + '/>';
       if (L.foc) o += '<circle cx="' + L.x.toFixed(1) + '" cy="' + L.y.toFixed(1) + '" r="11" fill="none" stroke="' + C.gold + '" stroke-width="1.2"/>';
       var y1 = L.top ? 0 : Hh - rowH;
+      if (L.hide) return;
       o += '<text x="' + L.c.toFixed(1) + '" y="' + (y1 + 18) + '" text-anchor="middle" fill="' + col + '"' + fw + halo + '>' + esc(L.name) + '</text>';
       o += '<text class="t" x="' + L.c.toFixed(1) + '" y="' + (y1 + 39) + '" text-anchor="middle" fill="' + col + '"' + fw + halo + '>' + esc(L.time) + '</text>';
     });
