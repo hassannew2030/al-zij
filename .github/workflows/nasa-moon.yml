@@ -1,0 +1,21 @@
+name: nasa-moon
+on: { push: { branches: [nasa-moon] }, workflow_dispatch: {} }
+permissions: { contents: write }
+jobs:
+  get:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download NASA Moon images
+        run: |
+          mkdir -p nasa-out
+          # NASA SVS CGI Moon Kit — LRO (LROC WAC) colour map, public domain
+          curl -sSfL -o nasa-out/lroc_color_1k.jpg "https://svs.gsfc.nasa.gov/vis/a000000/a004700/a004720/lroc_color_poles_1k.jpg" || echo "svs failed" >> nasa-out/log.txt
+          curl -sSfL -o nasa-out/lroc_color_2k.jpg "https://svs.gsfc.nasa.gov/vis/a000000/a004700/a004720/lroc_color_poles_2k.jpg" || echo "svs2k failed" >> nasa-out/log.txt
+          # NASA image library: a full-moon photo
+          curl -sSfL "https://images-api.nasa.gov/search?q=full%20moon%20lunar%20reconnaissance%20orbiter&media_type=image" -o nasa-out/search.json || echo "api failed" >> nasa-out/log.txt
+          ls -la nasa-out >> nasa-out/log.txt
+      - name: Commit
+        run: |
+          git config user.name "al-zij-bot"; git config user.email "alzijapp@gmail.com"
+          git add nasa-out; git commit -m "NASA moon images" || true; git push
