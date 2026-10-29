@@ -20,6 +20,7 @@ self.addEventListener('fetch', (event) => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
   if (url.origin !== location.origin) return; // weather, fonts, maps: handled by the page itself
+  if (url.searchParams.has('zclock')) return; // the inspector's phone-clock check: network only, never the saved copy (its old Date header looks like a wrong phone clock)
   // fonts never change: take the saved copy first (fast, works offline)
   if (url.pathname.includes('/fonts/')) {
     event.respondWith(caches.match(req).then((hit) => hit || fetch(req).then((res) => { if (res && res.ok) { const c = res.clone(); caches.open(CACHE_NAME).then((x) => x.put(req, c)); } return res; })));
