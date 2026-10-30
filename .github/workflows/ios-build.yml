@@ -66,6 +66,7 @@ jobs:
             grep -rn "interruptionLevel" node_modules/@capacitor/local-notifications/ios 2>/dev/null | head -5
           } > ci/report.txt
           rm -f ci/xcodebuild.log
+          if grep -q "build: SUCCEEDED" ci/report.txt; then git rm -q --ignore-unmatch ci/build-errors.txt; rm -f ci/build-errors.txt; fi
           git config user.name "github-actions"; git config user.email "github-actions@users.noreply.github.com"
           for f in ci/report.txt ci/simulator.png ci/build-errors.txt; do [ -f "$f" ] && git add "$f"; done
           [ "$NEW_IOS" = "1" ] && [ -d ios ] && git add ios
