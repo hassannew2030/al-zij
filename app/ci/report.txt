@@ -1,0 +1,19 @@
+run: 41134367959  (2026-10-30T21:54:20Z)
+commit: b1fbeb741a6dfd71e015e0fe89b3e97d0e0427ec
+capacitor: 7.6.10
+local-notifications: 7.0.7
+xcode: Xcode 16.4
+build: FAILED
+simulator: no screenshot
+--- add ios ---
+✔ Adding native Xcode project in ios in 15.50ms
+✔ add in 15.75ms
+✔ Copying web assets from www to ios/App/App/public in 48.97ms
+✔ Creating capacitor.config.json in ios/App/App in 436.08μs
+✔ copy ios in 59.44ms
+✔ Updating iOS plugins in 611.75μs
+✖ Updating iOS native dependencies with pod install - failed!
+✖ update ios - failed!
+[error] Error: ENOENT: no such file or directory, open '/Users/runner/work/al-zij/al-zij/app/ios/App/Podfile'
+--- errors ---
+--- interruptionLevel support in plugin ---
