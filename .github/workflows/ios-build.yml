@@ -1,0 +1,70 @@
+name: iPhone app — build check (simulator, unsigned)
+# Proves the iPhone app builds and opens on a cloud Mac. No Apple account needed yet; nothing is published.
+# Leaves a short report + a simulator screenshot in app/ci/ on the same branch.
+on:
+  push:
+    branches: [app-ios]
+    paths: ['app/**', 'index.html', '.github/workflows/ios-build.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 45
+    defaults: { run: { working-directory: app } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: Install
+        run: npm install --no-audit --no-fund 2>&1 | tail -5
+      - name: Build www
+        run: node build-www.mjs
+      - name: Add iOS platform (first time only)
+        run: |
+          if [ ! -d ios ]; then npx cap add ios --packagemanager SPM; echo NEW_IOS=1 >> $GITHUB_ENV; fi
+          bash ci/patch-ios.sh
+      - name: Icons and splash
+        run: npx capacitor-assets generate --ios --iconBackgroundColor '#0a0c12' --splashBackgroundColor '#0a0c12' 2>&1 | tail -3
+      - name: Sync
+        run: npx cap sync ios
+      - name: Build for simulator
+        run: |
+          set -o pipefail
+          xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Debug -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' -derivedDataPath build CODE_SIGNING_ALLOWED=NO build > ci/xcodebuild.log 2>&1 \
+            || { grep -E "error:|BUILD FAILED" ci/xcodebuild.log | head -40 > ci/build-errors.txt; exit 1; }
+          echo "BUILD OK"
+      - name: Open in simulator and take a screenshot
+        run: |
+          DEV=$(xcrun simctl list devices available | grep -m1 -oE "iPhone 1[5-7][^(]*\(([0-9A-F-]+)\)" | grep -oE "[0-9A-F-]{36}")
+          xcrun simctl boot "$DEV"; xcrun simctl bootstatus "$DEV" -b
+          APP=$(find build/Build/Products -name "App.app" -maxdepth 3 | head -1)
+          xcrun simctl install "$DEV" "$APP"
+          xcrun simctl privacy "$DEV" grant location com.alzijapp.app || true
+          xcrun simctl location "$DEV" set 21.4901,39.1862 || true
+          xcrun simctl launch "$DEV" com.alzijapp.app
+          sleep 25
+          xcrun simctl io "$DEV" screenshot ci/simulator.png
+      - name: Report back to the branch
+        if: always()
+        run: |
+          {
+            echo "run: ${{ github.run_id }}  ($(date -u +%FT%TZ))"
+            echo "commit: ${{ github.sha }}"
+            echo "capacitor: $(node -p "require('@capacitor/core/package.json').version" 2>/dev/null)"
+            echo "local-notifications: $(node -p "require('@capacitor/local-notifications/package.json').version" 2>/dev/null)"
+            echo "xcode: $(xcodebuild -version | head -1)"
+            if grep -q "BUILD SUCCEEDED" ci/xcodebuild.log 2>/dev/null; then echo "build: SUCCEEDED"; else echo "build: FAILED"; fi
+            [ -f ci/simulator.png ] && echo "simulator: screenshot taken" || echo "simulator: no screenshot"
+            echo "--- errors ---"; cat ci/build-errors.txt 2>/dev/null
+            echo "--- interruptionLevel support in plugin ---"
+            grep -rn "interruptionLevel" node_modules/@capacitor/local-notifications/ios 2>/dev/null | head -5
+          } > ci/report.txt
+          rm -f ci/xcodebuild.log
+          git config user.name "github-actions"; git config user.email "github-actions@users.noreply.github.com"
+          git add ci/report.txt ci/simulator.png ci/build-errors.txt 2>/dev/null || true
+          [ "$NEW_IOS" = "1" ] && git add ios || true
+          git commit -m "iPhone app: cloud build report" || exit 0
+          git pull --rebase -q origin app-ios && git push -q origin HEAD:app-ios

@@ -1,0 +1,22 @@
+{
+  "name": "al-zij-app",
+  "private": true,
+  "version": "1.0.0",
+  "description": "الزيج — تطبيق الآيفون (Capacitor): الزيج نفسه + تنبيهات الأذان من الآيفون",
+  "scripts": {
+    "www": "node build-www.mjs",
+    "sync": "node build-www.mjs && npx cap sync ios"
+  },
+  "dependencies": {
+    "@capacitor/app": "^7.0.0",
+    "@capacitor/app-launcher": "^7.0.0",
+    "@capacitor/core": "^7.0.0",
+    "@capacitor/filesystem": "^7.0.0",
+    "@capacitor/ios": "^7.0.0",
+    "@capacitor/local-notifications": "^7.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^7.0.0"
+  }
+}

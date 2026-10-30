@@ -1,0 +1,16 @@
+{
+  "appId": "com.alzijapp.app",
+  "appName": "الزيج",
+  "webDir": "www",
+  "backgroundColor": "#0a0c12",
+  "ios": {
+    "contentInset": "never",
+    "backgroundColor": "#0a0c12",
+    "preferredContentMode": "mobile"
+  },
+  "plugins": {
+    "LocalNotifications": {
+      "presentationOptions": ["banner", "list", "sound"]
+    }
+  }
+}
