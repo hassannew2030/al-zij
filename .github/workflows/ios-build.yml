@@ -24,7 +24,7 @@ jobs:
       - name: Add iOS platform (first time only)
         run: |
           set -o pipefail
-          if [ ! -d ios ]; then npx cap add ios --packagemanager SPM 2>&1 | tee ci/add-ios.txt; echo NEW_IOS=1 >> $GITHUB_ENV; fi
+          if [ ! -d ios ]; then npx cap add ios 2>&1 | tee ci/add-ios.txt; echo NEW_IOS=1 >> $GITHUB_ENV; fi
           bash ci/patch-ios.sh 2>&1 | tee -a ci/add-ios.txt
       - name: Icons and splash
         run: npx capacitor-assets generate --ios --iconBackgroundColor '#0a0c12' --splashBackgroundColor '#0a0c12' > ci/assets.txt 2>&1 || { tail -20 ci/assets.txt; exit 1; }
