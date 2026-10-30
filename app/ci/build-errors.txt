@@ -1,0 +1,2 @@
+/Users/runner/work/al-zij/al-zij/app/ios/App/App/AppDelegate.swift:2:8: error: no such module 'Capacitor'
+** BUILD FAILED **
