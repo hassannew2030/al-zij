@@ -51,6 +51,7 @@ jobs:
       - name: Report back to the branch
         if: always()
         run: |
+          set +e
           {
             echo "run: ${{ github.run_id }}  ($(date -u +%FT%TZ))"
             echo "commit: ${{ github.sha }}"
@@ -66,7 +67,7 @@ jobs:
           } > ci/report.txt
           rm -f ci/xcodebuild.log
           git config user.name "github-actions"; git config user.email "github-actions@users.noreply.github.com"
-          git add ci/report.txt ci/simulator.png ci/build-errors.txt 2>/dev/null || true
-          [ "$NEW_IOS" = "1" ] && git add ios || true
-          git commit -m "iPhone app: cloud build report" || exit 0
-          git pull --rebase --autostash -q origin app-ios && git push -q origin HEAD:app-ios
+          for f in ci/report.txt ci/simulator.png ci/build-errors.txt; do [ -f "$f" ] && git add "$f"; done
+          [ "$NEW_IOS" = "1" ] && [ -d ios ] && git add ios
+          git commit -q -m "iPhone app: cloud build report" || exit 0
+          git pull --rebase --autostash -q origin app-ios && git push -q origin HEAD:app-ios || exit 1
