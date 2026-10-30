@@ -1,27 +1,11 @@
-run: 41134486332  (2026-10-30T21:57:03Z)
-commit: 242189bd2dc7ab41c729248d27e26ca0bf6c588c
+run: 41134790776  (2026-10-30T22:03:48Z)
+commit: 972656761a4c7333aa372b56f5098ddc43061b15
 capacitor: 7.6.10
 local-notifications: 7.0.7
 xcode: Xcode 16.4
-build: FAILED
-simulator: no screenshot
+build: SUCCEEDED
+simulator: screenshot taken
 --- add ios ---
-✔ Adding native Xcode project in ios in 18.95ms
-✔ add in 19.30ms
-✔ Copying web assets from www to ios/App/App/public in 55.29ms
-✔ Creating capacitor.config.json in ios/App/App in 813.63μs
-✔ copy ios in 72.81ms
-✔ Updating iOS plugins in 613.75μs
-✔ Updating iOS native dependencies with pod install in 8.26s
-[info] Found 4 Capacitor plugins for ios:
-       @capacitor/app@7.1.2
-       @capacitor/app-launcher@7.0.4
-       @capacitor/filesystem@7.1.9
-       @capacitor/local-notifications@7.0.7
-✔ update ios in 8.35s
-[success] ios platform added!
-Follow the Developer Workflow guide to get building:
-https://capacitorjs.com/docs/basics/workflow
 Info.plist patched
 --- errors ---
 /Users/runner/work/al-zij/al-zij/app/ios/App/App/AppDelegate.swift:2:8: error: no such module 'Capacitor'
