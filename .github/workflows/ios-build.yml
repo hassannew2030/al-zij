@@ -23,10 +23,11 @@ jobs:
         run: node build-www.mjs
       - name: Add iOS platform (first time only)
         run: |
-          if [ ! -d ios ]; then npx cap add ios --packagemanager SPM; echo NEW_IOS=1 >> $GITHUB_ENV; fi
-          bash ci/patch-ios.sh
+          set -o pipefail
+          if [ ! -d ios ]; then npx cap add ios --packagemanager SPM 2>&1 | tee ci/add-ios.txt; echo NEW_IOS=1 >> $GITHUB_ENV; fi
+          bash ci/patch-ios.sh 2>&1 | tee -a ci/add-ios.txt
       - name: Icons and splash
-        run: npx capacitor-assets generate --ios --iconBackgroundColor '#0a0c12' --splashBackgroundColor '#0a0c12' 2>&1 | tail -3
+        run: npx capacitor-assets generate --ios --iconBackgroundColor '#0a0c12' --splashBackgroundColor '#0a0c12' > ci/assets.txt 2>&1 || { tail -20 ci/assets.txt; exit 1; }
       - name: Sync
         run: npx cap sync ios
       - name: Build for simulator
@@ -58,6 +59,7 @@ jobs:
             echo "xcode: $(xcodebuild -version | head -1)"
             if grep -q "BUILD SUCCEEDED" ci/xcodebuild.log 2>/dev/null; then echo "build: SUCCEEDED"; else echo "build: FAILED"; fi
             [ -f ci/simulator.png ] && echo "simulator: screenshot taken" || echo "simulator: no screenshot"
+            echo "--- add ios ---"; tail -25 ci/add-ios.txt 2>/dev/null
             echo "--- errors ---"; cat ci/build-errors.txt 2>/dev/null
             echo "--- interruptionLevel support in plugin ---"
             grep -rn "interruptionLevel" node_modules/@capacitor/local-notifications/ios 2>/dev/null | head -5
@@ -67,4 +69,4 @@ jobs:
           git add ci/report.txt ci/simulator.png ci/build-errors.txt 2>/dev/null || true
           [ "$NEW_IOS" = "1" ] && git add ios || true
           git commit -m "iPhone app: cloud build report" || exit 0
-          git pull --rebase -q origin app-ios && git push -q origin HEAD:app-ios
+          git pull --rebase --autostash -q origin app-ios && git push -q origin HEAD:app-ios
