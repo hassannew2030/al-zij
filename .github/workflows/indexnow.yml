@@ -1,0 +1,31 @@
+name: IndexNow (Bing / ChatGPT search)
+# After every push that changes the public site, tell IndexNow which pages exist so Bing re-reads them at once.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'about/**'
+      - 'mawaqit/**'
+      - 'support/**'
+      - 'privacy/**'
+      - 'llms.txt'
+      - 'sitemap.xml'
+      - '.github/workflows/indexnow.yml'
+      - 'tools/indexnow.py'
+  workflow_dispatch:
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Wait for GitHub Pages to publish the key file
+        run: |
+          K=$(ls | grep -E '^[0-9a-f]{32}\.txt$' | head -1)
+          for i in $(seq 1 30); do
+            if [ "$(curl -fsS "https://alzijapp.com/$K" 2>/dev/null)" = "${K%.txt}" ]; then echo "key live"; exit 0; fi
+            sleep 20
+          done
+          echo "key file not live yet"; exit 1
+      - name: Submit sitemap URLs
+        run: python3 tools/indexnow.py
