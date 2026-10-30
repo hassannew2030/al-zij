@@ -33,7 +33,7 @@ jobs:
       - name: Build for simulator
         run: |
           set -o pipefail
-          xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Debug -sdk iphonesimulator \
+          xcodebuild -workspace ios/App/App.xcworkspace -scheme App -configuration Debug -sdk iphonesimulator \
             -destination 'generic/platform=iOS Simulator' -derivedDataPath build CODE_SIGNING_ALLOWED=NO build > ci/xcodebuild.log 2>&1 \
             || { grep -E "error:|BUILD FAILED" ci/xcodebuild.log | head -40 > ci/build-errors.txt; exit 1; }
           echo "BUILD OK"
