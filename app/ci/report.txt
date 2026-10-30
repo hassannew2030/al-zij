@@ -1,5 +1,5 @@
-run: 41134790776  (2026-10-30T22:03:48Z)
-commit: 972656761a4c7333aa372b56f5098ddc43061b15
+run: 41135764321  (2026-10-30T22:12:10Z)
+commit: 9badb2f44a3599a05dd18f885312c1eb869c7bca
 capacitor: 7.6.10
 local-notifications: 7.0.7
 xcode: Xcode 16.4
@@ -8,6 +8,4 @@ simulator: screenshot taken
 --- add ios ---
 Info.plist patched
 --- errors ---
-/Users/runner/work/al-zij/al-zij/app/ios/App/App/AppDelegate.swift:2:8: error: no such module 'Capacitor'
-** BUILD FAILED **
 --- interruptionLevel support in plugin ---
