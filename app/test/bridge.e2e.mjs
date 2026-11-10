@@ -49,7 +49,7 @@ const b = await chromium.launch();
 let fails = 0;
 const check = (ok, msg) => { console.log((ok ? '✅ ' : '❌ ') + msg); if (!ok) fails++; };
 
-async function open({ zone, loc, method, lang }) {
+async function open({ zone, loc, method, lang, at }) {
   const ctx = await b.newContext({ timezoneId: zone, locale: lang === 'en' ? 'en-US' : 'ar-SA', viewport: { width: 390, height: 844 } });
   await ctx.addInitScript(MOCK);
   await ctx.addInitScript(([loc, method, lang]) => {
@@ -59,6 +59,8 @@ async function open({ zone, loc, method, lang }) {
     if (method) localStorage.setItem('zijCalcMethod', method);
   }, [loc, method, lang]);
   const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message));
+  // a fixed clock for the checks that depend on the calendar (e.g. a window that must cross a summer-time change)
+  if (at) await p.clock.setFixedTime(new Date(at));
   // the real Capacitor scripts would look for the iOS bridge; the mock stands in for them
   await p.route(/\/native\/(capacitor|app|local-notifications|filesystem)\.js$/, r => r.fulfill({ body: '', contentType: 'text/javascript' }));
   await p.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort());
@@ -108,13 +110,29 @@ async function open({ zone, loc, method, lang }) {
   await p.waitForTimeout(6000);
   r = await p.evaluate(() => ({ n: __nat.scheduled.length, iq: __nat.scheduled.filter(n => n.extra.kind === 'iqama' && n.extra.prayer === 'maghrib').length, bodies: __nat.scheduled.filter(n => n.extra.kind === 'iqama').slice(0, 1).map(n => n.body) }));
   check(r.iq > 0 && r.n <= 64, `after turning on Maghrib iqamah: ${r.iq} iqamah alerts, ${r.n} total — «${r.bodies[0]}»`);
+  // all three alerts for every prayer → the adhan still covers 8 days (#71), the status line says how far each reaches
+  await p.evaluate(() => {
+    for (const k of ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha']) for (const x of ['pre', 'iqama']) {
+      const c = document.querySelector(`#zAl input[data-k="${k}.${x}.on"]`); if (c && !c.checked) { c.checked = true; c.dispatchEvent(new Event('change', { bubbles: true })); }
+    }
+  });
+  await p.waitForTimeout(6000);
+  r = await p.evaluate(() => {
+    const L = __nat.scheduled, ad = L.filter(n => n.extra.kind === 'adhan');
+    return { n: L.length, adhans: ad.length, days: new Set(ad.map(n => n.extra.date)).size, extra: L.filter(n => n.extra.kind === 'pre' || n.extra.kind === 'iqama').length,
+             status: document.getElementById('zNat')?.textContent };
+  });
+  check(r.n === 64 && r.adhans >= 40 && r.days >= 8, `all three alerts on: ${r.adhans} adhans over ${r.days} days + ${r.extra} before/iqamah alerts (${r.n} total)`);
+  check(/قبل الأذان والإقامة/.test(r.status || ''), 'status line with all three: ' + (r.status || '').trim());
   check(errs.length === 0, 'no page errors' + (errs.length ? ': ' + errs.slice(0, 3).join(' | ') : ''));
   await ctx.close();
 }
 
 /* ---- 2 · Toronto across the end of summer time (1 Nov 2026), English ---- */
 {
-  const { ctx, p, errs } = await open({ zone: 'America/Toronto', loc: { lat: 43.6532, lon: -79.3832 }, method: 'ISNA', lang: 'en' });
+  // pinned to 28 Oct 2026 so the alert window always crosses the clock change of 1 Nov (the check was written on 24 Oct and
+  // failed once the real date moved past it)
+  const { ctx, p, errs } = await open({ zone: 'America/Toronto', loc: { lat: 43.6532, lon: -79.3832 }, method: 'ISNA', lang: 'en', at: '2026-10-28T12:00:00-04:00' });
   await p.evaluate(() => { __nat.perm = 'granted'; return zijNative.resync('test'); });
   await p.waitForTimeout(1500);
   const r = await p.evaluate(() => {

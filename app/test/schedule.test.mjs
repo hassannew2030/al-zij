@@ -72,7 +72,7 @@ test('a full Saudi day with all three alerts: before, adhan, iqamah at the right
   assert.equal(today.find(n => n.prayer === 'maghrib' && n.kind === 'iqama').body, '🕌 حان الآن وقت إقامة صلاة المغرب');
 });
 
-test('never more than 64 pending: 63 nearest alerts + 1 reminder, sorted, unique ids', () => {
+test('never more than 64 pending: 63 alerts + 1 reminder, sorted, unique ids', () => {
   const days = uqDays(74, 2026, 10, 25, 14);
   const now = Date.UTC(2026, 9, 25, 9, 0);              // 12:00 Jeddah — Fajr and Dhuhr already passed today
   const r = Z.plan({ days, settings: settings(allOn), now, lang: 'ar' });
@@ -83,15 +83,75 @@ test('never more than 64 pending: 63 nearest alerts + 1 reminder, sorted, unique
   assert.equal(ids.size, 64);
   for (let i = 1; i < r.notifications.length; i++) assert.ok(r.notifications[i].at >= r.notifications[i - 1].at, 'sorted');
   assert.ok(r.notifications.every(n => n.at > now), 'all in the future');
-  // the nearest is kept: the first alert is the next one after "now" (Dhuhr iqamah 20 min after Dhuhr adhan … or Asr pre)
+  // the very next alert is always kept (Dhuhr iqamah 20 min after Dhuhr adhan … or Asr pre)
   const alerts = r.notifications.filter(n => n.kind !== 'reminder');
   assert.equal(alerts[0].date, '2026-10-25');
-  // 15 a day → 63 alerts ≈ 4 days
-  assert.equal(new Set(alerts.map(n => n.date)).size, 5);
   const rem = r.notifications.find(n => n.kind === 'reminder');
   assert.equal(rem.id, Z.REMINDER_ID);
   assert.ok(rem.at < r.lastAt && rem.at > now);
   assert.match(rem.body, /افتح الزّيج/);
+});
+
+/* ---- the adhan first (table #71, Hassan's design of 31 Oct) ---- */
+test('all three alerts on: every adhan of the next 8 days is kept, the other slots go to the nearest before/iqamah alerts', () => {
+  const days = uqDays(74, 2026, 10, 25, 16);
+  const now = Date.UTC(2026, 9, 24, 21, 0);             // 25 Oct 00:00 Jeddah
+  const r = Z.plan({ days, settings: settings(allOn), now, lang: 'ar' });
+  assert.equal(r.notifications.length, 64);
+  const adhan = r.notifications.filter(n => n.kind === 'adhan');
+  const extra = r.notifications.filter(n => n.kind === 'pre' || n.kind === 'iqama');
+  // 8 full days × 5 = 40 adhans, none missing, in order
+  assert.equal(adhan.length, 40);
+  const dates = [...new Set(adhan.map(n => n.date))];
+  assert.equal(dates.length, 8);
+  assert.equal(dates[0], '2026-10-25'); assert.equal(dates[7], '2026-11-01');
+  for (const d of dates) assert.deepEqual(adhan.filter(n => n.date === d).map(n => n.prayer), PR, d);
+  // the 23 other alerts are the 23 nearest ones: a continuous run from now, nothing skipped in between
+  assert.equal(extra.length, 23);
+  // reference: the same before/iqamah alerts alone (adhan off), nearest first, no guarantee, no reminder
+  const ref = Z.plan({ days, settings: settings(s => { allOn(s); for (const k of PR) s.p[k].adhan.on = false; }), now, guaranteeDays: 0, reminder: false })
+    .notifications;
+  assert.deepEqual(extra.map(n => n.kind + n.prayer + n.at), ref.slice(0, 23).map(n => n.kind + n.prayer + n.at));
+  // the adhan is guaranteed up to the last adhan of day 8; the others for ≈ 2 days
+  assert.equal(r.mainUntil, adhan[adhan.length - 1].at);
+  const xDays = (r.extraUntil - now) / 864e5;
+  assert.ok(xDays > 2 && xDays < 3, 'extras cover ' + xDays.toFixed(2) + ' days');
+  // the reminder sits about a day before the end of the ADHAN window, not before the end of the extras
+  const rem = r.notifications.find(n => n.kind === 'reminder');
+  assert.ok(r.mainUntil - rem.at >= 12 * 3600e3 && r.mainUntil - rem.at <= 36 * 3600e3);
+});
+
+test('adhan only (the default): every slot is an adhan, ≈ 12½ days, and the guarantee changes nothing', () => {
+  const days = uqDays(74, 2026, 10, 25, 16);
+  const now = Date.UTC(2026, 9, 24, 21, 0);
+  const r = Z.plan({ days, settings: settings(), now });
+  assert.equal(r.alerts, 63);
+  assert.ok(r.notifications.filter(n => n.kind !== 'reminder').every(n => n.kind === 'adhan'));
+  assert.equal(r.extraUntil, null);
+  assert.equal(r.mainUntil, r.lastAt);
+});
+
+test('a prayer with the adhan off: its before-adhan alert becomes its main alert and is guaranteed too', () => {
+  const days = uqDays(74, 2026, 10, 25, 16);
+  const now = Date.UTC(2026, 9, 24, 21, 0);
+  const s = settings(s => { allOn(s); s.p.fajr.adhan.on = false; });   // Fajr: before-adhan + iqamah only
+  const r = Z.plan({ days, settings: s, now });
+  const fajrPre = r.notifications.filter(n => n.prayer === 'fajr' && n.kind === 'pre');
+  assert.ok(fajrPre.length >= 8, 'Fajr before-adhan kept every day for 8 days: ' + fajrPre.length);
+  assert.equal(r.notifications.filter(n => n.kind === 'adhan').length, 32);   // the other 4 prayers × 8 days
+});
+
+test('few extra alerts: they are all kept and the adhan runs beyond 8 days to fill the slots', () => {
+  const days = uqDays(74, 2026, 10, 25, 16);
+  const now = Date.UTC(2026, 9, 24, 21, 0);
+  const s = settings(s => { s.p.maghrib.iqama.on = true; });            // adhan for all + Maghrib iqamah
+  const r = Z.plan({ days, settings: s, now });
+  assert.equal(r.alerts, 63);
+  const iq = r.notifications.filter(n => n.kind === 'iqama');
+  const ad = r.notifications.filter(n => n.kind === 'adhan');
+  assert.equal(iq.length + ad.length, 63);
+  assert.ok(ad.length > 40, 'adhan beyond the 8 days: ' + ad.length);
+  assert.ok((r.mainUntil - now) / 864e5 > 10, 'adhan covers ' + ((r.mainUntil - now) / 864e5).toFixed(1) + ' days');
 });
 
 test('adhan only (the default): 63 alerts cover about 12 days', () => {

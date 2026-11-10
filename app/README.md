@@ -43,9 +43,9 @@ app/
 ```bash
 cd app
 npm install
-npm test               # 15 planner and injection tests
+npm test               # 19 planner and injection tests
 npm run bundle         # → app/www, 9 MB
-npm run test:e2e       # 25 checks in the real page (needs Playwright + Chromium)
+npm run test:e2e       # 27 checks in the real page (needs Playwright + Chromium)
 # macOS only:
 npx cap add ios && bash ios-config/configure-ios.sh && npx cap sync ios && npx cap open ios
 ```
@@ -54,7 +54,18 @@ npx cap add ios && bash ios-config/configure-ios.sh && npx cap sync ios && npx c
 
 1. **Source of the times.** The bridge calls the page's own engine for each coming day: `observer.realPrayerTimes(date, hijriCal.fromGregorian(date))`. This is the same call the screen and the in-page alerts make. Inside Saudi Arabia it returns the official Umm al-Qura minute from `data/uq/c/<id>.json`. Elsewhere it uses the astronomical engine, with each day's own UTC offset (`observer.tzAt`), so daylight-saving changes inside the window are handled. The bridge waits up to 6 s for `zijUQ.ready()` so the first plan already uses the official table. Fractional minutes are rounded the way `AstroMath.minToHHMM` rounds them on screen.
 2. **Settings.** The bridge reads the user's own `zijAlerts` object (`zijAlerts.get()`): master switch, plus for each prayer `pre {on,min,snd}`, `adhan {on,snd}` and `iqama {on,min,snd}`. Nothing is duplicated, and the native app has no settings screen of its own.
-3. **Planner** (`ZijSchedule.plan`). It expands every enabled alert over the coming days, drops any alert less than 15 s away, sorts by time and keeps the **63 nearest**. The 64th slot is a reminder, placed about a day before the last alert and moved out of 21:00–09:00, that says «افتح الزّيج ليستمر تنبيه الأذان». iOS keeps at most 64 pending local notifications per app and silently drops the rest. How far ahead that covers depends on the settings: adhan only (the default) gives 63 ÷ 5 ≈ 12½ days, and all 15 alerts a day give about 4 days. The planner fetches only as many days as it needs.
+3. **Planner** (`ZijSchedule.plan`) — **the adhan first** (table #71, Hassan's design of 31 Oct). It expands every enabled alert over the coming days and drops any alert less than 15 s away. Then it fills the 63 alert slots in two steps:
+   1. **Every main alert of the next 8 days** (`GUARANTEE_DAYS`). A prayer's main alert is its adhan; if the user turned that adhan off, it is the before-adhan alert, else the iqamah.
+   2. **The nearest of everything else** fills the slots left: the before-adhan and iqamah alerts of the coming days, then the adhans beyond day 8.
+
+   The 64th slot is a reminder, placed about a day before the end of the adhan window and moved out of 21:00–09:00, that says «افتح الزّيج ليستمر تنبيه الأذان». iOS keeps at most 64 pending local notifications per app and silently drops the rest. Coverage with no app open:
+
+   | Settings | Adhan | Before-adhan / iqamah |
+   |---|---|---|
+   | Adhan only (the default) | 63 ÷ 5 ≈ 12½ days | — |
+   | All three alerts | **8 days** (40) | the nearest 23 ≈ 2 days |
+
+   Before this change the planner kept the 63 nearest alerts of any kind, so with all three alerts on the adhan lasted only about 4 days. The plan also reports `mainUntil` and `extraUntil`, so the status line says how far each kind reaches. The bridge fetches enough days for both steps.
 4. **Wording.** Titles and bodies are the web app's own text from `#alertsJs → fire()`, in Arabic or English, with Arabic or Latin digits. On Friday Dhuhr becomes الجمعة / Jumu'ah.
 5. **When it reschedules.**
    - Every launch.
