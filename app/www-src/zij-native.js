@@ -4,7 +4,8 @@
 
    What it does inside the app:
    1. Adhan alerts that fire with the phone locked or Al-Zij closed: the next alerts (before-adhan · adhan · iqamah, exactly as
-      the user set them in Prayer → Alerts) are handed to iOS as local notifications — at most 64, the iOS ceiling — computed
+      the user set them in Prayer → Alerts) are handed to iOS as local notifications — at most 64, the iOS ceiling, the adhan
+      first: every adhan of the next 8 days is kept before any other alert, then the nearest of the rest (#71) — computed
       with the page's own prayer-time engine (observer.realPrayerTimes + the official Umm al-Qura table), so the minutes are
       the ones on the screen. Recomputed on every open, on every return to the screen, and whenever a setting, the place or
       the method changes. A gentle reminder near the end of the window asks the user to open Al-Zij so alerts keep coming.
@@ -56,11 +57,15 @@
   /* ---------- 1 · adhan alerts as iOS local notifications ---------- */
   var LANG = function () { return window.ZIJ_LANG === 'en' ? 'en' : 'ar'; };
   var T = function (a, e) { return LANG() === 'en' ? e : a; };
-  // enough days to fill the 63 alert slots with the user's own alerts (adhan only: 5 a day ≈ 12½ days; all three: ≈ 4 days)
+  // enough days for the planner (adhan first, #71): at least the guaranteed window (8 days), and enough for the main alerts
+  // alone to fill all 63 slots when the other alerts are few (adhan only: 5 a day ≈ 12½ days)
   function daysNeeded(S) {
-    var perDay = 0;
-    if (S && S.on !== false && S.p) Object.keys(S.p).forEach(function (k) { ['pre', 'adhan', 'iqama'].forEach(function (x) { if (S.p[k] && S.p[k][x] && S.p[k][x].on) perDay++; }); });
-    return Math.max(3, Math.min(40, Math.ceil(63 / Math.max(perDay, 1)) + 2));
+    var main = 0;
+    if (S && S.on !== false && S.p) Object.keys(S.p).forEach(function (k) {
+      var c = S.p[k]; if (c && ((c.pre && c.pre.on) || (c.adhan && c.adhan.on) || (c.iqama && c.iqama.on))) main++;
+    });
+    var g = (window.ZijSchedule && ZijSchedule.GUARANTEE_DAYS) || 8;
+    return Math.max(3, Math.min(40, Math.max(g + 2, Math.ceil(63 / Math.max(main, 1)) + 2)));
   }
   var perm = 'unknown';          // granted | denied | prompt | unknown
   // kept in memory only: the first sync of every launch always rewrites the pending list, so the plugin knows each
@@ -153,7 +158,8 @@
           return LN.schedule({ notifications: plan.notifications.map(toNative) });
         }).then(function () {
           lastSig = sig;
-          LS.set('zijNativeLast', JSON.stringify({ at: Date.now(), why: why, n: plan.alerts, first: plan.firstAt, last: plan.lastAt, perm: perm }));
+          LS.set('zijNativeLast', JSON.stringify({ at: Date.now(), why: why, n: plan.alerts, first: plan.firstAt, last: plan.lastAt,
+            adhanUntil: plan.mainUntil, extraUntil: plan.extraUntil, perm: perm }));
           log('scheduled', perm === 'granted' ? plan.notifications.length : 0, 'why=' + why);
         });
       });
@@ -178,9 +184,14 @@
     }
     var p = lastPlan;
     if (!p || !p.alerts) return '<div>' + T('✅ التنبيه والجوال مقفول مسموح.', '✅ Alerts with the phone locked are allowed.') + '</div>';
-    var n = Math.max(1, Math.round((p.lastAt - Date.now()) / 86400000));
-    return '<div>✅ ' + T('التنبيهات تصلك والجوال مقفول أو الزّيج مغلق، محفوظة على جوالك لـ<b>' + dayWord(n) + '</b> قادمة. افتح الزّيج مرة كل أسبوع تقريبًا ليستمر.',
-      'Alerts reach you with the phone locked or Al-Zij closed — saved on your phone for the next <b>' + dayWord(n) + '</b>. Open Al-Zij about once a week to keep them coming.') + '</div>';
+    var left = function (t) { return Math.max(1, Math.round((t - Date.now()) / 86400000)); };
+    var n = left(p.mainUntil != null ? p.mainUntil : p.lastAt);
+    // the before-adhan / iqamah alerts get the slots left after the adhan (#71): say honestly how far they reach
+    var x = p.extraUntil != null && p.mainUntil != null && p.extraUntil < p.mainUntil - 86400000 ? left(p.extraUntil) : 0;
+    if (x) return '<div>✅ ' + T('الأذان يصلك والجوال مقفول أو الزّيج مغلق، محفوظ على جوالك لـ<b>' + dayWord(n) + '</b> قادمة، وتنبيهات قبل الأذان والإقامة لـ<b>' + dayWord(x) + '</b>. افتح الزّيج كل يومين تقريبًا لتستمر كلها؛ والأذان يستمر ولو لم تفتحه أسبوعًا.',
+      'The adhan reaches you with the phone locked or Al-Zij closed — saved on your phone for the next <b>' + dayWord(n) + '</b>, and the before-adhan and iqamah alerts for <b>' + dayWord(x) + '</b>. Open Al-Zij every couple of days to keep them all; the adhan keeps going for a week even if you don\'t.') + '</div>';
+    return '<div>✅ ' + T('الأذان يصلك والجوال مقفول أو الزّيج مغلق، محفوظ على جوالك لـ<b>' + dayWord(n) + '</b> قادمة. افتح الزّيج مرة كل أسبوع تقريبًا ليستمر.',
+      'The adhan reaches you with the phone locked or Al-Zij closed — saved on your phone for the next <b>' + dayWord(n) + '</b>. Open Al-Zij about once a week to keep it coming.') + '</div>';
   }
   function paint() {
     var box = document.getElementById('zAl');
