@@ -38,6 +38,8 @@
         var n = pname(k, friday);
         if (kind === 'pre') return EN ? n + ' adhan in ' + mins(cfg.min) : 'بعد ' + mins(cfg.min) + ' أذان ' + n;
         if (kind === 'adhan') return EN ? '🕌 It is now time for the ' + n + ' adhan' : '🕌 حان الآن موعد أذان ' + n;
+        // Friday's optional iqamah is for someone praying away from the mosque — whether it is Jumu'ah or Dhuhr is not ours to name
+        if (k === 'dhuhr' && friday) return EN ? '🕌 It is now time for the iqamah' : '🕌 حان الآن وقت إقامة الصلاة';
         return EN ? '🕌 It is now time for the ' + n + ' iqamah' : '🕌 حان الآن وقت إقامة صلاة ' + n;
       },
       reminder: EN
@@ -55,6 +57,8 @@
    * @param {Array}  o.days      [{y, m, d, off, times:{fajr,dhuhr,asr,maghrib,isha}}] — off = that day's clock offset in minutes east of UTC;
    *                             times = minutes after local midnight exactly as the screen computes them (fractions allowed).
    * @param {object} o.settings  the web app's zijAlerts object {on, p:{fajr:{pre:{on,min,snd},adhan:{on,snd},iqama:{on,min,snd}},…}}
+   *                             Friday (Hassan, 10 Nov): Dhuhr's iqamah on a Friday comes from p.dhuhr.friIqama {on,min,snd} — OFF unless
+   *                             the user turns it on (at Jumu'ah the imam calls the iqamah; the phone must not ring in the mosque).
    * @param {number} o.now       epoch ms
    * @param {string} [o.lang]    'ar' | 'en'
    * @param {string} [o.digits]  'ar' | 'en' (Arabic-mode digit style)
@@ -79,13 +83,16 @@
           if (!c || t == null || !isFinite(t)) return;
           var shown = Math.round(t);                                     // the minute the screen shows (AstroMath.minToHHMM rounds)
           var base = localToEpoch(day.y, day.m, day.d, shown, day.off);
+          // Friday: Dhuhr's iqamah has its own setting, off unless the user chose it (praying away from the mosque)
+          var iq = k === 'dhuhr' && friday ? (c.friIqama || null) : c.iqama;
           // this prayer's main alert: the adhan, or (adhan off) the before-adhan alert, else the iqamah
-          var main = c.adhan && c.adhan.on ? 'adhan' : c.pre && c.pre.on ? 'pre' : c.iqama && c.iqama.on ? 'iqama' : null;
-          [['pre', c.pre, -1], ['adhan', c.adhan, 0], ['iqama', c.iqama, 1]].forEach(function (A) {
+          var main = c.adhan && c.adhan.on ? 'adhan' : c.pre && c.pre.on ? 'pre' : iq && iq.on ? 'iqama' : null;
+          [['pre', c.pre, -1], ['adhan', c.adhan, 0], ['iqama', iq, 1]].forEach(function (A) {
             var kind = A[0], cfg = A[1];
             if (!cfg || !cfg.on) return;
             var at = base + A[2] * (+cfg.min || 0) * MIN;
-            if (at <= now + MIN_LEAD_MS) return;                         // iOS refuses times in the past
+            // a time already past would be delivered at once by the plugin (8.3.1 turns it into a nil trigger) — never hand it over
+            if (at <= now + MIN_LEAD_MS) return;
             all.push({ at: at, kind: kind, prayer: k, snd: cfg.snd, body: W.body(kind, k, cfg, friday), main: kind === main,
                        date: day.y + '-' + pad(day.m) + '-' + pad(day.d) });
           });
@@ -117,7 +124,8 @@
     var mainUntil = until(true), extraUntil = until(false);
     if (wantReminder && chosen.length && limit > 1) {
       // the reminder belongs to the end of the adhan window: that is when the alerts that matter run out
-      var r = reminderTime(now, mainUntil != null ? mainUntil : lastAt, (o.days && o.days.length ? o.days[0].off : 0));
+      var r = reminderTime(now, mainUntil != null ? mainUntil : lastAt, (o.days && o.days.length ? o.days[0].off : 0),
+                           chosen.map(function (a) { return a.at; }));
       if (r) out.push({ id: REMINDER_ID, title: W.reminderTitle, body: W.reminder, at: r, kind: 'reminder', sound: SOUND_FILES.soft });
     }
     out.sort(function (a, b) { return a.at - b.at; });
@@ -125,8 +133,10 @@
              dropped: all.length - chosen.length, mainUntil: mainUntil, extraUntil: extraUntil };
   }
 
-  // about a day before the last saved alert, moved out of the night (21:00–09:00 local → 20:00 the evening before)
-  function reminderTime(now, lastAt, offMin) {
+  // about a day before the last saved alert, moved out of the night (21:00–09:00 local → 20:00 the evening before).
+  // `avoid` = the alert times: "a day before the last adhan" lands on the same prayer the day before (± a minute), so the
+  // reminder would ring together with an adhan — it is moved 30 min away from any alert (Fable review, 10 Nov).
+  function reminderTime(now, lastAt, offMin, avoid) {
     if (lastAt == null || lastAt - now < 2 * HOUR) return null;     // window too short to matter: the next open reschedules anyway
     var r = lastAt - DAY;
     if (r < now + HOUR) r = now + (lastAt - now) / 2;
@@ -135,7 +145,13 @@
       var eve = Date.UTC(local.getUTCFullYear(), local.getUTCMonth(), local.getUTCDate() - (h < 9 ? 1 : 0), 20) - offMin * MIN;
       if (eve > now + HOUR && eve < lastAt) r = eve;
     }
-    return Math.round(r / MIN) * MIN;
+    r = Math.round(r / MIN) * MIN;
+    var near = function (t) { return (avoid || []).some(function (a) { return Math.abs(a - t) < 2 * MIN; }); };
+    for (var k = 0; k < 4 && near(r); k++) {
+      var later = r + 30 * MIN, earlier = r - 30 * MIN;
+      r = (later < lastAt && !near(later)) || earlier <= now + HOUR ? later : earlier;
+    }
+    return r;
   }
 
   function pad(n) { return (n < 10 ? '0' : '') + n; }

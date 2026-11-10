@@ -43,9 +43,9 @@ app/
 ```bash
 cd app
 npm install
-npm test               # 19 planner and injection tests
+npm test               # 26 planner and injection tests
 npm run bundle         # → app/www, 9 MB
-npm run test:e2e       # 27 checks in the real page (needs Playwright + Chromium)
+npm run test:e2e       # 29 checks in the real page (needs Playwright + Chromium)
 # macOS only:
 npx cap add ios && bash ios-config/configure-ios.sh && npx cap sync ios && npx cap open ios
 ```
@@ -67,12 +67,16 @@ npx cap add ios && bash ios-config/configure-ios.sh && npx cap sync ios && npx c
 
    Before this change the planner kept the 63 nearest alerts of any kind, so with all three alerts on the adhan lasted only about 4 days. The plan also reports `mainUntil` and `extraUntil`, so the status line says how far each kind reaches. The bridge fetches enough days for both steps.
 4. **Wording.** Titles and bodies are the web app's own text from `#alertsJs → fire()`, in Arabic or English, with Arabic or Latin digits. On Friday Dhuhr becomes الجمعة / Jumu'ah.
+   - **Friday iqamah (Hassan, 10 Nov).** On a Friday, Dhuhr's iqamah comes from `p.dhuhr.friIqama {on, min, snd}`, and it is **off unless the user turns it on**: at Jumu'ah the imam calls the iqamah, and the phone must not ring in the mosque. It is meant for someone praying away from the mosque, so its own minutes are separate from the weekday iqamah and its wording is neutral («🕌 حان الآن وقت إقامة الصلاة»).
 5. **When it reschedules.**
    - Every launch.
    - Every return to the foreground (`visibilitychange` and the `App` `resume` event).
    - Whenever a fingerprint changes. The fingerprint covers the alert settings, place, method, Asr school, mosque offsets, high-latitude rule, language, digits, country, date and Hijri offset, and is polled every 4 s.
 
-   It cancels the old pending set and schedules the new one. If nothing changed, it does no work.
+   - Whenever the phone's time-zone offset changes (travel), which is part of the fingerprint.
+
+   It **schedules first**: the same ids replace the old requests in place. It then cancels the ids that are no longer in the plan and checks the count iOS holds, retrying once on a mismatch. If scheduling fails, the phone keeps its old alerts and is never left with none. It never schedules before the permission is granted, because the plugin's `schedule()` would prompt by itself. The days start from **yesterday**, so yesterday's Isha or iqamah after midnight is not lost. If nothing changed, it does no work.
+5b. **Interruption level and entitlement.** Every prayer alert is `timeSensitive`, so it passes Focus and the scheduled Notification Summary. The reminder is `active`. @capacitor/local-notifications 8.3.1 supports `interruptionLevel` (since 8.1.0) and schedules an `at` date as a `UNTimeIntervalNotificationTrigger`; both were checked in its source. The entitlement `com.apple.developer.usernotifications.time-sensitive` is in `ios-config/App.entitlements`; `configure-ios.sh` copies it and `configure-xcode.rb` sets `CODE_SIGN_ENTITLEMENTS`. The TestFlight job checks the signed app for it. Time Sensitive does **not** pass the ring/silent switch; only an AlarmKit alarm will (#66).
 6. **Permission.** It is **never asked on first launch**, following the owner's zero-interaction rule. It is asked in either of two cases:
    - The user taps «🔔 اسمح بتنبيه الأذان» on the alerts card.
    - The user flips any alert switch there.
@@ -80,6 +84,7 @@ npx cap add ios && bash ios-config/configure-ios.sh && npx cap sync ios && npx c
    If the user denies it, the card shows a button that opens iPhone Settings. The web-only line «التنبيه والجوال مقفول يأتي مع تطبيق الزّيج في المتجر» and the browser-notification button are replaced inside the app with a status line, for example «✅ … محفوظة على جوالك لـ١٣ يومًا قادمة».
 7. **Foreground.** Notifications are scheduled with `silent: true`. While Al-Zij is on screen, iOS does not show them, because the page itself already rings and shows its banner, so the alert is not doubled. With the phone locked or the app in the background, they show normally with sound.
 8. **Sounds.** The three tones (`brass`, `bell`, `soft`) are rendered from the same recipe the web app plays with Web Audio, so they need no licence. They are 2–5 s long; iOS allows at most 30 s. They ship in the app bundle and are also copied to `Library/Sounds`. If the user picks «بدون صوت», the notification is a message only.
+9. **Reminder.** The reminder is placed about a day before the end of the adhan window, and moved 30 min away from any alert, because "a day before the last adhan" falls on the same prayer the day before.
    - **A real muezzin recording (table #30)** needs written permission and must be at most 30 s, for example the takbir only.
    - To add one, replace `www-src/sounds/zij-brass.wav`, or add a new key to `SOUND_FILES` together with a choice in the web app's sound list.
 

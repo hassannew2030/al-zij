@@ -78,6 +78,9 @@ jobs:
           test -f "$APPB/public/data/uq/c/74.json"
           test -f "$APPB/PrivacyInfo.xcprivacy"
           ls "$APPB"/*.wav
+          # Time Sensitive entitlement wired into the project (#71); signing itself is checked in the TestFlight job
+          plutil -lint ios/App/App/App.entitlements
+          grep -q 'CODE_SIGN_ENTITLEMENTS = App/App.entitlements' ios/App/App.xcodeproj/project.pbxproj
           /usr/libexec/PlistBuddy -c 'Print :CFBundleDisplayName' "$APPB/Info.plist"
           du -sh "$APPB"
       - uses: actions/upload-artifact@v4
@@ -131,6 +134,12 @@ jobs:
             -archivePath build/AlZij.xcarchive DEVELOPMENT_TEAM="$TEAM" CODE_SIGN_STYLE=Automatic \
             -allowProvisioningUpdates -authenticationKeyPath ~/private_keys/AuthKey_${KEY_ID}.p8 \
             -authenticationKeyID "$KEY_ID" -authenticationKeyIssuerID "$ISSUER" archive
+      - name: Signed entitlements include Time Sensitive notifications (#71)
+        run: |
+          APPA=build/AlZij.xcarchive/Products/Applications/App.app
+          codesign -d --entitlements - "$APPA" 2>/dev/null | tee build/entitlements.txt
+          grep -q 'com.apple.developer.usernotifications.time-sensitive' build/entitlements.txt || {
+            echo "::error::the signed app lacks the Time Sensitive entitlement — enable 'Time Sensitive Notifications' for the App ID at developer.apple.com"; exit 1; }
       - name: Export and upload to App Store Connect (TestFlight)
         run: |
           cat > build/export.plist <<PLIST

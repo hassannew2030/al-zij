@@ -187,13 +187,93 @@ test('an alert less than 15 s away or already past is not handed to iOS', () => 
 
 test('English wording and Friday → Jumu\'ah, matching the web app', () => {
   const days = uqDays(74, 2026, 10, 30, 1);            // Friday 30 Oct 2026
-  const s = settings(s => { s.p.dhuhr.pre.on = true; s.p.dhuhr.pre.min = 60; s.p.dhuhr.iqama.on = true; });
+  const s = settings(s => { s.p.dhuhr.pre.on = true; s.p.dhuhr.pre.min = 60; s.p.dhuhr.iqama.on = true;
+    s.p.dhuhr.friIqama = { on: true, min: 30, snd: 'bell' }; });      // the user chose the Friday iqamah (praying away from the mosque)
   const r = Z.plan({ days, settings: s, now: Date.UTC(2026, 9, 29, 21), lang: 'en' });
   const d = r.notifications.filter(n => n.prayer === 'dhuhr');
-  assert.deepEqual(d.map(n => n.body), ['Jumu\'ah adhan in 1 hour', '🕌 It is now time for the Jumu\'ah adhan', '🕌 It is now time for the Jumu\'ah iqamah']);
+  assert.deepEqual(d.map(n => n.body), ['Jumu\'ah adhan in 1 hour', '🕌 It is now time for the Jumu\'ah adhan', '🕌 It is now time for the iqamah']);
   assert.equal(d[0].title, 'Al-Zij');
   const ar = Z.plan({ days, settings: s, now: Date.UTC(2026, 9, 29, 21), lang: 'ar' }).notifications.filter(n => n.prayer === 'dhuhr');
-  assert.deepEqual(ar.map(n => n.body), ['بعد ساعة أذان الجمعة', '🕌 حان الآن موعد أذان الجمعة', '🕌 حان الآن وقت إقامة صلاة الجمعة']);
+  assert.deepEqual(ar.map(n => n.body), ['بعد ساعة أذان الجمعة', '🕌 حان الآن موعد أذان الجمعة', '🕌 حان الآن وقت إقامة الصلاة']);
+});
+
+/* ---- Friday iqamah (Hassan, 10 Nov): off unless chosen, its own minutes ---- */
+test('Friday: Dhuhr iqamah is OFF by default even when the weekday Dhuhr iqamah is on', () => {
+  const days = uqDays(74, 2026, 10, 29, 3);            // Thu 29, Fri 30, Sat 31 Oct 2026
+  const s = settings(s => { s.p.dhuhr.iqama.on = true; s.p.dhuhr.iqama.min = 20; });
+  const r = Z.plan({ days, settings: s, now: Date.UTC(2026, 9, 28, 21) });
+  const iq = r.notifications.filter(n => n.prayer === 'dhuhr' && n.kind === 'iqama').map(n => n.date);
+  assert.deepEqual(iq, ['2026-10-29', '2026-10-31']);
+  // the Friday adhan itself is untouched (the official minute, named Jumu'ah)
+  assert.ok(r.notifications.some(n => n.date === '2026-10-30' && n.prayer === 'dhuhr' && n.kind === 'adhan'));
+});
+
+test('Friday: when the user turns the Friday iqamah on, it uses its own minutes and neutral wording', () => {
+  const days = uqDays(74, 2026, 10, 30, 1);
+  const s = settings(s => { s.p.dhuhr.iqama.on = true; s.p.dhuhr.iqama.min = 20; s.p.dhuhr.friIqama = { on: true, min: 35, snd: 'bell' }; });
+  const r = Z.plan({ days, settings: s, now: Date.UTC(2026, 9, 29, 21) });
+  const ad = r.notifications.find(n => n.prayer === 'dhuhr' && n.kind === 'adhan');
+  const iq = r.notifications.find(n => n.prayer === 'dhuhr' && n.kind === 'iqama');
+  assert.equal((iq.at - ad.at) / MIN, 35);
+  assert.equal(iq.body, '🕌 حان الآن وقت إقامة الصلاة');
+  assert.equal(iq.sound, 'zij-bell.wav');
+});
+
+/* ---- Fable review, 10 Nov ---- */
+test('two alerts at the same minute (iqamah of one prayer = before-adhan of the next) are both kept, before-adhan first', () => {
+  const days = [{ y: 2026, m: 11, d: 11, off: 180, times: { fajr: 300, dhuhr: 720, asr: 900, maghrib: 960, isha: 1050 } }];
+  const s = settings(s => { s.p.asr.iqama.on = true; s.p.asr.iqama.min = 30; s.p.maghrib.pre.on = true; s.p.maghrib.pre.min = 30; });
+  const r = Z.plan({ days, settings: s, now: Date.UTC(2026, 10, 11, 0) });   // 03:00 Jeddah
+  const same = r.notifications.filter(n => hhmm(n.at, 180) === '15:30');
+  assert.deepEqual(same.map(n => n.prayer + ':' + n.kind), ['maghrib:pre', 'asr:iqama']);
+  assert.equal(new Set(same.map(n => n.id)).size, 2);
+});
+
+test('yesterday\'s Isha iqamah after midnight is still scheduled when the plan is made at 00:05', () => {
+  // high-latitude summer: Isha 23:50, iqamah 20 min later = 00:10 the next day
+  const days = [{ y: 2026, m: 6, d: 20, off: 120, times: { fajr: 150, dhuhr: 790, asr: 1060, maghrib: 1350, isha: 1430 } },
+                { y: 2026, m: 6, d: 21, off: 120, times: { fajr: 150, dhuhr: 790, asr: 1060, maghrib: 1350, isha: 1430 } }];
+  const s = settings(s => { s.p.isha.iqama.on = true; s.p.isha.iqama.min = 20; });
+  const now = Z.localToEpoch(2026, 6, 21, 5, 120);       // 21 June 00:05 local
+  const r = Z.plan({ days, settings: s, now });
+  const first = r.notifications[0];
+  assert.equal(first.prayer + ':' + first.kind + ':' + first.date, 'isha:iqama:2026-06-20');
+  assert.equal(hhmm(first.at, 120), '00:10');
+});
+
+test('the reminder never rings within 2 minutes of an alert (a day before the last adhan = the same prayer the day before)', () => {
+  const now = Date.UTC(2026, 9, 24, 21, 0);
+  for (const [name, fn] of [['adhan only', null], ['all three', allOn], ['adhan + before', s => { for (const k of PR) s.p[k].pre.on = true; }]]) {
+    const r = Z.plan({ days: uqDays(74, 2026, 10, 25, 16), settings: settings(fn), now });
+    const rem = r.notifications.find(n => n.kind === 'reminder');
+    const clash = r.notifications.filter(n => n.kind !== 'reminder' && Math.abs(n.at - rem.at) < 2 * MIN);
+    assert.equal(clash.length, 0, name + ': reminder at ' + hhmm(rem.at, 180) + ' clashes with ' + clash.map(n => n.prayer + ' ' + n.kind).join(', '));
+    assert.ok(rem.at > now && rem.at < r.mainUntil, name);
+  }
+});
+
+test('the adhan is guaranteed 8 days in every combination that keeps the adhan on', () => {
+  const now = Date.UTC(2026, 9, 24, 21, 0);
+  const combos = {
+    'adhan only': null,
+    'adhan + before': s => { for (const k of PR) s.p[k].pre.on = true; },
+    'adhan + iqamah': s => { for (const k of PR) s.p[k].iqama.on = true; },
+    'all three': allOn,
+  };
+  for (const [name, fn] of Object.entries(combos)) {
+    const r = Z.plan({ days: uqDays(74, 2026, 10, 25, 16), settings: settings(fn), now });
+    const days = (r.mainUntil - now) / 864e5;
+    assert.ok(days >= 7.75, name + ': adhan ' + days.toFixed(2) + ' days');
+    if (fn) assert.ok(r.extraUntil > now, name + ': others reach ' + ((r.extraUntil - now) / 864e5).toFixed(2) + ' days');
+  }
+});
+
+test('fewer days than the guarantee (the engine gave only 5): no crash, every adhan of those days kept, slots filled', () => {
+  const now = Date.UTC(2026, 9, 24, 21, 0);
+  const r = Z.plan({ days: uqDays(74, 2026, 10, 25, 5), settings: settings(allOn), now });
+  assert.equal(r.notifications.filter(n => n.kind === 'adhan').length, 25);
+  assert.equal(r.alerts, 63);
+  assert.equal(r.mainUntil, Math.max(...r.notifications.filter(n => n.kind === 'adhan').map(n => n.at)));
 });
 
 test('Arabic with Latin digits (zijDigits = en)', () => {
