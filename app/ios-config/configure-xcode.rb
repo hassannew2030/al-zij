@@ -18,6 +18,7 @@ target.build_configurations.each do |c|
   c.build_settings['MARKETING_VERSION'] = version
   c.build_settings['CURRENT_PROJECT_VERSION'] = build
   c.build_settings['PRODUCT_BUNDLE_IDENTIFIER'] = ENV['ZIJ_APP_ID'] || c.build_settings['PRODUCT_BUNDLE_IDENTIFIER']
+  c.build_settings['CODE_SIGN_ENTITLEMENTS'] = 'App/App.entitlements'   # Time Sensitive notifications (#71)
 end
 project.save
-puts "Xcode: #{files.join(', ')} in App target; iPhone only; version #{version} (#{build})"
+puts "Xcode: #{files.join(', ')} in App target; iPhone only; version #{version} (#{build}); entitlements App/App.entitlements"

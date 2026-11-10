@@ -84,7 +84,9 @@
     var out = [];
     var tz0 = observer.tzAt ? observer.tzAt(new Date(now)) : observer.tz;
     var l0 = new Date(now + tz0 * 3600000);
-    for (var i = 0; i < (count || 14); i++) {
+    // from YESTERDAY: yesterday's Isha / its iqamah can fall after midnight (high latitudes in summer, late iqamah) and must
+    // still be scheduled when the plan is made at 00:05 (Fable review, 10 Nov); the planner drops everything already past
+    for (var i = -1; i < (count || 14); i++) {
       var y = l0.getUTCFullYear(), m = l0.getUTCMonth(), d = l0.getUTCDate() + i;
       var guess = Date.UTC(y, m, d, 12) - tz0 * 3600000;                         // local noon that day …
       var tz = observer.tzAt ? observer.tzAt(new Date(guess)) : tz0;             // … with that day's own offset (summer time)
@@ -136,6 +138,9 @@
   function toNative(n) {
     var o = { id: n.id, title: n.title, body: n.body, schedule: { at: new Date(n.at), allowWhileIdle: true },
               threadIdentifier: 'zij-alerts', silent: true,  // silent = not shown while Al-Zij is on screen: the page itself rings then
+              // Time Sensitive: passes Focus and the scheduled Notification Summary (needs the entitlement in App.entitlements);
+              // it does NOT pass the ring/silent switch — only AlarmKit will (#66). The reminder is an ordinary message.
+              interruptionLevel: n.kind === 'reminder' ? 'active' : 'timeSensitive',
               extra: { kind: n.kind, prayer: n.prayer || '', date: n.date || '' } };
     if (n.sound) o.sound = n.sound;
     return o;
@@ -152,11 +157,24 @@
       return LN.getPending().then(function (r) {
         var pending = (r && r.notifications) || [];
         if (sig === lastSig && pending.length === plan.notifications.length) return;    // nothing changed
-        var cancel = pending.length ? LN.cancel({ notifications: pending.map(function (n) { return { id: +n.id }; }) }) : Promise.resolve();
-        return cancel.then(function () {
-          if (perm !== 'granted' || !plan.notifications.length) return;
-          return LN.schedule({ notifications: plan.notifications.map(toNative) });
-        }).then(function () {
+        // never ask for the permission from here: the plugin's schedule() would prompt by itself when it is undecided
+        var want = perm === 'granted' ? plan.notifications : [];
+        var wanted = {}; want.forEach(function (n) { wanted[n.id] = 1; });
+        // 1 · schedule FIRST: the same ids replace the old ones in place, so if anything fails the phone keeps the old alerts
+        //     instead of being left with none (Fable review, 10 Nov). 2 · then drop the ids that are no longer in the plan.
+        // 3 · check the count iOS really holds; on a mismatch try once more.
+        var attempt = function (left) {
+          var sched = want.length ? LN.schedule({ notifications: want.map(toNative) }) : Promise.resolve();
+          return sched.then(function () { return LN.getPending(); }).then(function (r2) {
+            var now2 = (r2 && r2.notifications) || [];
+            var stale = now2.filter(function (n) { return !wanted[+n.id]; }).map(function (n) { return { id: +n.id }; });
+            return (stale.length ? LN.cancel({ notifications: stale }) : Promise.resolve()).then(function () { return LN.getPending(); });
+          }).then(function (r3) {
+            var n3 = ((r3 && r3.notifications) || []).length;
+            if (n3 !== want.length && left > 0) { log('pending count', n3, '≠', want.length, '— retry'); return attempt(left - 1); }
+          });
+        };
+        return attempt(1).then(function () {
           lastSig = sig;
           LS.set('zijNativeLast', JSON.stringify({ at: Date.now(), why: why, n: plan.alerts, first: plan.firstAt, last: plan.lastAt,
             adhanUntil: plan.mainUntil, extraUntil: plan.extraUntil, perm: perm }));
@@ -234,8 +252,9 @@
     if (!engineReady()) return '';
     var keys = ['zijAlerts', 'zijCalcMethod', 'zijAsr', 'zijAdhanOffsets', 'zijHighLat', 'zijLang', 'zijDigits', 'zijCountry'];
     var day = new Date(); day = day.getFullYear() + '-' + day.getMonth() + '-' + day.getDate();
+    // + the phone's time-zone offset: travelling to another zone changes nothing else here, but the plan must be rebuilt
     return keys.map(function (k) { return LS.get(k) || ''; }).join('§') + '§' + (+observer.lat).toFixed(3) + ',' + (+observer.lon).toFixed(3) +
-      '§' + (observer.activeMethod ? observer.activeMethod() : '') + '§' + day + '§' + (hijriCal.offset || 0);
+      '§' + (observer.activeMethod ? observer.activeMethod() : '') + '§' + day + '§' + (hijriCal.offset || 0) + '§' + new Date().getTimezoneOffset();
   }
   var lastFp = '';
   function watch() {

@@ -36,7 +36,13 @@ const MOCK = () => {
     requestPermissions: async () => { rec.asked++; rec.perm = 'granted'; return { display: 'granted' }; },
     getPending: async () => ({ notifications: rec.scheduled.map(n => ({ id: n.id })) }),
     cancel: async o => { rec.cancelled += o.notifications.length; const ids = new Set(o.notifications.map(n => n.id)); rec.scheduled = rec.scheduled.filter(n => !ids.has(n.id)); },
-    schedule: async o => { if (rec.scheduled.length + o.notifications.length > 64) throw new Error('more than 64 pending'); rec.scheduled.push(...o.notifications); return { notifications: o.notifications.map(n => ({ id: String(n.id) })) }; },
+    // like iOS: a request with an existing id replaces it; more than 64 pending is an error here (iOS would drop the rest silently)
+    schedule: async o => {
+      if (rec.failNext) { rec.failNext--; throw new Error('injected schedule failure'); }
+      const byId = new Map(rec.scheduled.map(n => [n.id, n])); for (const n of o.notifications) byId.set(n.id, n);
+      if (byId.size > 64) throw new Error('more than 64 pending');
+      rec.scheduled = [...byId.values()]; return { notifications: o.notifications.map(n => ({ id: String(n.id) })) };
+    },
   };
   rec.writes = {}; rec.base = [];
   const Filesystem = { writeFile: async o => { rec.files.push(o.path); rec.writes[o.path] = typeof o.data === 'string' ? o.data.length : 0; if (o.path.endsWith('/index.html')) rec.page = o.data; return { uri: 'file:///lib/' + o.path }; },
@@ -124,6 +130,26 @@ async function open({ zone, loc, method, lang, at }) {
   });
   check(r.n === 64 && r.adhans >= 40 && r.days >= 8, `all three alerts on: ${r.adhans} adhans over ${r.days} days + ${r.extra} before/iqamah alerts (${r.n} total)`);
   check(/قبل الأذان والإقامة/.test(r.status || ''), 'status line with all three: ' + (r.status || '').trim());
+  // Time Sensitive for every prayer alert, an ordinary level for the reminder (#71, Fable review)
+  r = await p.evaluate(() => {
+    const L = __nat.scheduled;
+    return { ts: L.filter(n => n.extra.kind !== 'reminder').every(n => n.interruptionLevel === 'timeSensitive'),
+             rem: (L.find(n => n.extra.kind === 'reminder') || {}).interruptionLevel };
+  });
+  check(r.ts && r.rem === 'active', `interruption level: alerts timeSensitive, reminder ${r.rem}`);
+  // a failing schedule() must not leave the phone without alerts: the old ones stay until the next good run
+  r = await p.evaluate(async () => {
+    const before = __nat.scheduled.length;
+    __nat.failNext = 2;                                   // both the attempt and its single retry fail
+    localStorage.setItem('zijAdhanOffsets', JSON.stringify({ fajr: 1 }));   // any change → resync
+    await zijNative.resync('test-fail');
+    const during = __nat.scheduled.length;
+    __nat.failNext = 0;
+    localStorage.removeItem('zijAdhanOffsets');
+    await zijNative.resync('test-ok');
+    return { before, during, after: __nat.scheduled.length };
+  });
+  check(r.before > 0 && r.during === r.before && r.after > 0, `schedule failure keeps the old alerts (${r.before} → ${r.during} during the failure → ${r.after} after)`);
   check(errs.length === 0, 'no page errors' + (errs.length ? ': ' + errs.slice(0, 3).join(' | ') : ''));
   await ctx.close();
 }

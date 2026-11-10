@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Al-Zij — Time Sensitive notifications (table #71): the adhan alerts pass Focus and the scheduled Notification Summary.
+     Copied to ios/App/App/ by configure-ios.sh and set as CODE_SIGN_ENTITLEMENTS by configure-xcode.rb.
+     The App ID needs the "Time Sensitive Notifications" capability; automatic signing should add it — check on the first
+     TestFlight build (the workflow prints the signed entitlements). -->
+<plist version="1.0">
+<dict>
+	<key>com.apple.developer.usernotifications.time-sensitive</key>
+	<true/>
+</dict>
+</plist>

@@ -43,6 +43,9 @@ fi
 # notification sounds also in the app bundle itself (iOS looks there and in Library/Sounds)
 cp www-src/sounds/*.wav "$APPDIR/"
 cp ios-config/PrivacyInfo.xcprivacy "$APPDIR/"
+# Time Sensitive notifications (#71) — the entitlement file; configure-xcode.rb points CODE_SIGN_ENTITLEMENTS at it
+cp ios-config/App.entitlements "$APPDIR/"
+plutil -lint "$APPDIR/App.entitlements"
 
 # add the new files to the Xcode target, iPhone only, version numbers
 gem list -i xcodeproj >/dev/null 2>&1 || gem install --user-install xcodeproj >/dev/null
