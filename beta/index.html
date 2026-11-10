@@ -7053,12 +7053,16 @@ ${clipDefs}<clipPath id="zdMoonClip"><circle r="13"/></clipPath></defs><g id="zd
     for(let k=0;k<24;k++){const [x1,y1]=P(ang(k*60),RB[0]+1),[x2,y2]=P(ang(k*60),RB[0]+(k%3?5:9));s+=`<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="#080b13" stroke-opacity=".55" stroke-width="${k%3?1.2:2}"/>`;}
     /* the labels: name over time, placed just outside the ring, then nudged apart so no two touch */
     const L=[];
+    /* the same language as «كيرف الشمس» (home-designs.js, هـ): name and time the same size, next prayer gold and bold with a ring
+       round its dot, past ones dimmed, everything else ink; a dark halo behind every word; the same calm palette after Isha */
+    const night=nm>=p.isha||nm<p.fajr;
+    const K={brass:night?'#a8813f':'#c9a35d',ink:night?'#f0cf94':'#fbf4e2',gold:night?'#e6c287':'#f5e6b4',past:night?'#b09872':'#b9b09a',bg:night?'#030406':'#0a0c12'};
     T.forEach((t,i)=>{const tmr=aftM&&i<2,tl=(tmr?(en?'tmrw ':'غداً '):'')+f12(t);
-      L.push({a:ga(t),name:NM[i],time:tl,fs:33,ft:29,next:i===nx,kind:'p'});});
-    L.push({a:ga(midN),name:en?'Midnight':'منتصف الليل',time:f12(midN),fs:24,ft:22,kind:'n'});
-    L.push({a:ga(third),name:en?'Last third':'الثلث الأخير',time:f12(third),fs:24,ft:22,kind:'n'});
+      L.push({a:ga(t),t,name:NM[i],time:tl,fs:33,ft:33,next:i===nx,past:t<nm&&i!==nx,kind:'p'});});
+    L.push({a:ga(midN),t:midN,name:en?'Midnight':'منتصف الليل',time:f12(midN),fs:25,ft:25,kind:'n',past:midN<nm});
+    L.push({a:ga(third),t:third,name:en?'Last third':'الثلث الأخير',time:f12(third),fs:25,ft:25,kind:'n',past:third<nm});
     const R0=RB[1]+14,PAD=4;
-    L.forEach(l=>{l.w=Math.max(tw(l.name,l.fs,700),tw(l.time,l.ft,400))+6;l.h=l.fs*1.08+l.ft*1.16;l.b=l.a;});
+    L.forEach(l=>{l.w=Math.max(tw(l.name,l.fs,700),tw(l.time,l.ft,700))+8;l.h=l.fs*1.08+l.ft*1.16;l.b=l.a;});
     const place=l=>{let r=R0;for(;r<R0+200;r+=1){const [x,y]=P(l.b,r),x0=x-l.w/2,x1=x+l.w/2,y0=y-l.h/2,y1=y+l.h/2;
         const nx2=Math.min(Math.max(C,x0),x1),ny=Math.min(Math.max(C,y0),y1);if(Math.hypot(nx2-C,ny-C)>=R0)break;}
       [l.x,l.y]=P(l.b,r);};
@@ -7070,19 +7074,23 @@ ${clipDefs}<clipPath id="zdMoonClip"><circle r="13"/></clipPath></defs><g id="zd
         u.b-=s1*.6*(u.kind==='n'||st!==1?1:0)+(u.kind==='p'&&v.kind==='n'?0:0);v.b+=s1*.6*(v.kind==='n'||u.kind===v.kind?1:0);
         if(u.kind==='n'&&v.kind==='p')u.b-=s1*.6;place(u);place(v);moved=true;}
       if(!moved)break;}
+    // still crowded: the oldest past names give way (their dots stay on the ring) — as on the sun curve
+    {const past=L.filter(l=>l.past).sort((u,v)=>u.t-v.t);
+      for(const l of past){if(L.some(v=>v!==l&&!v.hide&&hit(l,v)))l.hide=true;}}
     let lab='';
     L.forEach(l=>{const [dx,dy]=P(l.a,RBm),[ex,ey]=P(l.a,RB[1]+4),[fx,fy]=P(l.a,RB[1]+11);
       // the line goes from the ring to the nearest edge of the label
       const tx=Math.min(Math.max(fx,l.x-l.w/2),l.x+l.w/2),ty=Math.min(Math.max(fy,l.y-l.h/2),l.y+l.h/2);
-      const gold=l.next,nc=l.kind==='n'?'#d9c48e':(gold?'#f3d98a':'#f1e9d4'),tc=l.kind==='n'?'#bfae84':(gold?'#f3d98a':'#d8ccaa');
-      lab+=`<polyline points="${ex.toFixed(1)},${ey.toFixed(1)} ${fx.toFixed(1)},${fy.toFixed(1)} ${tx.toFixed(1)},${ty.toFixed(1)}" fill="none" stroke="${gold?'#f3d98a':'#c9a35d'}" stroke-opacity="${gold?1:.7}" stroke-width="${gold?2:1.4}"/>`;
-      if(l.kind==='p')lab+=(gold?`<circle cx="${dx.toFixed(1)}" cy="${dy.toFixed(1)}" r="12" fill="url(#zdGlow)"/>`:'')+
-        `<circle cx="${dx.toFixed(1)}" cy="${dy.toFixed(1)}" r="${gold?6.5:5.5}" fill="${gold?'#f3d98a':'#f6efdb'}" stroke="#080b13" stroke-width="2.4"/>`;
-      else{const q=l.a,[cx,cy]=P(q,RBm),z=6;lab+=`<path d="M${cx} ${cy-z}L${cx+z*.75} ${cy}L${cx} ${cy+z}L${cx-z*.75} ${cy}Z" transform="rotate(${q.toFixed(1)} ${cx.toFixed(1)} ${cy.toFixed(1)})" fill="#e9d79c" stroke="#080b13" stroke-width="1.6"/>`;}
+      const foc=l.next,col=foc?K.gold:(l.past?K.past:K.ink),fw=foc?' font-weight="700"':'',halo=` stroke="${K.bg}" stroke-width="9" paint-order="stroke" stroke-linejoin="round"`;
+      if(!l.hide)lab+=`<polyline points="${ex.toFixed(1)},${ey.toFixed(1)} ${fx.toFixed(1)},${fy.toFixed(1)} ${tx.toFixed(1)},${ty.toFixed(1)}" fill="none" stroke="${col}" stroke-opacity=".45" stroke-width="1.8"/>`;
+      if(l.kind==='p')lab+=`<circle cx="${dx.toFixed(1)}" cy="${dy.toFixed(1)}" r="${foc?7.5:5}" fill="${col}"${foc?` stroke="${K.bg}" stroke-width="2.4"`:''}/>`+
+        (foc?`<circle cx="${dx.toFixed(1)}" cy="${dy.toFixed(1)}" r="12.5" fill="none" stroke="${K.gold}" stroke-width="1.8"/>`:'');
+      else{const q=l.a,[cx,cy]=P(q,RBm),z=6;lab+=`<path d="M${cx} ${cy-z}L${cx+z*.75} ${cy}L${cx} ${cy+z}L${cx-z*.75} ${cy}Z" transform="rotate(${q.toFixed(1)} ${cx.toFixed(1)} ${cy.toFixed(1)})" fill="${col}" fill-opacity=".85" stroke="${K.bg}" stroke-width="1.6"/>`;}
+      if(l.hide)return;
       const y1=l.y-l.h/2+l.fs*.86;
       // one <text> per line (Safari splits a word when one <text> holds two positioned lines)
-      lab+=`<text x="${l.x.toFixed(1)}" y="${y1.toFixed(1)}" font-family="${FONT}" font-size="${l.fs}" font-weight="700" text-anchor="middle" fill="${nc}">${l.name}</text>`+
-        `<text x="${l.x.toFixed(1)}" y="${(y1+l.ft*1.14).toFixed(1)}" font-family="${FONT}" font-size="${l.ft}" text-anchor="middle" fill="${tc}">${l.time}</text>`;});
+      lab+=`<text x="${l.x.toFixed(1)}" y="${y1.toFixed(1)}" font-family="${FONT}" font-size="${l.fs}" text-anchor="middle" fill="${col}"${fw}${halo}>${l.name}</text>`+
+        `<text x="${l.x.toFixed(1)}" y="${(y1+l.ft*1.14).toFixed(1)}" font-family="${FONT}" font-size="${l.ft}" text-anchor="middle" fill="${col}"${fw}${halo}>${l.time}</text>`;});
     /* the Sun on the day ring, where it is now (the navy medallion with a gold rim from 7 Nov): bright by day, muted at night */
     let sunTag='';
     {const up=nm>=p.sunrise&&nm<p.maghrib,[x,y]=P(ga(nm),RBm),R=14.5;
