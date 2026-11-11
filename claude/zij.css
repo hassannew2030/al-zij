@@ -5,6 +5,9 @@
 @font-face{font-family:'ZPlex';src:url('/fonts/lib/plex-r.woff') format('woff');font-weight:400;font-display:swap}
 @font-face{font-family:'ZPlex';src:url('/fonts/lib/plex-b.woff') format('woff');font-weight:700;font-display:swap}
 @font-face{font-family:'ZInter';src:url('/fonts/lib/inter.woff') format('woff');font-weight:400 800;font-display:swap}
+@font-face{font-family:'ZNaskh';src:url('/fonts/lib/naskh.woff') format('woff');font-weight:400 700;font-display:swap}
+@font-face{font-family:'ZAmiri';src:url('/fonts/Amiri-Regular.woff') format('woff');font-weight:400;font-display:swap}
+@font-face{font-family:'ZAmiri';src:url('/fonts/Amiri-Bold.woff') format('woff');font-weight:700;font-display:swap}
 @font-face{font-family:'ZMarkazi';src:url('/fonts/lib/markazi.woff') format('woff');font-weight:400 700;font-display:swap}
 
 :root{
@@ -210,9 +213,9 @@ select{cursor:pointer}
 /* ---------- prayer screen ---------- */
 .pgrid{display:grid;grid-template-columns:minmax(300px,380px) minmax(0,1fr) minmax(320px,420px);gap:var(--gap);align-items:start}
 .pgrid .card+.card{margin-top:16px}
-.month{width:100%;border-collapse:separate;border-spacing:0;font-size:14px}
+.month{width:100%;border-collapse:separate;border-spacing:0;font-size:13.5px}
 .month th{position:sticky;top:0;background:var(--panel-solid);color:var(--dim);font-weight:700;font-size:12.5px;padding:9px 8px;text-align:center;border-bottom:1px solid var(--edge);z-index:1}
-.month td{padding:7px 8px;text-align:center;border-bottom:1px solid rgba(196,210,255,.06);font-family:var(--f-num);color:var(--ink-2);white-space:nowrap}
+.month td{padding:7px 6px;text-align:center;border-bottom:1px solid rgba(196,210,255,.06);font-family:var(--f-num);color:var(--ink-2);white-space:nowrap}
 .month td.d{text-align:start;font-family:var(--f-ui);color:var(--ink)}
 .month td.d small{color:var(--dim);margin-inline-start:6px}
 .month tr.fri td{background:rgba(179,157,255,.05)}
@@ -345,3 +348,6 @@ body.calm *,body.calm *::before,body.calm *::after{animation:none!important;tran
   .month td{color:#000;border-bottom:1px solid #ccc}
   .month tr.today td{background:#f3e3b3;color:#000}
 }
+
+.svgd text{font-family:var(--f-ui)}.svgd .disp{font-family:var(--f-display)}.svgd .num{font-family:var(--f-num)}
+#gdefs{position:absolute;width:0;height:0;overflow:hidden}

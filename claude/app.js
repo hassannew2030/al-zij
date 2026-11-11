@@ -238,6 +238,7 @@ window.zijGo=go;
 
 /* ---------- boot ---------- */
 function boot(){
+  document.body.insertAdjacentHTML('afterbegin',`<svg id="gdefs" aria-hidden="true" focusable="false"><defs>${SVG_DEFS}</defs></svg>`);
   document.documentElement.lang=EN()?'en':'ar'; document.documentElement.dir=EN()?'ltr':'rtl';
   document.body.classList.toggle('calm',LS.get('zijCalm')==='1');
   { const fs=+LS.get('zijClaudeFs')||1; document.documentElement.style.setProperty('--fs',fs); }
