@@ -81,7 +81,7 @@
   }
   function playClips(ids) {
     var c = ctx(); if (!c) return Promise.reject();
-    if (c.state === 'suspended') c.resume();
+    wakeCtx(c); // 'suspended' or, after the phone was locked, Safari's 'interrupted'
     return Promise.all(ids.map(load)).then(function (bufs) {
       var t = c.currentTime + 0.08, GAP = 0.12;
       bufs.forEach(function (b) { var s = c.createBufferSource(); s.buffer = b; s.connect(c.destination); s.start(t); t += b.duration + GAP; });
@@ -94,8 +94,11 @@
     }
     speak(text(slot, d));
   }
-  // unlock audio on the first tap anywhere (iPhone needs a touch before sound)
-  document.addEventListener('touchend', function u() { try { var c = ctx(); c && c.resume(); } catch (e) {} document.removeEventListener('touchend', u); }, { once: true });
+  // unlock audio on a tap anywhere (iPhone needs a touch before sound) — and again after the phone was locked, when Safari marks it
+  // 'interrupted' (11 Nov: the old one-time unlock never woke it again). Made only if the speaking clock is on.
+  function wakeCtx(c) { try { if (c.state !== 'running') { var r = c.resume(); if (r && r.catch) r.catch(function () {}); } } catch (e) {} }
+  function wakeOnTap() { try { var c = AC || (on() ? ctx() : null); if (c) wakeCtx(c); } catch (e) {} }
+  ['touchend', 'click', 'keydown'].forEach(function (ev) { document.addEventListener(ev, wakeOnTap, { capture: true, passive: true }); });
   window.zijVoiceClock = { speak: speak, text: text, slots: SLOTS, voiceName: voiceName, seq: seq, announce: announce };
 
   function check() {
