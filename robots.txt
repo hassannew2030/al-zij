@@ -2,6 +2,8 @@
 User-agent: *
 Allow: /
 Disallow: /beta/
+Disallow: /claude/
+Disallow: /fable/
 Disallow: /al-zij-v2.html
 
 Sitemap: https://alzijapp.com/sitemap.xml
