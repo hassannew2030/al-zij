@@ -351,3 +351,6 @@ body.calm *,body.calm *::before,body.calm *::after{animation:none!important;tran
 
 .svgd text{font-family:var(--f-ui)}.svgd .disp{font-family:var(--f-display)}.svgd .num{font-family:var(--f-num)}
 #gdefs{position:absolute;width:0;height:0;overflow:hidden}
+.seg{max-width:100%;flex-wrap:wrap}
+#scr-sky .seg[role=tablist]{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+.dialwrap.zoomed svg{overflow:hidden;border-radius:28px;cursor:grab}
