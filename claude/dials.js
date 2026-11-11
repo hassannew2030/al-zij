@@ -30,7 +30,7 @@ const MARIA=[[-.28,-.22,.26,.2],[.18,-.32,.2,.15],[.05,.1,.3,.22],[-.3,.28,.16,.
 function moonG(r,ph,dark='#05070f'){
   let s=`<circle r="${r}" fill="url(#gMoon)"/>`;
   s+=MARIA.map(([x,y,a,b])=>`<ellipse cx="${f1(x*r)}" cy="${f1(y*r)}" rx="${f1(a*r)}" ry="${f1(b*r)}" fill="#8f99ad" fill-opacity=".28"/>`).join('');
-  if(ph&&ph.illum<0.995){ const pd=Ephemeris.moonDarkPath(r,ph.illum,ph.waxing); s+=`<path d="${pd.d}" fill="${dark}" fill-opacity=".88" ${pd.flip?'transform="scale(-1 1)"':''}/>`; }
+  if(ph&&ph.illum<0.995){ const pd=Ephemeris.moonDarkPath(r,ph.illum,ph.waxing); s+=`<path d="${pd.d}" fill="${dark}" fill-opacity=".95" ${pd.flip?'transform="scale(-1 1)"':''}/>`; }
   return s+`<circle r="${r}" fill="none" stroke="rgba(226,232,246,.45)" stroke-width="${Math.max(.6,r/24).toFixed(2)}"/>`;
 }
 function sunG(r,lit=true){

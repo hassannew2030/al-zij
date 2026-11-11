@@ -32,6 +32,10 @@ parts = [
     ('ZIJ_CITIES', one(r'(const ZIJ_CITIES=\[.*?\]\];)') + '\n'),
     ('kaabaToday (home screen)', between("const _kaaba={day:'',v:null};", '// tourbillon: tap the complication itself')),
     ('ZIJ_COAST', one(r'<script>(window\.ZIJ_COAST=\[.*?\];)</script>') + '\n'),
+    # the adhan-moment recorder: its references (Umm al-Qura and the alternative angles) and its storage — the screens are new
+    ('Adhan log references', between("const AL_KEY = 'zijAdhanLog'", 'function alSaveControls(){')),
+    ('alMedian', one(r'^(function alMedian\(a\)\{.*?\})$', re.M) + '\n'),
+    ('Adhan offsets storage', between("const AL_OFFSET_KEY = 'zijAdhanOffsets';", 'function alApplyOffsetFromLog(){')),
 ]
 build = one(r'window\.ZIJ_BUILD="(\d+)"')
 out = ['/* Al-Zij engine — copied verbatim from beta/index.html (build %s) by claude/tools/build_engine.py.\n'
