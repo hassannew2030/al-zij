@@ -1,4 +1,4 @@
-/* Al-Zij — native bridge (iPhone app only).
+/* Al-Zij — native bridge (iPhone and Android apps).
    Injected by app/scripts/bundle-web.mjs into the app's COPY of index.html, right after <meta charset>, so it runs before the
    page's own scripts. The live site never loads this file. Outside the Capacitor app it does nothing at all.
 
@@ -19,6 +19,11 @@
   var isNative = !!(Cap && typeof Cap.isNativePlatform === 'function' && Cap.isNativePlatform());
   window.ZIJ_NATIVE = isNative;
   if (!isNative) return;
+  // Android (table #73): the same page, the same planner and the same settings. What differs: a larger alert ceiling, one
+  // notification channel per sound, the «Alarms & reminders» permission for on-the-minute delivery, and the wording of the card.
+  var PLATFORM = (typeof Cap.getPlatform === 'function' && Cap.getPlatform()) || 'ios';
+  var ANDROID = PLATFORM === 'android';
+  window.ZIJ_PLATFORM = PLATFORM;
 
   var CFG = window.ZIJ_NATIVE_CFG || {};
   var SITE = CFG.site || 'https://alzijapp.com';
@@ -65,9 +70,11 @@
       var c = S.p[k]; if (c && ((c.pre && c.pre.on) || (c.adhan && c.adhan.on) || (c.iqama && c.iqama.on))) main++;
     });
     var g = (window.ZijSchedule && ZijSchedule.GUARANTEE_DAYS) || 8;
-    return Math.max(3, Math.min(40, Math.max(g + 2, Math.ceil(63 / Math.max(main, 1)) + 2)));
+    var slots = (ANDROID ? ((window.ZijSchedule && ZijSchedule.ANDROID_LIMIT) || 150) : 64) - 1;
+    return Math.max(3, Math.min(40, Math.max(g + 2, Math.ceil(slots / Math.max(main, 1)) + 2)));
   }
   var perm = 'unknown';          // granted | denied | prompt | unknown
+  var exact = ANDROID ? 'unknown' : 'granted';   // Android 12+: «Alarms & reminders» (SCHEDULE_EXACT_ALARM) — granted | denied
   // kept in memory only: the first sync of every launch always rewrites the pending list, so the plugin knows each
   // notification's `silent` flag in this process (not shown on top of the page's own alert while Al-Zij is on screen)
   var lastSig = '';
@@ -102,7 +109,8 @@
 
   function buildPlan(now) {
     var S = settings();
-    return window.ZijSchedule.plan({ days: days(now, daysNeeded(S)), settings: S, now: now, lang: LANG(), digits: LS.get('zijDigits') === 'en' ? 'en' : 'ar' });
+    return window.ZijSchedule.plan({ days: days(now, daysNeeded(S)), settings: S, now: now, lang: LANG(), digits: LS.get('zijDigits') === 'en' ? 'en' : 'ar',
+                                     platform: ANDROID ? 'android' : 'ios' });
   }
 
   // wait (briefly) for the official Saudi table so the first plan uses it, exactly like the screen
@@ -126,6 +134,28 @@
     return LN.checkPermissions().then(function (r) { perm = r && r.display === 'granted' ? 'granted' : r && r.display === 'denied' ? 'denied' : 'prompt'; return perm; })
       .catch(function () { return perm; });
   }
+  // Android 12+: may alerts ring on the exact minute? Without it Android may deliver them up to an hour late (developer.android.com,
+  // «Schedule alarms»); from Android 14 it is OFF by default for new installs, so the card asks for it (never a settings screen by itself)
+  function checkExact() {
+    if (!ANDROID || !LN || typeof LN.checkExactNotificationSetting !== 'function') return Promise.resolve(exact);
+    return LN.checkExactNotificationSetting().then(function (r) { exact = r && r.exact_alarm === 'denied' ? 'denied' : 'granted'; return exact; })
+      .catch(function () { return exact; });
+  }
+  function askExact() {
+    if (!ANDROID || !LN || typeof LN.changeExactNotificationSetting !== 'function') return Promise.resolve(exact);
+    return LN.changeExactNotificationSetting().catch(function () {}).then(checkExact).then(function (x) { paint(); resync('exact'); return x; });
+  }
+  // Android 8+: the sound belongs to the channel. Created (or renamed to the current language) on every launch; a channel's
+  // sound cannot change after it exists, and the user may adjust each channel in Android Settings.
+  function ensureChannels() {
+    if (!ANDROID || !LN || typeof LN.createChannel !== 'function' || !window.ZijSchedule) return Promise.resolve();
+    return Promise.all(ZijSchedule.ANDROID_CHANNELS.map(function (c) {
+      var o = { id: c.id, name: T(c.ar, c.en), importance: c.importance, visibility: 1, vibration: c.importance >= 4, lights: false,
+                description: T('تنبيهات الزّيج', 'Al-Zij alerts') };
+      if (c.sound) o.sound = c.sound;
+      return LN.createChannel(o).catch(function (e) { log('channel failed', c.id, e && e.message); });
+    }));
+  }
   function askPerm() {
     if (!LN) return Promise.resolve('unknown');
     return LN.requestPermissions().then(function (r) { perm = r && r.display === 'granted' ? 'granted' : 'denied'; return perm; })
@@ -136,6 +166,13 @@
   function sigOf(list) { return list.map(function (n) { return n.id + '@' + n.at + (n.sound || '') + n.body; }).join('|'); }
 
   function toNative(n) {
+    if (ANDROID) {
+      var a = { id: n.id, title: n.title, body: n.body, schedule: { at: new Date(n.at), allowWhileIdle: true },
+                extra: { kind: n.kind, prayer: n.prayer || '', date: n.date || '' } };
+      var ao = ZijSchedule.androidOptions(n, exact === 'granted');
+      for (var k in ao) a[k] = ao[k];
+      return a;
+    }
     var o = { id: n.id, title: n.title, body: n.body, schedule: { at: new Date(n.at), allowWhileIdle: true },
               threadIdentifier: 'zij-alerts', silent: true,  // silent = not shown while Al-Zij is on screen: the page itself rings then
               // Time Sensitive: passes Focus and the scheduled Notification Summary (needs the entitlement in App.entitlements);
@@ -150,10 +187,10 @@
     if (busy) { again = true; return Promise.resolve(); }
     if (!LN || !engineReady() || !window.ZijSchedule) return Promise.resolve();
     busy = true;
-    return uqSettled().then(checkPerm).then(function () {
+    return uqSettled().then(checkPerm).then(checkExact).then(ensureChannels).then(function () {
       var plan = buildPlan(Date.now());
       lastPlan = plan;
-      var sig = perm + '#' + sigOf(plan.notifications);
+      var sig = perm + '#' + exact + '#' + sigOf(plan.notifications);
       return LN.getPending().then(function (r) {
         var pending = (r && r.notifications) || [];
         if (sig === lastSig && pending.length === plan.notifications.length) return;    // nothing changed
@@ -192,6 +229,10 @@
   function statusHTML() {
     var S = settings() || {};
     if (S.on === false) return null;
+    if (perm === 'denied' && ANDROID) {
+      return '<div>' + T('🔕 إشعارات الزّيج ممنوعة من إعدادات الجوال. لتصلك: الإعدادات ← التطبيقات ← الزّيج ← الإشعارات ← اسمح.',
+        '🔕 Al-Zij notifications are turned off in the phone\'s Settings. To get them: Settings → Apps → Al-Zij → Notifications → Allow.') + '</div>';
+    }
     if (perm === 'denied') {
       return '<div>' + T('🔕 التنبيه والجوال مقفول ممنوع من إعدادات الآيفون.', '🔕 Alerts with the phone locked are turned off in iPhone Settings.') + '</div>' +
         '<button type="button" data-nat="settings">' + T('افتح الإعدادات ← الإشعارات ← الزّيج', 'Open Settings → Notifications → Al-Zij') + '</button>';
@@ -200,7 +241,14 @@
       return '<div>' + T('ليصلك الأذان والجوال مقفول أو الزّيج مغلق، اسمح للزّيج بالتنبيه مرة واحدة.', 'To get the adhan with the phone locked or Al-Zij closed, allow Al-Zij to notify you once.') + '</div>' +
         '<button type="button" data-nat="ask">' + T('🔔 اسمح بتنبيه الأذان', '🔔 Allow adhan alerts') + '</button>';
     }
+    // Android 12+: allowed, but not on the exact minute — say it plainly and offer the one switch that fixes it
+    var exactNote = ANDROID && exact === 'denied'
+      ? '<div>⏰ ' + T('ليصلك الأذان في دقيقته بالضبط، اسمح للزّيج بـ«المنبّهات والتذكيرات». بدونها قد يتأخر أندرويد بالتنبيه حتى ساعة.',
+          'For the adhan to arrive on the exact minute, allow Al-Zij «Alarms & reminders». Without it Android may deliver an alert up to an hour late.') +
+        '</div><button type="button" data-nat="exact">' + T('⏰ اسمح بالمنبّهات والتذكيرات', '⏰ Allow alarms & reminders') + '</button>'
+      : '';
     var p = lastPlan;
+    if (exactNote) return exactNote;
     if (!p || !p.alerts) return '<div>' + T('✅ التنبيه والجوال مقفول مسموح.', '✅ Alerts with the phone locked are allowed.') + '</div>';
     var left = function (t) { return Math.max(1, Math.round((t - Date.now()) / 86400000)); };
     var n = left(p.mainUntil != null ? p.mainUntil : p.lastAt);
@@ -236,6 +284,7 @@
     if (b) {
       e.preventDefault();
       if (b.dataset.nat === 'ask') askPerm();
+      else if (b.dataset.nat === 'exact') askExact();
       else { try { location.href = 'app-settings:'; } catch (x) {} }   // UIApplication.openSettingsURLString
       return;
     }
@@ -263,7 +312,7 @@
     if (fp && fp !== lastFp) { var first = !lastFp; lastFp = fp; resync(first ? 'open' : 'change'); }
     paint();
   }
-  function resumed() { lastFp = ''; checkPerm().then(watch); }
+  function resumed() { lastFp = ''; checkPerm().then(checkExact).then(watch); }
   document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') resumed(); });
   try { var APP = plugin('App'); if (APP && APP.addListener) APP.addListener('resume', resumed); } catch (e) {}
   window.addEventListener('load', function () {
@@ -278,6 +327,7 @@
 
   /* ---------- notification sounds: iOS plays custom sounds only from the app's Library/Sounds folder ---------- */
   function installSounds() {
+    if (ANDROID) return;               // Android plays them from res/raw through the channels (configure-android.sh copies them there)
     if (!FS || !window.ZijSchedule) return;
     var files = Object.keys(ZijSchedule.SOUND_FILES).map(function (k) { return ZijSchedule.SOUND_FILES[k]; });
     var want = (CFG.build || '') + ':' + files.join(',');

@@ -12,10 +12,22 @@
   },
   "plugins": {
     "LocalNotifications": {
-      "presentationOptions": ["banner", "list", "sound"]
+      "presentationOptions": [
+        "banner",
+        "list",
+        "sound"
+      ],
+      "smallIcon": "ic_stat_zij",
+      "iconColor": "#C9A35D"
     },
     "CapacitorHttp": {
       "enabled": false
     }
+  },
+  "android": {
+    "backgroundColor": "#0a0c12",
+    "allowMixedContent": false,
+    "captureInput": false,
+    "webContentsDebuggingEnabled": false
   }
 }
