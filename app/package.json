@@ -2,16 +2,18 @@
   "name": "al-zij-app",
   "version": "1.0.0",
   "private": true,
-  "description": "Al-Zij (الزيج) — iPhone app shell around the offline web app, with adhan alerts as iOS local notifications",
+  "description": "Al-Zij (الزيج) — iPhone and Android app shell around the offline web app, with adhan alerts as local notifications",
   "license": "UNLICENSED",
   "scripts": {
     "sounds": "python3 scripts/make-sounds.py www-src/sounds",
     "bundle": "node scripts/bundle-web.mjs",
     "test": "node --test test/schedule.test.mjs test/inject.test.mjs",
     "test:e2e": "node test/bridge.e2e.mjs",
-    "sync": "npm run bundle && npx cap sync ios"
+    "sync": "npm run bundle && npx cap sync ios",
+    "sync:android": "npm run bundle && npx cap sync android"
   },
   "dependencies": {
+    "@capacitor/android": "8.5.3",
     "@capacitor/app": "8.1.2",
     "@capacitor/core": "8.5.3",
     "@capacitor/filesystem": "8.1.5",

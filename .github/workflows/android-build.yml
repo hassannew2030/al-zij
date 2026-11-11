@@ -1,0 +1,84 @@
+# Al-Zij Android app — builds on GitHub's Linux machines (table #73).
+# Runs on every push to the android or ios-app branch that touches app/ or the web app.
+# Output: a debug APK (installable for testing) and an UNSIGNED release AAB. Google Play needs the AAB signed with the upload
+# key — see app/README.md «Android». No signing secrets are used here. It never deploys the website and never touches main.
+name: Android build
+
+on:
+  push:
+    branches: [android, ios-app]
+    paths: ['app/**', 'index.html', 'data/uq/**', 'fonts/**', 'icons/**', '.github/workflows/android-build.yml']
+  workflow_dispatch:
+
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Alert planner and bridge tests
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: app } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm install --no-audit --no-fund
+      - run: npm test
+      - name: Bundle the web app into app/www
+        run: npm run bundle
+        env: { CI: '1' }
+      - name: End-to-end check of the bridge in the real page (Chromium) — iPhone and Android mocks
+        run: |
+          npm install --no-save --no-audit --no-fund playwright@1.63.0
+          npx playwright install --with-deps chromium
+          npm run test:e2e
+
+  android:
+    name: Build the Android app (debug APK + unsigned release AAB)
+    needs: test
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: app } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '21' }
+      - run: npm install --no-audit --no-fund
+      - run: python3 -m pip install --quiet pillow
+      - name: Bundle the web app
+        run: npm run bundle
+        env: { CI: '1' }
+      - name: Create the Android project (generated fresh each time; app/android is not kept in git)
+        run: npx cap add android
+      - name: Apply Al-Zij native settings (name, icons, sounds, portrait, version)
+        run: bash android-config/configure-android.sh
+        env:
+          ZIJ_BUILD_NUMBER: ${{ github.run_number }}
+      - run: npx cap sync android
+      - name: Build
+        working-directory: app/android
+        run: ./gradlew --no-daemon assembleDebug bundleRelease
+      - name: Check the built app
+        run: |
+          APK=android/app/build/outputs/apk/debug/app-debug.apk
+          AAB=android/app/build/outputs/bundle/release/app-release.aab
+          ls -la "$APK" "$AAB"
+          unzip -l "$APK" > apk.txt
+          grep -q 'assets/public/index.html' apk.txt
+          grep -q 'assets/public/native/zij-native.js' apk.txt
+          grep -q 'assets/public/data/uq/c/74.json' apk.txt
+          for s in zij_brass zij_bell zij_soft; do grep -q "res/raw/$s.wav" apk.txt; done
+          unzip -p "$APK" assets/public/index.html | grep -q 'zij-native'
+          unzip -l "$AAB" | grep -q 'base/assets/public/index.html'
+          grep -E "applicationId|versionCode|versionName" android/app/build.gradle
+          grep -E "POST_NOTIFICATIONS|SCHEDULE_EXACT_ALARM|RECEIVE_BOOT_COMPLETED" android/app/build/intermediates/merged_manifests/*/process*Manifest/AndroidManifest.xml 2>/dev/null \
+            || find android/app/build/intermediates -name AndroidManifest.xml -path '*merged*' | head -1 | xargs grep -E "POST_NOTIFICATIONS|SCHEDULE_EXACT_ALARM|RECEIVE_BOOT_COMPLETED"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: al-zij-android-${{ github.run_number }}
+          path: |
+            app/android/app/build/outputs/apk/debug/app-debug.apk
+            app/android/app/build/outputs/bundle/release/app-release.aab
+          retention-days: 14

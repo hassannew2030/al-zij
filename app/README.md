@@ -1,4 +1,4 @@
-# Al-Zij iPhone app (Capacitor)
+# Al-Zij iPhone and Android apps (Capacitor)
 
 The App Store app is a native shell around the same offline web app that runs at alzijapp.com. The web files at the repo root are **only read**; everything native lives in `app/`. Its main native feature is **adhan alerts that fire when the phone is locked or Al-Zij is closed**, using iOS local notifications. There is no server, no push service and no data collection.
 
@@ -43,9 +43,9 @@ app/
 ```bash
 cd app
 npm install
-npm test               # 26 planner and injection tests
+npm test               # 31 planner and injection tests (5 for Android)
 npm run bundle         # → app/www, 9 MB
-npm run test:e2e       # 29 checks in the real page (needs Playwright + Chromium)
+npm run test:e2e       # 36 checks in the real page, iPhone and Android mocks (needs Playwright + Chromium)
 # macOS only:
 npx cap add ios && bash ios-config/configure-ios.sh && npx cap sync ios && npx cap open ios
 ```
@@ -142,3 +142,30 @@ In the App Review notes, explain how to test the alerts:
 2. Lock the phone and wait for the next prayer, or turn on the 5-minute pre-alert.
 
 Planned next native features that strengthen 4.2: a widget and a Lock Screen widget (#28), and the pre-sunrise alert (#27).
+
+## Android (table #73)
+
+The Android app is the same shell: the same bundled web app, the same planner (`zij-schedule.js`) and the same bridge (`zij-native.js`, which checks `Capacitor.getPlatform()`). Built on branch `android` (off `ios-app`) by `.github/workflows/android-build.yml` on GitHub's Linux machines: tests → bundle → `npx cap add android` → `android-config/configure-android.sh` → `cap sync` → `./gradlew assembleDebug bundleRelease`. Artifacts: a debug APK (install it on a test phone) and an **unsigned** release AAB. `app/android` is generated and not committed, like `app/ios`.
+
+| | iPhone | Android |
+|---|---|---|
+| App id | `com.alzijapp.app` | `com.alzijapp.app` (same) |
+| Home-screen name | الزيج | الزيج (store name «الزيج — Al-Zij», #73) |
+| Pending alerts | 64 (63 + reminder) | 150 (149 + reminder) ≈ 30 days of adhans |
+| Sound | per notification (Library/Sounds) | per **channel**: `zij_brass`, `zij_bell`, `zij_soft`, `zij_silent` (no sound), `zij_reminder`; files in `res/raw/zij_*.wav` |
+| On the exact minute | always | only with «Alarms & reminders» (see below) |
+| Status-bar icon | — | `ic_stat_zij` (white crescent), gold accent |
+
+**Platform facts** (verified = read in the source or the official docs; assumption = not yet seen on a phone):
+- **Exact alarms — verified** in @capacitor/local-notifications 8.3.1 (`LocalNotificationManager.setExactIfPossible`): with `isExactNotification: true` and the permission granted, an `at` alert uses `setExactAndAllowWhileIdle(RTC_WAKEUP)`, so it fires in Doze. Without the permission the plugin falls back to `setAndAllowWhileIdle`, which Android may deliver **up to an hour late** on Android 12+ (developer.android.com, «Schedule alarms»).
+- **The permission — verified:** the plugin's manifest declares `SCHEDULE_EXACT_ALARM`, `POST_NOTIFICATIONS` and `RECEIVE_BOOT_COMPLETED`. On Android 14+, `SCHEDULE_EXACT_ALARM` is **denied by default** for new installs that are not alarm-clock or calendar apps (developer.android.com, «Schedule exact alarms are denied by default»). `USE_EXACT_ALARM` is not used: Play allows it only for apps whose core function is an alarm clock or calendar.
+- **No surprise settings screen — verified in the plugin source:** `schedule()` opens the «Alarms & reminders» screen by itself whenever any notification asks for exact delivery and the permission is missing. So the bridge checks `checkExactNotificationSetting()` first and asks for exact delivery only when it is granted; otherwise the alerts card says plainly that alerts may be late and offers «⏰ اسمح بالمنبّهات والتذكيرات» (`changeExactNotificationSetting()`). Never on first launch.
+- **Notification permission — verified:** Android 13+ asks with the system dialog from `requestPermissions()`; older versions are allowed by default. Asked only from the alerts card, as on iPhone.
+- **Reboot — verified:** the plugin's `LocalNotificationRestoreReceiver` re-arms the saved alerts on `BOOT_COMPLETED` / `LOCKED_BOOT_COMPLETED`; Android cancels all alarms at shutdown (developer.android.com). Works only after the app was opened once.
+- **Ceiling — partly verified:** Android refuses more than 500 alarms per app («Too many alarms (500) registered» — the system's own exception text); some phones count other alarms of the app too. 150 leaves a wide margin.
+- **Channels — verified:** on Android 8+ a notification's sound comes from its channel, and a channel's sound cannot change after it exists; the plugin creates channels with `createChannel()` and plays `res/raw/<name>`.
+- **Assumptions to check on a real phone:** maker battery savers (Samsung, Xiaomi, Huawei…) that kill or delay alarms; the WebView's location prompt (the manifest declares coarse and fine location); `WebView.setServerBasePath` for silent web updates (snapshot in the app's files folder); and that while Al-Zij is on screen the system notification and the page's own sound may both ring (Android shows notifications in the foreground; iPhone does not).
+
+**What Hassan provides later (never commit it):** an **upload keystore** (`.jks`) and its passwords, kept in the Passwords app and a backup copy offline. With Play App Signing, Google keeps the real signing key; losing the upload key is recoverable through Play support, but it is still a key of the project (#70). When it exists, add it as repository secrets and a signing step to the workflow.
+
+**Tests:** `npm test` adds 5 Android planner tests (31 in all); `npm run test:e2e` adds 7 Android checks in the real page with an Android mock (36 in all).

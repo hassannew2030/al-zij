@@ -17,7 +17,11 @@
   var KIND_ORDER = { pre: 0, adhan: 1, iqama: 2 };
   // the in-app sounds, rendered once into short files (app/scripts/make-sounds.py). 'silent' = message only.
   var SOUND_FILES = { brass: 'zij-brass.wav', bell: 'zij-bell.wav', soft: 'zij-soft.wav' };
-  var IOS_LIMIT = 64, REMINDER_ID = 999, MIN_LEAD_MS = 15000, MIN = 60000, HOUR = 3600000, DAY = 86400000;
+  var IOS_LIMIT = 64, REMINDER_ID = 999,
+      // Android has no 64-alert ceiling, but every pending alert is one AlarmManager alarm, and the system refuses more than
+      // 500 per app ("Too many alarms (500) registered") — some phones count the app's other alarms too. 150 keeps a wide
+      // margin and still covers a month of adhans (adhan only: 5 a day ≈ 30 days; all three alerts: 8 days of adhan + the rest).
+      ANDROID_LIMIT = 150, MIN_LEAD_MS = 15000, MIN = 60000, HOUR = 3600000, DAY = 86400000;
   var GUARANTEE_DAYS = 8;          // each prayer's main alert is kept this many days ahead before any other alert (#71)
   var AR_DIGITS = '٠١٢٣٤٥٦٧٨٩';
 
@@ -62,7 +66,8 @@
    * @param {number} o.now       epoch ms
    * @param {string} [o.lang]    'ar' | 'en'
    * @param {string} [o.digits]  'ar' | 'en' (Arabic-mode digit style)
-   * @param {number} [o.limit]   total pending notifications allowed (default 64 — the iOS ceiling)
+   * @param {number} [o.limit]   total pending notifications allowed (default: the platform ceiling — iOS 64, Android 150)
+   * @param {string} [o.platform] 'ios' (default) | 'android' — only changes the ceiling
    * @param {boolean}[o.reminder] add the "open Al-Zij" reminder (default true)
    * @param {number} [o.guaranteeDays] days ahead for which each prayer's main alert is kept first (default GUARANTEE_DAYS = 8)
    * @returns {{notifications:Array, alerts:number, firstAt:number|null, lastAt:number|null, dropped:number,
@@ -71,7 +76,8 @@
    *   extraUntil = the same for the other alerts (before-adhan, iqamah), or null when none is enabled.
    */
   function plan(o) {
-    var limit = Math.max(1, Math.min(o.limit || IOS_LIMIT, IOS_LIMIT));
+    var ceil = o.platform === 'android' ? ANDROID_LIMIT : IOS_LIMIT;
+    var limit = Math.max(1, Math.min(o.limit || ceil, ceil));
     var S = o.settings, now = o.now, W = words(o.lang, o.digits);
     var gDays = o.guaranteeDays != null ? Math.max(0, +o.guaranteeDays) : GUARANTEE_DAYS;
     var all = [];
@@ -154,9 +160,35 @@
     return r;
   }
 
+  /* ---------- Android: how a planned alert is handed to @capacitor/local-notifications 8.3.1 ----------
+     On Android 8+ the sound belongs to the notification CHANNEL, not to the notification, so each sound has its own channel
+     (created once by the bridge from ANDROID_CHANNELS). Raw resource names may only use a–z, 0–9 and _, so the sounds ship as
+     res/raw/zij_brass.wav etc. «بدون صوت» goes to a low-importance channel with no sound. `exact` = the user allowed
+     «Alarms & reminders»: then the plugin uses setExactAndAllowWhileIdle; otherwise it must NOT ask (it would open the settings
+     screen on every reschedule — plugin source, doSchedule), so isExactNotification is false and Android may deliver the alert
+     up to an hour late — the alerts card says so and offers the switch. */
+  var ANDROID_CHANNELS = [
+    { id: 'zij_brass', snd: 'brass', sound: 'zij_brass.wav', importance: 4, ar: 'الأذان والتنبيهات — نغمة النحاس', en: 'Adhan and alerts — brass tone' },
+    { id: 'zij_bell', snd: 'bell', sound: 'zij_bell.wav', importance: 4, ar: 'الأذان والتنبيهات — نغمة الجرس', en: 'Adhan and alerts — bell tone' },
+    { id: 'zij_soft', snd: 'soft', sound: 'zij_soft.wav', importance: 4, ar: 'الأذان والتنبيهات — نغمة هادئة', en: 'Adhan and alerts — soft tone' },
+    { id: 'zij_silent', snd: 'silent', sound: null, importance: 2, ar: 'تنبيهات بلا صوت', en: 'Alerts without sound' },
+    { id: 'zij_reminder', snd: null, sound: 'zij_soft.wav', importance: 3, ar: 'تذكير بفتح الزّيج', en: 'Reminder to open Al-Zij' }
+  ];
+  function androidRaw(file) { return file ? String(file).replace(/\.[^.]+$/, '').replace(/[^a-z0-9_]/gi, '_').toLowerCase() : null; }
+  function androidOptions(n, exact) {
+    var ch;
+    if (n.kind === 'reminder') ch = 'zij_reminder';
+    else if (!n.sound) ch = 'zij_silent';
+    else ch = androidRaw(n.sound);                                    // zij-brass.wav → zij_brass
+    var o = { channelId: ch, smallIcon: 'ic_stat_zij', iconColor: '#C9A35D', isExactNotification: !!exact, autoCancel: true };
+    if (n.sound) o.sound = androidRaw(n.sound) + '.wav';             // Android 7 and older: per-notification sound from res/raw
+    return o;
+  }
+
   function pad(n) { return (n < 10 ? '0' : '') + n; }
 
   var api = { plan: plan, words: words, localToEpoch: localToEpoch, reminderTime: reminderTime, SOUND_FILES: SOUND_FILES, IOS_LIMIT: IOS_LIMIT,
+              ANDROID_LIMIT: ANDROID_LIMIT, ANDROID_CHANNELS: ANDROID_CHANNELS, androidOptions: androidOptions, androidRaw: androidRaw,
               REMINDER_ID: REMINDER_ID, GUARANTEE_DAYS: GUARANTEE_DAYS };
   if (typeof module === 'object' && module.exports) module.exports = api;
   else root.ZijSchedule = api;

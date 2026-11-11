@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Al-Zij status-bar icon: Android draws it as a white silhouette, so it is a single-colour crescent with a small star. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp"
+    android:viewportWidth="24" android:viewportHeight="24">
+    <path android:fillColor="#FFFFFFFF"
+        android:pathData="M12.8,2.2A9.9,9.9 0,1 0,21.8 15.4A8,8 0,0 1,12.8 2.2Z"/>
+    <path android:fillColor="#FFFFFFFF"
+        android:pathData="M17.6,4.4l0.75,1.65l1.8,0.2l-1.35,1.2l0.4,1.75l-1.6,-0.9l-1.6,0.9l0.4,-1.75l-1.35,-1.2l1.8,-0.2z"/>
+</vector>

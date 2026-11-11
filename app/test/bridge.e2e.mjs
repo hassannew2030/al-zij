@@ -220,6 +220,57 @@ async function open({ zone, loc, method, lang, at }) {
   await ctx.close();
 }
 
+/* ---- 5 · Android (#73): same page and planner; channels per sound; up to 150; «Alarms & reminders» asked from the card only ---- */
+{
+  const ctx = await b.newContext({ timezoneId: 'Asia/Riyadh', locale: 'ar-SA', viewport: { width: 390, height: 844 } });
+  await ctx.addInitScript(() => {
+    const rec = window.__and = { asked: 0, exactAsked: 0, exact: 'denied', perm: 'prompt', scheduled: [], channels: {}, files: [] };
+    const LocalNotifications = {
+      checkPermissions: async () => ({ display: rec.perm }),
+      requestPermissions: async () => { rec.asked++; rec.perm = 'granted'; return { display: 'granted' }; },
+      checkExactNotificationSetting: async () => ({ exact_alarm: rec.exact }),
+      changeExactNotificationSetting: async () => { rec.exactAsked++; rec.exact = 'granted'; return { exact_alarm: 'granted' }; },
+      createChannel: async o => { rec.channels[o.id] = o; },
+      getPending: async () => ({ notifications: rec.scheduled.map(n => ({ id: n.id })) }),
+      cancel: async o => { const ids = new Set(o.notifications.map(n => n.id)); rec.scheduled = rec.scheduled.filter(n => !ids.has(n.id)); },
+      schedule: async o => { const m = new Map(rec.scheduled.map(n => [n.id, n])); for (const n of o.notifications) m.set(n.id, n);
+        if (m.size > 500) throw new Error('Too many alarms (500)'); rec.scheduled = [...m.values()]; return { notifications: o.notifications.map(n => ({ id: String(n.id) })) }; },
+    };
+    const Filesystem = { writeFile: async o => { rec.files.push(o.path); return { uri: 'file:///x/' + o.path }; }, getUri: async o => ({ uri: 'file:///x/' + o.path }), rmdir: async () => {} };
+    window.Capacitor = { isNativePlatform: () => true, getPlatform: () => 'android', Plugins: { LocalNotifications, Filesystem, WebView: { setServerBasePath: async () => {} }, App: { addListener: () => {} } } };
+    if (!sessionStorage.getItem('seeded')) { sessionStorage.setItem('seeded', '1');
+      localStorage.setItem('zijWelcomed', '1'); localStorage.setItem('zijLang', 'ar'); localStorage.setItem('zijLocAuto', '0');
+      localStorage.setItem('zijLastLocation', JSON.stringify({ lat: 21.5433, lon: 39.1728 })); localStorage.setItem('zijLocationLocked', 'true'); localStorage.setItem('zijLockByUser', '1'); }
+  });
+  const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message));
+  await p.route(/\/native\/(capacitor|app|local-notifications|filesystem)\.js$/, r => r.fulfill({ body: '', contentType: 'text/javascript' }));
+  await p.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort());
+  await p.goto(BASE + 'index.html'); await p.waitForTimeout(3500);
+  let r = await p.evaluate(() => ({ asked: __and.asked, ex: __and.exactAsked, n: __and.scheduled.length, plat: window.ZIJ_PLATFORM }));
+  check(r.plat === 'android' && r.asked === 0 && r.ex === 0 && r.n === 0, 'Android: no prompt and no settings screen at launch');
+  await p.evaluate(() => document.querySelector('#zNat [data-nat="ask"]').click());
+  await p.waitForTimeout(3000);
+  r = await p.evaluate(() => {
+    const L = __and.scheduled, chans = __and.channels;
+    return { n: L.length, inexact: L.every(n => n.isExactNotification === false), ch: L.every(n => chans[n.channelId]),
+      first: L[0] && { ch: L[0].channelId, snd: L[0].sound, icon: L[0].smallIcon, ios: 'interruptionLevel' in L[0] },
+      chanIds: Object.keys(chans).sort().join(','), brassSound: chans.zij_brass && chans.zij_brass.sound, silentImp: chans.zij_silent && chans.zij_silent.importance,
+      status: document.getElementById('zNat')?.textContent || '', btn: !!document.querySelector('#zNat [data-nat="exact"]'), sounds: __and.files.length };
+  });
+  check(r.n > 64 && r.n <= 150, `Android: ${r.n} alerts scheduled (more than iOS's 64, at most 150)`);
+  check(r.chanIds === 'zij_bell,zij_brass,zij_reminder,zij_silent,zij_soft' && r.brassSound === 'zij_brass.wav' && r.silentImp === 2, 'Android: five channels created — ' + r.chanIds);
+  check(r.ch && r.first.ch === 'zij_brass' && r.first.snd === 'zij_brass.wav' && r.first.icon === 'ic_stat_zij' && !r.first.ios, 'Android: each alert on its sound\'s channel, white status icon, no iOS-only fields');
+  check(r.inexact && r.btn && /المنبّهات والتذكيرات/.test(r.status), 'Android without «Alarms & reminders»: inexact, and the card says so — ' + r.status.trim().slice(0, 70));
+  check(r.sounds === 0, 'Android: no Library/Sounds copy (sounds come from res/raw)');
+  await p.evaluate(() => document.querySelector('#zNat [data-nat="exact"]').click());
+  await p.waitForTimeout(3000);
+  r = await p.evaluate(() => ({ ex: __and.exactAsked, exact: __and.scheduled.every(n => n.isExactNotification === true), n: __and.scheduled.length,
+    status: document.getElementById('zNat')?.textContent || '' }));
+  check(r.ex === 1 && r.exact && /✅/.test(r.status) && !/الآيفون/.test(r.status), 'Android after allowing: every alert exact, status — ' + r.status.trim().slice(0, 80));
+  check(errs.length === 0, 'Android: no page errors' + (errs.length ? ': ' + errs.slice(0, 3).join(' | ') : ''));
+  await ctx.close();
+}
+
 await b.close(); server.close();
 console.log(fails ? `FAIL ${fails}` : 'ALL OK');
 process.exit(fails ? 1 : 0);

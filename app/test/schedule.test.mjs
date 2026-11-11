@@ -331,3 +331,60 @@ test('limit is clamped to the iOS ceiling even if asked for more', () => {
   const r = Z.plan({ days, settings: settings(allOn), now: Date.UTC(2026, 9, 24, 21), limit: 500 });
   assert.equal(r.notifications.length, 64);
 });
+
+/* ---------- Android (table #73): the same planner, a larger ceiling, one channel per sound ---------- */
+test('Android: adhan only fills 149 slots ≈ 30 days of adhans, + the reminder; never above 150', () => {
+  const days = uqDays(74, 2026, 10, 25, 40);
+  const r = Z.plan({ days, settings: settings(), now: Date.UTC(2026, 9, 24, 21), platform: 'android' });
+  assert.equal(r.alerts, 149);
+  assert.equal(r.notifications.length, 150);
+  assert.ok(r.notifications.filter(n => n.kind !== 'reminder').every(n => n.kind === 'adhan'));
+  assert.ok((r.mainUntil - Date.UTC(2026, 9, 24, 21)) / 864e5 > 29);
+  const ids = new Set(r.notifications.map(n => n.id)); assert.equal(ids.size, 150);
+  assert.ok(r.notifications.every(n => n.id < 1000 && n.id > 0));
+});
+
+test('Android: all three alerts — the adhan-first rule still guarantees 8 days, the extra slots reach further than on iOS', () => {
+  const days = uqDays(74, 2026, 10, 25, 40);
+  const now = Date.UTC(2026, 9, 24, 21);
+  const ios = Z.plan({ days, settings: settings(allOn), now });
+  const and = Z.plan({ days, settings: settings(allOn), now, platform: 'android', limit: 500 });
+  assert.equal(and.notifications.length, 150);
+  assert.ok(and.mainUntil >= ios.mainUntil);
+  assert.ok(and.extraUntil > ios.extraUntil);
+  const adhans = and.notifications.filter(n => n.kind === 'adhan' && n.at <= now + 8 * 864e5);
+  assert.equal(adhans.length, 40);
+});
+
+test('Android: the iOS ceiling is unchanged when no platform is given', () => {
+  const days = uqDays(74, 2026, 10, 25, 40);
+  const r = Z.plan({ days, settings: settings(allOn), now: Date.UTC(2026, 9, 24, 21), limit: 150 });
+  assert.equal(r.notifications.length, 64);
+});
+
+test('Android: each sound rides on its own channel with a valid res/raw name; «بدون صوت» and the reminder have their own', () => {
+  const days = uqDays(74, 2026, 10, 25, 3);
+  const r = Z.plan({ days, settings: settings(s => { allOn(s); s.p.asr.adhan.snd = 'silent'; }), now: Date.UTC(2026, 9, 24, 21), platform: 'android' });
+  const ids = new Set(Z.ANDROID_CHANNELS.map(c => c.id));
+  for (const n of r.notifications) {
+    const o = Z.androidOptions(n, true);
+    assert.ok(ids.has(o.channelId), o.channelId);
+    assert.equal(o.isExactNotification, true);
+    if (o.sound) assert.match(o.sound, /^[a-z0-9_]+\.wav$/);
+  }
+  const by = k => r.notifications.find(k);
+  assert.equal(Z.androidOptions(by(n => n.kind === 'adhan' && n.prayer === 'fajr'), true).channelId, 'zij_brass');
+  assert.equal(Z.androidOptions(by(n => n.kind === 'iqama'), true).channelId, 'zij_bell');
+  assert.equal(Z.androidOptions(by(n => n.kind === 'pre'), true).channelId, 'zij_soft');
+  const asr = Z.androidOptions(by(n => n.kind === 'adhan' && n.prayer === 'asr'), true);
+  assert.equal(asr.channelId, 'zij_silent'); assert.equal(asr.sound, undefined);
+  assert.equal(Z.androidOptions(by(n => n.kind === 'reminder'), true).channelId, 'zij_reminder');
+  // every channel's sound file is one of the app's own tones
+  for (const c of Z.ANDROID_CHANNELS) if (c.sound) assert.ok(Object.values(Z.SOUND_FILES).map(Z.androidRaw).includes(Z.androidRaw(c.sound)));
+});
+
+test('Android: without «Alarms & reminders» the alerts are handed over as inexact (no settings screen on every reschedule)', () => {
+  const n = { id: 1, kind: 'adhan', sound: 'zij-brass.wav' };
+  assert.equal(Z.androidOptions(n, false).isExactNotification, false);
+  assert.equal(Z.androidOptions(n, true).isExactNotification, true);
+});
