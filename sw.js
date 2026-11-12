@@ -4,10 +4,10 @@
 // (?t=…) is no longer part of the key, so update checks stop piling up copies of version.json ③ /beta/ and /beta/index.html
 // (and / and /index.html) are the same saved page, so the test copy never silently opens as the main one.
 // Inside the App Store app this file is not used at all (the app opens its own bundled copy).
-const CACHE_NAME = 'al-zij-v8';
+const CACHE_NAME = 'al-zij-v9';
 const NET_WAIT = 3000;
 const FONTS = ['./fonts/Amiri-Regular.woff', './fonts/Amiri-Bold.woff', './fonts/EBGaramond.woff'];
-const FILES_TO_CACHE = ['./index.html', './manifest.json', './version.json', './icons/apple-touch-icon.png', './icons/icon-192.png', ...FONTS];
+const FILES_TO_CACHE = ['./index.html', './manifest.json', './version.json', './variants.js', './voice.js', './home-designs.js', './icons/apple-touch-icon.png', './icons/icon-192.png', ...FONTS];
 
 // one key per file: no query, and a folder means its index.html
 const keyOf = (u) => { const x = new URL(u, self.location.href); let p = x.pathname; if (p.endsWith('/')) p += 'index.html'; return x.origin + p; };
