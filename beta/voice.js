@@ -63,7 +63,7 @@
   function ctx() { if (!AC) { var C = window.AudioContext || window.webkitAudioContext; if (C) AC = new C(); } return AC; }
   function load(id) {
     if (BUF[id]) return BUF[id];
-    BUF[id] = fetch('beta/voice/' + id + '.m4a').then(function (r) { if (!r.ok) throw 0; return r.arrayBuffer(); })
+    BUF[id] = fetch('voice/' + id + '.m4a').then(function (r) { if (!r.ok) throw 0; return r.arrayBuffer(); })
       .then(function (a) { return new Promise(function (ok, no) { ctx().decodeAudioData(a, ok, no); }); });
     return BUF[id];
   }

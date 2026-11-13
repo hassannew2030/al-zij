@@ -1,32 +1,51 @@
 #!/usr/bin/env python3
-"""Build the test copy at alzijapp.com/beta/ from a working index.html.
+"""beta = the live backup of Al-Zij, ONE STEP BEHIND the main site (rule of 13 Nov 2026, Hassan).
 
-Usage:  python3 tools/make_beta.py [source_index.html]
-- Same files as the real Al-Zij (fonts, icons, data) through <base href="/">, so nothing is copied twice.
-- Its own beta/version.json, so the auto-update check never jumps between the real copy and the test copy.
-- A thin gold ribbon «نسخة تجربة» so it is never mistaken for the real one; hidden from search engines.
-Note: settings and reminders are shared with the real copy (same site), so test reminders appear there too.
+Before every publish of the main site:
+    python3 tools/make_beta.py          # copies the CURRENT main (the last good one) into /beta/
+    ... then edit and publish the main site.
+So alzijapp.com/beta/ is always the version before the last publish: if a publish breaks something, the previous Al-Zij is
+open at once on the phone, and the main site can be put back from it.
+
+What the copy changes, nothing else:
+- reads the main page and its scripts from git HEAD (what is published now), never from unsaved edits
+- <base href="/"> so fonts, icons, data and voice clips are the main site's own files (nothing copied twice)
+- its own scripts in beta/ (variants.js, voice.js, home-designs.js), so the backup does not change when main's scripts do
+- its own beta/version.json, so the update check never jumps between the two copies
+- hidden from search engines: noindex,nofollow, and every search/share tag (canonical, hreflang, og:, twitter:, ld+json)
+  removed, so the backup is never seen as a second Al-Zij; robots.txt also disallows /beta/ and nothing links to it
+- a thin gold ribbon «نسخة احتياطية · BACKUP» so it is never mistaken for the real one
+Settings and reminders are shared with the main site in the same browser (same domain): don't turn the adhan on in both.
 """
-import sys, re, json, time, os
-src = sys.argv[1] if len(sys.argv) > 1 else 'index.html'
-s = open(src, encoding='utf-8').read()
+import sys, re, json, time, os, subprocess
+
+def head_file(path):
+    return subprocess.run(['git', 'show', 'HEAD:' + path], capture_output=True, check=True).stdout.decode('utf-8')
+
+s = head_file('index.html')
 build = str(int(time.time()))
 s = re.sub(r'window\.ZIJ_BUILD="\d+"', 'window.ZIJ_BUILD="%s"' % build, s, count=1)
+n = s.count("fetch('version.json?")
 s = s.replace("fetch('version.json?", "fetch('beta/version.json?")
+# search engines: drop every tag that says «this is Al-Zij, index me / share me»
+s = re.sub(r'<link rel="(canonical|alternate)"[^>]*>\n?', '', s)
+s = re.sub(r'<meta (property|name)="(og:|twitter:)[^"]*"[^>]*>\n?', '', s)
+s = re.sub(r'<script type="application/ld\+json">.*?</script>\n?', '', s, flags=re.S)
+# the page's own scripts → the backup's copies
+os.makedirs('beta', exist_ok=True)
+for js in ('variants.js', 'voice.js', 'home-designs.js'):
+    open('beta/' + js, 'w', encoding='utf-8').write(head_file(js))
+    s = re.sub(r'<script src="%s(\?v=\d+)?"' % re.escape(js), '<script src="beta/%s?v=%s"' % (js, build), s)
 head = ('<base href="/">\n<meta name="robots" content="noindex,nofollow">\n'
-        '<style id="betaRibbon">body::before{content:"نسخة تجربة · BETA";position:fixed;top:0;left:50%;transform:translateX(-50%);'
+        '<style id="betaRibbon">body::before{content:"نسخة احتياطية · BACKUP";position:fixed;top:0;left:50%;transform:translateX(-50%);'
         'z-index:99999;background:#c9a35d;color:#1a140a;font:700 12px/1 Georgia,serif;padding:3px 12px 4px;border-radius:0 0 10px 10px;pointer-events:none}</style>\n')
 s = s.replace('<head>', '<head>\n' + head, 1)
-if os.path.exists('beta/variants.js'):
-    s = s.replace('</body>', '<script src="beta/variants.js" defer></script>\n</body>', 1)  # home-layout variants (beta only)
-if os.path.exists('beta/voice.js'):
-    s = s.replace('</body>', '<script src="beta/voice.js" defer></script>\n</body>', 1)  # talking clock (beta only)
-if os.path.exists('beta/home-designs.js'):
-    s = s.replace('</body>', '<script src="beta/home-designs.js" defer></script>\n</body>', 1)  # home designs د هـ و (beta only)
-os.makedirs('beta', exist_ok=True)
-# guard: the beta clock (#zDial, added to beta only) must never be lost by building from a source without it
-if os.path.exists('beta/index.html') and 'zDial' in open('beta/index.html', encoding='utf-8').read() and 'zDial' not in s:
-    sys.exit('STOP: the source has no beta clock (#zDial). Build from the current beta/index.html instead.')
+# checks: never write a broken backup
+assert n == 2, 'expected 2 version.json fetches, found %d' % n
+assert 'rel="canonical"' not in s and 'og:' not in s and 'ld+json' not in s, 'search tags left in the backup'
+for js in ('variants.js', 'voice.js', 'home-designs.js'):
+    assert 'src="beta/%s' % js in s, js + ' not pointed at beta/'
 open('beta/index.html', 'w', encoding='utf-8').write(s)
 json.dump({'build': build}, open('beta/version.json', 'w'))
-print('beta built', build, len(s))
+print('backup built from main HEAD', subprocess.run(['git', 'rev-parse', '--short', 'HEAD'], capture_output=True, text=True).stdout.strip(),
+      '→ beta build', build, len(s), 'bytes')

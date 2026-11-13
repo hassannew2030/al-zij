@@ -7,7 +7,7 @@
    فالمواقيت هي أرقام الزيج نفسها بالحرف. الساعة (#zDial) لا تُرسم من جديد: تُخفى، وتظهر فوق الصفحة بزر «الزيج».
    مقياس الخط ثلاثة أحجام فقط من النسبة الذهبية: ١٨ × φ⁰ ، ١٨ × φ ≈ ٢٩ ، ١٨ × φ³ ≈ ٧٦. */
 (function () {
-  if (!/\/beta\//.test(location.pathname)) return;
+  /* 13 Nov: on the main site too — the floating switcher is hidden; the choice lives in المزيد ← شكل الصفحة الرئيسية (#mHome) */
   var KEY = 'zijHomeDesign', SEEN = 'zijHomeDesignSeen2';
   var MINE = ['d', 'e', 'h', 'g', 'f'];
   var OPTS = [['d', 'د'], ['e', 'هـ'], ['h', 'ح'], ['g', 'ز'], ['f', 'و'], ['a', 'أ'], ['b', 'ب'], ['c', 'ج'], ['orig', 'الأصل']];
@@ -32,6 +32,7 @@
   css.textContent = [
     /* one switcher: the old A/B/C bar is driven from here (hidden), so its choices keep working */
     '#zVarBar{display:none!important}',
+    '#zhdBar,#zVarBar{display:none!important}',
     '#zhdBar{position:fixed;top:calc(24px + env(safe-area-inset-top,0px));left:8px;z-index:45;display:flex;align-items:center;gap:2px;background:rgba(17,20,29,.94);border:1px solid #c9a35d;border-radius:16px;padding:2px;font-family:Amiri,serif;direction:rtl}',
     '#zhdBar button{border:0;background:none;color:#e6dcbd;font:700 15px/1.2 Amiri,serif;padding:3px 8px;border-radius:12px;cursor:pointer;min-width:28px}',
     '#zhdBar button.on{background:#c9a35d;color:#1a140a}',
@@ -534,7 +535,7 @@
   var bar = null;
   function paintBar() {
     if (!bar) return;
-    var on = MINE.indexOf(cur) >= 0 ? cur : (LS.get('zijBetaVariant') || 'a');
+    var on = MINE.indexOf(cur) >= 0 ? cur : (LS.get('zijBetaVariant') || 'orig');
     bar.querySelectorAll('button[data-v]').forEach(function (b) { b.classList.toggle('on', b.dataset.v === on); });
   }
   function choose(v) {
@@ -550,6 +551,8 @@
     }
     paintBar(); window.scrollTo(0, 0);
   }
+  window.zijHome = { choose: function (v) { if (!bar) return false; choose(v); return true; },
+    current: function () { return MINE.indexOf(cur) >= 0 ? cur : (LS.get('zijBetaVariant') || 'orig'); } };
   function init() {
     if (!$('zVarBar') && init.n++ < 10) { setTimeout(init, 200); return; } // let variants.js build its bar first
     bar = document.createElement('div'); bar.id = 'zhdBar'; bar.setAttribute('data-notr', ''); bar.setAttribute('data-nodigit', '');
@@ -566,7 +569,7 @@
     // leaving home closes the clock view
     document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('.htab')) document.body.classList.remove('zhd-dial'); }, true);
     var saved = LS.get(KEY);
-    if (!LS.get(SEEN)) { saved = 'd'; LS.set(SEEN, '1'); } // «د» is the default home: everyone lands on it once, then their own choice stays
+    // 13 Nov: no forced first design any more — the home stays «الأصل» until the user picks another in المزيد
     if (MINE.indexOf(saved) >= 0) choose(saved); else paintBar();
     setInterval(update, 500);
     var rz; window.addEventListener('resize', function () { clearTimeout(rz); rz = setTimeout(function () { hzKey = ''; update(); }, 150); });
