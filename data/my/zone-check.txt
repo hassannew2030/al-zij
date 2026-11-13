@@ -1,5 +1,5 @@
-JAKIM zone check — 2026-11-13T14:22:32.934Z
-matched 68/74 (waktusolat errors: 3)
+JAKIM zone check — 2026-11-13T14:26:34.971Z
+matched 69/74 (waktusolat errors: 3)
 
 OK   | Kuala Lumpur | waktusolat WLY01 | Al-Zij WLY01 | MY-14 | 
 OK   | Putrajaya | waktusolat WLY01 | Al-Zij WLY01 | MY-16 | Putrajaya
@@ -31,7 +31,7 @@ OK   | Raub | waktusolat PHG04 | Al-Zij PHG04 | MY-06 | Raub, Raub
 OK   | Bentong | waktusolat PHG04 | Al-Zij PHG04 | MY-06 | Bentong, Bentong
 OK   | Jerantut | waktusolat PHG03 | Al-Zij PHG03 | MY-06 | Jerantut, Jerantut
 OK   | Kuala Lipis | waktusolat PHG04 | Al-Zij PHG04 | MY-06 | Kuala Lipis, Lipis
-DIFF | Cameron Highlands (Tanah Rata) | waktusolat PHG06 | Al-Zij PHG04 | MY-06 | Tanah Rata, Cameron Highlands
+OK   | Cameron Highlands (Tanah Rata) | waktusolat PHG06 | Al-Zij PHG06 | MY-06 | Tanah Rata, Cameron Highlands
 DIFF | Ipoh | waktusolat PRK01 | Al-Zij PRK02 | MY-08 | Majlis Bandaraya Ipoh, Kinta
 OK   | Taiping | waktusolat PRK06 | Al-Zij PRK06 | MY-08 | Kamunting, Larut, Matang dan Selama
 DIFF | Teluk Intan | waktusolat PRK02 | Al-Zij PRK05 | MY-08 | Teluk Intan, Hilir Perak
