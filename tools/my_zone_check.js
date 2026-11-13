@@ -23,6 +23,18 @@ const P = [ // town, lat, lon  (the same point is given to both, so its exact po
  ['Keningau',5.337,116.160],['Kudat',6.883,116.833],['Beaufort',5.347,115.745],['Ranau',5.953,116.664],['Labuan',5.280,115.240],
 ];
 const store = {};
+// waktusolat's GPS → zone endpoint (path/field names tried in turn; the first point prints the raw answers for the record)
+async function refZone(lat, lon, dbg) {
+  const U = [`https://api.waktusolat.app/zones/${lat}/${lon}`, `https://api.waktusolat.app/zones/gps?lat=${lat}&long=${lon}`,
+             `https://api.waktusolat.app/v2/zones/gps?lat=${lat}&long=${lon}`, `https://api.waktusolat.app/zones/gps?lat=${lat}&lng=${lon}`];
+  for (const u of U) {
+    try { const r = await realFetch(u); const t = await r.text(); if (dbg) console.log('RAW', r.status, u, t.slice(0, 300));
+      if (!r.ok) continue; let j; try { j = JSON.parse(t); } catch (e) { continue; }
+      const z = (j && (j.zone || j.jakimCode || j.code || (j.data && (j.data.zone || j.data.code)))) || (Array.isArray(j) && j[0] && (j[0].zone || j[0].jakimCode));
+      if (z && /^[A-Z]{3}\d{2}$/.test(z)) return z; } catch (e) { if (dbg) console.log('RAW ERR', u, e.message); }
+  }
+  return '';
+}
 global.localStorage = { getItem: k => (k in store ? store[k] : null), setItem: (k, v) => { store[k] = String(v); }, removeItem: k => { delete store[k]; } };
 global.navigator = { onLine: true };
 global.window = global;
@@ -39,7 +51,7 @@ eval(code);
   for (const [n, lat, lon] of P) {
     for (const k of Object.keys(store)) delete store[k];
     let ref = '';
-    try { const r = await realFetch(`https://api.waktusolat.app/zones/gps?lat=${lat}&long=${lon}`); ref = (await r.json()).zone || ''; } catch (e) { ref = 'ERR'; }
+    ref = await refZone(lat, lon, n === P[0][0]);
     // the region code comes from the phone's first place lookup; zijMY's own Malay lookup sets it too
     let got = '';
     for (let i = 0; i < 40 && !got; i++) { await window.zijMY.ensure(lat, lon); const z = window.zijMY.zone(); if (z) got = z.id; else await new Promise(r => setTimeout(r, 100)); }
