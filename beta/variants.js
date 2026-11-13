@@ -4,11 +4,11 @@
    ج «الساعة تحت»: الصلاة القادمة والصلوات أولًا، والساعة كما هي تحتها
    الأصل: الشكل الحالي */
 (function () {
-  if (!/\/beta\//.test(location.pathname)) return;
+  /* 13 Nov (Hassan: «كل العمل على الرئيسي فقط»): runs on the main site too; the choice is made in المزيد ← شكل الصفحة الرئيسية */
   var KEY = 'zijBetaVariant';
   var V = ['a', 'b', 'c', 'orig'];
   var NAMES = { a: 'أ', b: 'ب', c: 'ج', orig: 'الأصل' };
-  function get() { try { return localStorage.getItem(KEY) || 'a'; } catch (e) { return 'a'; } }
+  function get() { try { return localStorage.getItem(KEY) || 'orig'; } catch (e) { return 'orig'; } } // nobody's home changes unless they choose
   function set(v) { try { localStorage.setItem(KEY, v); } catch (e) {} }
 
   var css = document.createElement('style');
