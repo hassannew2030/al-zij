@@ -1,77 +1,77 @@
-JAKIM zone check — 2026-11-13T14:20:02.228Z
-matched 0/74 (waktusolat errors: 74)
+JAKIM zone check — 2026-11-13T14:22:32.934Z
+matched 68/74 (waktusolat errors: 3)
 
-DIFF | Kuala Lumpur | waktusolat  | Al-Zij WLY01 | MY-14 | 
-DIFF | Putrajaya | waktusolat  | Al-Zij WLY01 | MY-16 | Putrajaya
-DIFF | Shah Alam | waktusolat  | Al-Zij SGR01 | MY-10 | Shah Alam, Petaling
-DIFF | Petaling Jaya | waktusolat  | Al-Zij SGR01 | MY-10 | Petaling Jaya, Petaling
-DIFF | Klang | waktusolat  | Al-Zij SGR03 | MY-10 | Klang City, Pelabuhan Klang, Klang
-DIFF | Kuala Selangor | waktusolat  | Al-Zij SGR02 | MY-10 | Kuala Selangor, Kuala Selangor
-DIFF | Sabak Bernam | waktusolat  | Al-Zij SGR02 | MY-10 | Sabak Bernam, Sabak Bernam
-DIFF | Hulu Selangor (Kuala Kubu Bharu) | waktusolat  | Al-Zij SGR01 | MY-10 | Kerling, Hulu Selangor
-DIFF | Sepang | waktusolat  | Al-Zij SGR01 | MY-10 | Sepang, Pekan Sepang
-DIFF | Kajang | waktusolat  | Al-Zij SGR01 | MY-10 | Majlis Perbandaran Kajang, Semenyih, Hulu Langat
-DIFF | Seremban | waktusolat  | Al-Zij NGS03 | MY-05 | Seremban, Seremban
-DIFF | Port Dickson | waktusolat  | Al-Zij NGS03 | MY-05 | Port Dickson, Port Dickson
-DIFF | Kuala Pilah | waktusolat  | Al-Zij NGS02 | MY-05 | Kuala Pilah, Kuala Pilah
-DIFF | Tampin | waktusolat  | Al-Zij NGS01 | MY-05 | Tampin, Tampin
-DIFF | Melaka | waktusolat  | Al-Zij MLK01 | MY-04 | Ayer Keroh, Majlis Perbandaran Hang Tuah Jaya, Melaka Tengah
-DIFF | Johor Bahru | waktusolat  | Al-Zij JHR02 | MY-01 | Johor Bahru, Johor Bahru
-DIFF | Kota Tinggi | waktusolat  | Al-Zij JHR02 | MY-01 | Kota Tinggi, Daerah Kota Tinggi
-DIFF | Mersing | waktusolat  | Al-Zij JHR02 | MY-01 | Mersing, Daerah Mersing
-DIFF | Kluang | waktusolat  | Al-Zij JHR03 | MY-01 | Kluang, Kluang
-DIFF | Pontian | waktusolat  | Al-Zij JHR03 | MY-01 | Pontian, Pontian
-DIFF | Batu Pahat | waktusolat  | Al-Zij JHR04 | MY-01 | Bandar Penggaram, Batu Pahat
-DIFF | Muar | waktusolat  | Al-Zij JHR04 | MY-01 | Muar
-DIFF | Segamat | waktusolat  | Al-Zij JHR04 | MY-01 | Segamat, Segamat
-DIFF | Kuantan | waktusolat  | Al-Zij PHG02 | MY-06 | Kuantan, Kuantan
-DIFF | Pekan | waktusolat  | Al-Zij PHG02 | MY-06 | Pekan, Pekan
-DIFF | Temerloh | waktusolat  | Al-Zij PHG03 | MY-06 | Mentakab, Temerloh
-DIFF | Raub | waktusolat  | Al-Zij PHG04 | MY-06 | Raub, Raub
-DIFF | Bentong | waktusolat  | Al-Zij PHG04 | MY-06 | Bentong, Bentong
-DIFF | Jerantut | waktusolat  | Al-Zij PHG03 | MY-06 | Jerantut, Jerantut
-DIFF | Kuala Lipis | waktusolat  | Al-Zij PHG04 | MY-06 | Kuala Lipis, Lipis
-DIFF | Cameron Highlands (Tanah Rata) | waktusolat  | Al-Zij PHG04 | MY-06 | Tanah Rata, Cameron Highlands
-DIFF | Ipoh | waktusolat  | Al-Zij PRK02 | MY-08 | Majlis Bandaraya Ipoh, Kinta
-DIFF | Taiping | waktusolat  | Al-Zij PRK06 | MY-08 | Kamunting, Larut, Matang dan Selama
-DIFF | Teluk Intan | waktusolat  | Al-Zij PRK05 | MY-08 | Teluk Intan, Hilir Perak
-DIFF | Sitiawan | waktusolat  | Al-Zij PRK05 | MY-08 | Sitiawan, Daerah Manjung
-DIFF | Gerik | waktusolat  | Al-Zij PRK03 | MY-08 | Hulu Perak
-DIFF | Kuala Kangsar | waktusolat  | Al-Zij PRK02 | MY-08 | Kuala Kangsar, Kuala Kangsar
-DIFF | Tapah | waktusolat  | Al-Zij PRK01 | MY-08 | Tapah, Batang Padang
-DIFF | George Town | waktusolat  | Al-Zij PNG01 | MY-07 | George Town, Central George Town, Timur Laut
-DIFF | Butterworth | waktusolat  | Al-Zij PNG01 | MY-07 | Bandar Butterworth, Seberang Perai Utara, Seberang Perai
-DIFF | Alor Setar | waktusolat  | Al-Zij KDH01 | MY-02 | Pekan Langgar, Kota Setar
-DIFF | Sungai Petani | waktusolat  | Al-Zij KDH02 | MY-02 | Semeling, Kuala Muda
-DIFF | Kulim | waktusolat  | Al-Zij KDH05 | MY-02 | Lunas, Kulim
-DIFF | Langkawi (Kuah) | waktusolat  | Al-Zij KDH06 | MY-02 | Kuah, Daerah Langkawi
-DIFF | Baling | waktusolat  | Al-Zij KDH04 | MY-02 | Baling, Baling
-DIFF | Kangar | waktusolat  | Al-Zij PLS01 | MY-09 | Kangar
-DIFF | Kota Bharu | waktusolat  | Al-Zij KTN01 | MY-03 | Kota Bharu, Kota Bharu
-DIFF | Gua Musang | waktusolat  | Al-Zij KTN02 | MY-03 | Gua Musang, Jajahan Gua Musang
-DIFF | Kuala Krai | waktusolat  | Al-Zij KTN01 | MY-03 | Kuala Krai, Jajahan Kuala Krai
-DIFF | Jeli | waktusolat  | Al-Zij KTN02 | MY-03 | Jeli, Jajahan Jeli
-DIFF | Kuala Terengganu | waktusolat  | Al-Zij TRG01 | MY-11 | Kuala Terengganu, Kuala Terengganu
-DIFF | Kemaman (Chukai) | waktusolat  | Al-Zij TRG04 | MY-11 | Chukai
-DIFF | Dungun | waktusolat  | Al-Zij TRG04 | MY-11 | Dungun
-DIFF | Besut (Jerteh) | waktusolat  | Al-Zij TRG02 | MY-11 | Jerteh, Besut
-DIFF | Kuching | waktusolat  | Al-Zij SWK08 | MY-13 | Kuching, Kuching
-DIFF | Sri Aman | waktusolat  | Al-Zij SWK06 | MY-13 | Simanggang, Sri Aman
-DIFF | Sibu | waktusolat  | Al-Zij SWK04 | MY-13 | Sibu, Sibu
-DIFF | Mukah | waktusolat  | Al-Zij SWK04 | MY-13 | Petanak, Mukah
-DIFF | Bintulu | waktusolat  | Al-Zij SWK03 | MY-13 | Bintulu, Bintulu
-DIFF | Miri | waktusolat  | Al-Zij SWK02 | MY-13 | Miri, Miri
-DIFF | Limbang | waktusolat  | Al-Zij SWK01 | MY-13 | Desa Pabahanan, Limbang
-DIFF | Lawas | waktusolat  | Al-Zij SWK01 | MY-13 | Lawas, Lawas
-DIFF | Kapit | waktusolat  | Al-Zij SWK04 | MY-13 | Kapit, Kapit
-DIFF | Sarikei | waktusolat  | Al-Zij SWK05 | MY-13 | Sarikei, Sarikei
-DIFF | Kota Kinabalu | waktusolat  | Al-Zij SBH07 | MY-12 | Kota Kinabalu, Kota Kinabalu, Bahagian Pantai Barat
-DIFF | Sandakan | waktusolat  | Al-Zij SBH01 | MY-12 | Sandakan, Daerah Sandakan
+OK   | Kuala Lumpur | waktusolat WLY01 | Al-Zij WLY01 | MY-14 | 
+OK   | Putrajaya | waktusolat WLY01 | Al-Zij WLY01 | MY-16 | Putrajaya
+OK   | Shah Alam | waktusolat SGR01 | Al-Zij SGR01 | MY-10 | Shah Alam, Petaling
+OK   | Petaling Jaya | waktusolat SGR01 | Al-Zij SGR01 | MY-10 | Petaling Jaya, Petaling
+OK   | Klang | waktusolat SGR03 | Al-Zij SGR03 | MY-10 | Klang City, Pelabuhan Klang, Klang
+OK   | Kuala Selangor | waktusolat SGR02 | Al-Zij SGR02 | MY-10 | Kuala Selangor, Kuala Selangor
+OK   | Sabak Bernam | waktusolat SGR02 | Al-Zij SGR02 | MY-10 | Sabak Bernam, Sabak Bernam
+OK   | Hulu Selangor (Kuala Kubu Bharu) | waktusolat SGR01 | Al-Zij SGR01 | MY-10 | Kerling, Hulu Selangor
+OK   | Sepang | waktusolat SGR01 | Al-Zij SGR01 | MY-10 | Sepang, Pekan Sepang
+OK   | Kajang | waktusolat SGR01 | Al-Zij SGR01 | MY-10 | Majlis Perbandaran Kajang, Semenyih, Hulu Langat
+OK   | Seremban | waktusolat NGS03 | Al-Zij NGS03 | MY-05 | Seremban, Seremban
+OK   | Port Dickson | waktusolat NGS03 | Al-Zij NGS03 | MY-05 | Port Dickson, Port Dickson
+OK   | Kuala Pilah | waktusolat NGS02 | Al-Zij NGS02 | MY-05 | Kuala Pilah, Kuala Pilah
+OK   | Tampin | waktusolat NGS01 | Al-Zij NGS01 | MY-05 | Tampin, Tampin
+OK   | Melaka | waktusolat MLK01 | Al-Zij MLK01 | MY-04 | Ayer Keroh, Majlis Perbandaran Hang Tuah Jaya, Melaka Tengah
+OK   | Johor Bahru | waktusolat JHR02 | Al-Zij JHR02 | MY-01 | Johor Bahru, Johor Bahru
+OK   | Kota Tinggi | waktusolat JHR02 | Al-Zij JHR02 | MY-01 | Kota Tinggi, Daerah Kota Tinggi
+OK   | Mersing | waktusolat JHR02 | Al-Zij JHR02 | MY-01 | Mersing, Daerah Mersing
+OK   | Kluang | waktusolat JHR03 | Al-Zij JHR03 | MY-01 | Kluang, Kluang
+OK   | Pontian | waktusolat JHR03 | Al-Zij JHR03 | MY-01 | Pontian, Pontian
+OK   | Batu Pahat | waktusolat JHR04 | Al-Zij JHR04 | MY-01 | Bandar Penggaram, Batu Pahat
+OK   | Muar | waktusolat JHR04 | Al-Zij JHR04 | MY-01 | Muar
+OK   | Segamat | waktusolat JHR04 | Al-Zij JHR04 | MY-01 | Segamat, Segamat
+OK   | Kuantan | waktusolat PHG02 | Al-Zij PHG02 | MY-06 | Kuantan, Kuantan
+OK   | Pekan | waktusolat PHG02 | Al-Zij PHG02 | MY-06 | Pekan, Pekan
+OK   | Temerloh | waktusolat PHG03 | Al-Zij PHG03 | MY-06 | Mentakab, Temerloh
+OK   | Raub | waktusolat PHG04 | Al-Zij PHG04 | MY-06 | Raub, Raub
+OK   | Bentong | waktusolat PHG04 | Al-Zij PHG04 | MY-06 | Bentong, Bentong
+OK   | Jerantut | waktusolat PHG03 | Al-Zij PHG03 | MY-06 | Jerantut, Jerantut
+OK   | Kuala Lipis | waktusolat PHG04 | Al-Zij PHG04 | MY-06 | Kuala Lipis, Lipis
+DIFF | Cameron Highlands (Tanah Rata) | waktusolat PHG06 | Al-Zij PHG04 | MY-06 | Tanah Rata, Cameron Highlands
+DIFF | Ipoh | waktusolat PRK01 | Al-Zij PRK02 | MY-08 | Majlis Bandaraya Ipoh, Kinta
+OK   | Taiping | waktusolat PRK06 | Al-Zij PRK06 | MY-08 | Kamunting, Larut, Matang dan Selama
+DIFF | Teluk Intan | waktusolat PRK02 | Al-Zij PRK05 | MY-08 | Teluk Intan, Hilir Perak
+OK   | Sitiawan | waktusolat PRK05 | Al-Zij PRK05 | MY-08 | Sitiawan, Daerah Manjung
+OK   | Gerik | waktusolat PRK03 | Al-Zij PRK03 | MY-08 | Hulu Perak
+OK   | Kuala Kangsar | waktusolat PRK02 | Al-Zij PRK02 | MY-08 | Kuala Kangsar, Kuala Kangsar
+OK   | Tapah | waktusolat PRK01 | Al-Zij PRK01 | MY-08 | Tapah, Batang Padang
+OK   | George Town | waktusolat PNG01 | Al-Zij PNG01 | MY-07 | George Town, Central George Town, Timur Laut
+OK   | Butterworth | waktusolat PNG01 | Al-Zij PNG01 | MY-07 | Bandar Butterworth, Seberang Perai Utara, Seberang Perai
+OK   | Alor Setar | waktusolat KDH01 | Al-Zij KDH01 | MY-02 | Pekan Langgar, Kota Setar
+OK   | Sungai Petani | waktusolat KDH02 | Al-Zij KDH02 | MY-02 | Semeling, Kuala Muda
+OK   | Kulim | waktusolat KDH05 | Al-Zij KDH05 | MY-02 | Lunas, Kulim
+OK   | Langkawi (Kuah) | waktusolat KDH06 | Al-Zij KDH06 | MY-02 | Kuah, Daerah Langkawi
+OK   | Baling | waktusolat KDH04 | Al-Zij KDH04 | MY-02 | Baling, Baling
+OK   | Kangar | waktusolat PLS01 | Al-Zij PLS01 | MY-09 | Kangar
+OK   | Kota Bharu | waktusolat KTN01 | Al-Zij KTN01 | MY-03 | Kota Bharu, Kota Bharu
+OK   | Gua Musang | waktusolat KTN02 | Al-Zij KTN02 | MY-03 | Gua Musang, Jajahan Gua Musang
+OK   | Kuala Krai | waktusolat KTN01 | Al-Zij KTN01 | MY-03 | Kuala Krai, Jajahan Kuala Krai
+OK   | Jeli | waktusolat KTN02 | Al-Zij KTN02 | MY-03 | Jeli, Jajahan Jeli
+OK   | Kuala Terengganu | waktusolat TRG01 | Al-Zij TRG01 | MY-11 | Kuala Terengganu, Kuala Terengganu
+OK   | Kemaman (Chukai) | waktusolat TRG04 | Al-Zij TRG04 | MY-11 | Chukai
+OK   | Dungun | waktusolat TRG04 | Al-Zij TRG04 | MY-11 | Dungun
+OK   | Besut (Jerteh) | waktusolat TRG02 | Al-Zij TRG02 | MY-11 | Jerteh, Besut
+OK   | Kuching | waktusolat SWK08 | Al-Zij SWK08 | MY-13 | Kuching, Kuching
+OK   | Sri Aman | waktusolat SWK06 | Al-Zij SWK06 | MY-13 | Simanggang, Sri Aman
+OK   | Sibu | waktusolat SWK04 | Al-Zij SWK04 | MY-13 | Sibu, Sibu
+OK   | Mukah | waktusolat SWK04 | Al-Zij SWK04 | MY-13 | Petanak, Mukah
+OK   | Bintulu | waktusolat SWK03 | Al-Zij SWK03 | MY-13 | Bintulu, Bintulu
+OK   | Miri | waktusolat SWK02 | Al-Zij SWK02 | MY-13 | Miri, Miri
+OK   | Limbang | waktusolat SWK01 | Al-Zij SWK01 | MY-13 | Desa Pabahanan, Limbang
+OK   | Lawas | waktusolat SWK01 | Al-Zij SWK01 | MY-13 | Lawas, Lawas
+OK   | Kapit | waktusolat SWK04 | Al-Zij SWK04 | MY-13 | Kapit, Kapit
+OK   | Sarikei | waktusolat SWK05 | Al-Zij SWK05 | MY-13 | Sarikei, Sarikei
+OK   | Kota Kinabalu | waktusolat SBH07 | Al-Zij SBH07 | MY-12 | Kota Kinabalu, Kota Kinabalu, Bahagian Pantai Barat
+OK   | Sandakan | waktusolat SBH01 | Al-Zij SBH01 | MY-12 | Sandakan, Daerah Sandakan
 DIFF | Tawau | waktusolat  | Al-Zij SBH04 | MY-12 | Tawau, Tawau
-DIFF | Lahad Datu | waktusolat  | Al-Zij SBH03 | MY-12 | Lahad Datu, Lahad Datu
+OK   | Lahad Datu | waktusolat SBH03 | Al-Zij SBH03 | MY-12 | Lahad Datu, Lahad Datu
 DIFF | Semporna | waktusolat  | Al-Zij SBH03 | MY-12 | Semporna, Semporna
-DIFF | Keningau | waktusolat  | Al-Zij SBH08 | MY-12 | Keningau, Keningau
-DIFF | Kudat | waktusolat  | Al-Zij SBH05 | MY-12 | Kudat, Bahagian Kudat
-DIFF | Beaufort | waktusolat  | Al-Zij SBH09 | MY-12 | Beaufort, Beaufort
-DIFF | Ranau | waktusolat  | Al-Zij SBH07 | MY-12 | Ranau, Ranau, Bahagian Pantai Barat
-DIFF | Labuan | waktusolat  | Al-Zij WLY02 | MY-15 | Bandar Victoria
+OK   | Keningau | waktusolat SBH08 | Al-Zij SBH08 | MY-12 | Keningau, Keningau
+DIFF | Kudat | waktusolat  | Al-Zij SBH05 | MY-12 | Kudat, Kudat
+OK   | Beaufort | waktusolat SBH09 | Al-Zij SBH09 | MY-12 | Beaufort, Beaufort
+OK   | Ranau | waktusolat SBH07 | Al-Zij SBH07 | MY-12 | Ranau, Ranau, Bahagian Pantai Barat
+OK   | Labuan | waktusolat WLY02 | Al-Zij WLY02 | MY-15 | Bandar Victoria
