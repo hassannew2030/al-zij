@@ -1,0 +1,50 @@
+# Malaysia (Hassan, 13 Nov 2026): download the OFFICIAL JAKIM prayer-time tables (e-solat.gov.my) for every zone,
+# so Al-Zij can use the official calendar in Malaysia, as it does with Umm al-Qura in Saudi Arabia.
+# Runs on GitHub's machine (the work container cannot reach e-solat). Output: data/my/raw/<ZONE>-<YEAR>.json + zones page.
+name: JAKIM tables
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/jakim-tables.yml']
+permissions:
+  contents: write
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download zone list and yearly tables
+        run: |
+          set -u
+          mkdir -p data/my/raw
+          UA='Mozilla/5.0 (Al-Zij prayer app; alzijapp.com)'
+          curl -sSL -A "$UA" --retry 3 'https://www.e-solat.gov.my/index.php?siteId=24&pageId=24' -o data/my/raw/zones-page.html || true
+          ZONES=$(grep -oE 'value="[A-Z]{3}[0-9]{2}"' data/my/raw/zones-page.html | grep -oE '[A-Z]{3}[0-9]{2}' | sort -u)
+          if [ -z "$ZONES" ]; then
+            ZONES="JHR01 JHR02 JHR03 JHR04 KDH01 KDH02 KDH03 KDH04 KDH05 KDH06 KDH07 KTN01 KTN02 KTN03 MLK01 NGS01 NGS02 NGS03 PHG01 PHG02 PHG03 PHG04 PHG05 PHG06 PHG07 PLS01 PNG01 PRK01 PRK02 PRK03 PRK04 PRK05 PRK06 PRK07 SBH01 SBH02 SBH03 SBH04 SBH05 SBH06 SBH07 SBH08 SBH09 SGR01 SGR02 SGR03 SWK01 SWK02 SWK03 SWK04 SWK05 SWK06 SWK07 SWK08 SWK09 TRG01 TRG02 TRG03 TRG04 WLY01 WLY02"
+          fi
+          ok=0; bad=""
+          for z in $ZONES; do
+            for y in 2026 2027; do
+              f="data/my/raw/$z-$y.json"
+              if [ "$y" = "2026" ]; then
+                curl -sSL -A "$UA" --retry 3 "https://www.e-solat.gov.my/index.php?r=esolatApi/takwimsolat&period=year&zone=$z" -o "$f" || true
+              else
+                curl -sSL -A "$UA" --retry 3 -X POST "https://www.e-solat.gov.my/index.php?r=esolatApi/takwimsolat&period=duration&zone=$z" \
+                  --data "datestart=$y-01-01&dateend=$y-12-31" -o "$f" || true
+              fi
+              n=$(python3 -c "import json,sys;print(len(json.load(open('$f')).get('prayerTime') or []))" 2>/dev/null || echo 0)
+              if [ "$n" -ge 365 ]; then ok=$((ok+1)); else bad="$bad $z-$y($n)"; rm -f "$f"; fi
+              sleep 1
+            done
+          done
+          echo "tables ok: $ok"; echo "missing:$bad"
+          printf 'ok=%s\nmissing=%s\n' "$ok" "$bad" > data/my/raw/REPORT.txt
+      - name: Commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add data/my/raw
+          git commit -m "JAKIM official tables (data/my/raw) [skip ci]" || echo 'nothing new'
+          git pull --rebase origin main && git push origin HEAD:main
