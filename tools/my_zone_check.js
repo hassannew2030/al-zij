@@ -1,4 +1,5 @@
 // Malaysia (Hassan 13 Nov 2026): does Al-Zij put each place in the right JAKIM zone?
+// run 2 (13 Nov): after «a zone that names the place wins, special zones included»
 // Independent witness: waktusolat.app (Malaysia Prayer Time project) — GPS → JAKIM zone. Al-Zij's own code (window.zijMY, cut out of
 // index.html) runs here exactly as on a phone: real OpenStreetMap names in Malay, the state code, then its zone pick. Runs on GitHub.
 const fs = require('fs');
