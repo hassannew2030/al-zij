@@ -156,8 +156,6 @@
   function actsHtml() {
     return '<div class="acts">' +
       '<button type="button" class="zij s1" data-a="zij">' + DIAL + '<span>' + T('الزيج', 'Al-Zij') + '</span></button>' +
-      '<button type="button" class="s1" data-a="cal">' + CAL + '<span>' + T('التقويم', 'Calendar') + '</span></button>' +
-      '<button type="button" class="dgt s1" data-a="dgt" data-nodigit aria-label="' + T('شكل الأرقام', 'Digits') + '"><span data-k="dgt"></span></button>' +
       '</div>';
   }
   function topHtml() { return '<div class="top"><button type="button" class="city s1" data-a="city">' + PIN + '<span data-k="city"></span></button></div>'; }
@@ -166,7 +164,7 @@
   var TPL = {
     d: function () {
       return topHtml() +
-        '<div class="day"><div class="wd s2 b" data-k="wd"></div><div class="hj s1 b" data-k="hj"></div><div class="gr s1" data-k="gr"></div></div>' +
+        '<div class="day" data-a="cal" role="button" tabindex="0" style="cursor:pointer"><div class="wd s2 b" data-k="wd"></div><div class="hj s1 b" data-k="hj"></div><div class="gr s1" data-k="gr"></div></div>' +
         '<div class="g1"></div>' +
         '<div class="clock" aria-live="off"><span class="tm s3 n" data-k="tm"></span><span class="per s2" data-k="per"></span></div>' +
         '<div class="secs" aria-hidden="true"><i data-k="secs"></i></div>' +
@@ -437,7 +435,7 @@
     o += '<line x1="' + cx + '" x2="' + cx + '" y1="0" y2="' + Hh + '" stroke="' + C.red + '" stroke-width="1.6"/>';
     o += '<path d="M' + (cx - 7) + ',' + (rowH + 2) + 'L' + (cx + 7) + ',' + (rowH + 2) + 'L' + cx + ',' + (rowH + 11) + 'Z" fill="' + C.red + '"/>';
     // labels: the highest point above, rise/set below; never on the red line or on each other
-    var lab = ev.map(function (e) { var nm = NAMES[e.k], tm = hm(e.t); return { k: e.k, x: X(e.t), y: e.k === 'top' ? Ya(e.a) : yH, t: e.t, name: nm, time: tm,
+    var lab = ev.map(function (e) { var nm = NAMES[e.k] + (e.t >= 1440 ? T(' غدًا', ' tomorrow') : e.t < 0 ? T(' أمس', ' yesterday') : ''), tm = hm(e.t); return { k: e.k, x: X(e.t), y: e.k === 'top' ? Ya(e.a) : yH, t: e.t, name: nm, time: tm,
       past: e.t < now, top: e.k === 'top', w: Math.max(nm.length, tm.length) * 9.5 + 12 }; });
     [true, false].forEach(function (tp) {
       var row = lab.filter(function (L) { return L.top === tp; }).sort(function (u, v) { return u.x - v.x; }), gap = 13, k;
@@ -458,10 +456,12 @@
       (pct >= 99 ? '' : '<path d="' + dk.d + '" fill="' + C.bg + '" fill-opacity=".92"' + (dk.flip ? ' transform="scale(-1,1)"' : '') + '/>') + '</g>';
     o += '</svg>';
     var nm = (Ephemeris.PHASE_NAMES && Ephemeris.PHASE_NAMES[ph.idx]) || '', hd = (D.hj || '').match(/^\s*([0-9٠-٩]+)/);
-    var line = (EN() ? 'Moon ' + pct + '%' : (hd ? 'الليلة ' + hd[1] + ' من الشهر · ' : '') + (nm ? nm + ' · ' : '') + dg(pct) + '٪') + (up ? '' : T(' · تحت الأفق الآن', ' · below the horizon now'));
+    var line = (EN() ? 'Moon ' + pct + '%' : (hd && !D.inSky ? 'الليلة ' + hd[1] + ' من الشهر · ' : '') + (nm ? nm + ' · ' : '') + dg(pct) + '٪') + (up ? '' : T(' · تحت الأفق الآن', ' · below the horizon now'));
     box.innerHTML = o + '<div class="alts s1">' + esc(line) + '</div>';
     var mg = box.querySelector('.zmoon'); if (mg) mg.addEventListener('click', function () { var tb = document.querySelector('[data-go="sky"]'); if (tb) tb.click(); });
   }
+  // Hassan 19 Nov: the Moon's path moved from the home layouts to السماء ← القمر — the SAME drawing, called from there
+  window.zijMoonCurve = function (box) { if (!box) return; if (!box.firstChild) mcKey = ''; var D = read(); D.inSky = true; drawMoonCurve(box, D); };   // in السماء the night's number is the card's, not this line's
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 
   /* ---------- render ---------- */
@@ -492,7 +492,7 @@
     else { setK('lbl', (cur === 'f' && !EN() && D.lbl ? 'و' : '') + (D.lbl ? D.lbl + ' ' : '') + words(D.left)); }
     // «كيرف الشمس»: the adhan time and the Moon are already drawn on the curve, so they are not repeated in text
     setK('sub', (cur === 'd' || cur === 'e' || cur === 'g' || cur === 'h') ? '' : (EN() ? D.sub : D.sub.replace(/\s+[صم]$/, ''))); // the prayer name already says which half of the day
-    var note = (cur === 'e' || cur === 'g' || cur === 'h') ? D.note : [D.note, D.moon && !/—/.test(D.moon) && D.note.indexOf(D.moon) < 0 ? T('القمر: ', 'Moon: ') + D.moon : ''].filter(Boolean).join(' · ');
+    var note = D.note;   // Hassan 19 Nov: the Moon is off the home screen — it lives in السماء (the moon-path card there)
     setK('note', note);
     var dt = root.querySelector('[data-k="dgt"]'); if (dt) { var en = digitsEn(); if (dt.dataset.m !== String(en)) { dt.dataset.m = String(en); dt.innerHTML = '<b class="' + (en ? '' : 'on') + '">١٢٣</b><i>|</i><b class="' + (en ? 'on' : '') + '">123</b>'; } }
     var lb = root.querySelector('.next .l'); if (lb) lb.classList.toggle('nowmsg', D.nowState);
