@@ -5841,7 +5841,7 @@ function tick(){
   const sinceMin=!afterMidnight?nm-p[list[curI][0]]:999, curIsPrayer=curI>=0&&list[curI][0]!=='sunrise';
   // hero
   const hero=$('hHero');
-  if(curIsPrayer&&sinceMin<10){hero.classList.add('now');$('hLbl').textContent='';$('hCd').textContent='حان الآن '+(list[curI][0]==='dhuhr'&&friday?'وقت صلاة الجمعة':'أذان '+list[curI][1]);$('hSub').textContent='الساعة '+fmt(p[list[curI][0]]);}
+  if(curIsPrayer&&sinceMin<10){hero.classList.add('now');$('hLbl').textContent='';$('hCd').textContent=window.ZIJ_LANG==='en'?(list[curI][0]==='dhuhr'&&friday?'Time for Jumu\'ah prayer':'Time for the '+((window.ZIJ_EN||{})[list[curI][1]]||list[curI][1])+' adhan'):'حان الآن '+(list[curI][0]==='dhuhr'&&friday?'وقت صلاة الجمعة':'أذان '+list[curI][1]);$('hSub').textContent='الساعة '+fmt(p[list[curI][0]]);}
   else{hero.classList.remove('now');
     let lbl=nextName+' بعد',sub='الأذان '+fmt(nextMin);
     if(ramadan&&list[nextI][0]==='maghrib'){lbl='الإفطار بعد';sub='المغرب '+fmt(nextMin);}
