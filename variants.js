@@ -163,6 +163,14 @@
     if (key === lastMoon) return null; lastMoon = key;
     return (c ? '<img alt="" src="' + c.url + '">' : moonSvg2(ph)) + '<div class="nm">' + (c ? c.name : (EN ? 'Moon' : 'القمر')) + '</div><div>' + pct + '</div>' + (ev ? '<div class="ev">' + ev + '</div>' : '');
   }
+  // «ساعة و٢٠ دقيقة» — Arabic counting: 1 · 2 (dual) · 3–10 (plural) · 11+ (singular)
+  function inWords(h, m) {
+    if (window.ZIJ_LANG === 'en') return !h && !m ? 'less than a minute' : [h ? h + ' hr' : '', m ? m + ' min' : ''].filter(Boolean).join(' ');
+    var w = function (n, one, two, few) { return n === 1 ? one : n === 2 ? two : dgt(n) + ' ' + (n <= 10 ? few : one); };
+    if (!h && !m) return 'أقل من دقيقة';
+    var hs = h ? w(h, 'ساعة', 'ساعتين', 'ساعات') : '', ms = m ? w(m, 'دقيقة', 'دقيقتين', 'دقائق') : '';
+    return hs && ms ? hs + ' و' + ms : hs || ms;
+  }
   function tick() {
     var v = get(); if (v !== 'a' && v !== 'b' && v !== 'c') return;
     var $ = function (i) { return document.getElementById(i); };
@@ -191,6 +199,10 @@
     if (v === 'b') { var cur = document.querySelector('#hRow .pc.cur'), hw = $('zHeroWrap'), txt = '';
       if (hw) { var ln = (hw.textContent || '').split(/\n+/).map(function (x) { return x.trim(); }).filter(Boolean); txt = ln.slice(0, 2).join(' '); }
       if (!txt) { var cd = $('hCd'), lb = $('hLbl'); txt = (lb ? lb.textContent : '') + ' ' + (cd ? cd.textContent : ''); }
+      // Hassan 19 Nov 18:31 («اكتبه بعد»): «العشاء بعد ٥٧ دقيقة», not «٥٧:٠١» that reads like a clock time
+      try { var lb2 = $('hLbl'), cd2 = $('hCd'), raw2 = String(cd2 ? cd2.textContent : '').replace(/[٠-٩]/g, function (x) { return x.charCodeAt(0) - 1632; });
+        if (lb2 && lb2.textContent && /^\d+(:\d{2}){1,2}$/.test(raw2.trim())) { var pp = raw2.trim().split(':').map(Number), HH = pp.length === 3 ? pp[0] : 0, MM = pp.length === 3 ? pp[1] : pp[0];
+          txt = lb2.textContent.trim() + ' ' + inWords(HH, MM); } } catch (e) {}
       var row = $('hRow'); if (row) row.style.setProperty('--zcd', JSON.stringify(txt)); }
   }
 
