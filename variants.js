@@ -35,7 +35,7 @@
     'body.zv-a.zv-clock #zDial,body.zv-b.zv-clock #zDial{order:9}',
     'body.zv-a .glance,body.zv-b .glance,body.zv-c .glance{display:none!important}',
     'body:not(.zv-a):not(.zv-b):not(.zv-c) #zToday,body:not(.zv-a):not(.zv-b) #zTiles{display:none!important}',
-    'body.zv-c #zToday .mn,body.zv-a #zToday .mn,body.zv-b #zToday .mn{display:none}',   /* Hassan 19 Nov: the Moon is off the home screen (it is in السماء) */
+    'body.zv-c #zToday .mn,body.zv-a #zToday .mn{display:none}',   /* Hassan 19 Nov: the Moon is off the home screen (it is in السماء) */
     'body.zv-a #zTiles,body.zv-b #zTiles{grid-template-columns:1fr}','body.zv-a #zTiles button,body.zv-b #zTiles button{flex-direction:row;justify-content:center;gap:10px;padding:10px;font-size:20px}','body.zv-a #zTiles button svg,body.zv-b #zTiles button svg{width:30px;height:30px}',
     /* the next prayer: one size down from the time (29), countdown no longer the focal point */
     'body.zv-a #zHeroWrap .hero,body.zv-c #zHeroWrap .hero{background:none!important;border:0!important;box-shadow:none!important;padding:0!important}',
@@ -49,11 +49,15 @@
     '#zToday .c{display:flex;justify-content:space-between;align-items:center;gap:10px}',
     '#zToday .wd{font-size:29px;line-height:1.2;color:#f5e6b4;font-weight:700}',
     '#zToday .tm{font-family:"EB Garamond",serif;font-size:76px;line-height:1;color:#fbf4e2;font-weight:700;direction:ltr;unicode-bidi:isolate;display:inline-block;letter-spacing:-.5px}',
+    '#zToday .tw{direction:ltr;unicode-bidi:isolate;display:inline-block;white-space:nowrap}',
+    '#zToday .sc{font-family:"EB Garamond",serif;font-size:30px;color:#d8ccaa;direction:ltr;unicode-bidi:isolate;display:inline-block;margin-left:2px;font-variant-numeric:tabular-nums}',
     '#zToday .pd{font-size:29px;color:#f5e6b4;margin-inline-start:10px}',
     '#zToday .dt{font-size:18px;color:#d8ccaa;line-height:1.5}',
     '#zToday .rm{font-size:18px;color:#e6c983}',
     '#zToday .mn{text-align:center;font-size:18px;color:#d8ccaa;min-width:70px}',
     '#zToday .mn svg{width:56px;height:56px;display:block;margin:0 auto 2px}',
+    '#zToday .mn{cursor:pointer;line-height:1.35;max-width:120px}','#zToday .mn img{width:76px;height:76px;display:block;margin:0 auto 4px;border-radius:50%}',
+    '#zToday .mn .nm{color:#f5e6b4;font-size:17px}','#zToday .mn .ev{font-size:16px;color:#d8ccaa}',
     /* tiles: one compact row in the thumb zone */
     '#zTiles{max-width:560px;margin:14px auto 0;padding:0 12px;box-sizing:border-box;width:100%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;font-family:Amiri,serif;direction:rtl}',
     '#zTiles button{display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:1px solid rgba(201,163,93,.30);border-radius:16px;padding:10px 4px;color:#fbf4e2;font:400 18px Amiri,serif;cursor:pointer}',
@@ -113,7 +117,7 @@
   }
   function build() {
     if (document.getElementById('zToday')) return;
-    var t = document.createElement('section'); t.id = 'zToday'; t.innerHTML = '<div class="c"><div><div class="wd" id="zWd">—</div><div><span class="tm" id="zTm">—</span><span class="pd" id="zPd"></span></div><div class="dt"><div id="zHj">—</div><div id="zGr">—</div></div><div class="rm" id="zRm"></div></div><div class="mn" id="zMn"></div></div>';
+    var t = document.createElement('section'); t.id = 'zToday'; t.innerHTML = '<div class="c"><div><div class="wd" id="zWd">—</div><div><span class="tw"><span class="tm" id="zTm">—</span><span class="sc" id="zSc"></span></span><span class="pd" id="zPd"></span></div><div class="dt"><div id="zHj">—</div><div id="zGr">—</div></div><div class="rm" id="zRm"></div></div><div class="mn" id="zMn"></div></div>';
     var g = document.createElement('section'); g.id = 'zTiles';
     var dial = '<svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="27" fill="#0f1424" stroke="#c9a35d" stroke-width="2.5"/><circle cx="30" cy="30" r="20" fill="none" stroke="#7c5f30" stroke-dasharray="1.5 3"/><path id="zMiniH" d="M30 30V18" stroke="#eddba0" stroke-width="3" stroke-linecap="round"/><path id="zMiniM" d="M30 30V11" stroke="#eddba0" stroke-width="2" stroke-linecap="round"/><circle cx="30" cy="30" r="2.5" fill="#c9a35d"/></svg>';
     var I = function (p) { return '<svg viewBox="0 0 24 24" fill="none" stroke="#e6c983" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' + p + '</svg>'; };
@@ -124,6 +128,7 @@
     var hb = document.getElementById('hBottom');
     (hb && hb.parentNode ? hb.parentNode : document.body).insertBefore(t, hb ? hb.nextSibling : null);
     t.parentNode.insertBefore(g, t.nextSibling);
+    var mn = t.querySelector('.mn'); if (mn) { mn.setAttribute('role', 'button'); mn.addEventListener('click', function () { var x = document.querySelector('[data-go="sky"]'); if (x) x.click(); }); }
     var dt = t.querySelector('.dt'); if (dt) { dt.setAttribute('role', 'button'); dt.tabIndex = 0; dt.style.cursor = 'pointer';
       dt.addEventListener('click', function () { if (window.zijCalendar && window.zijCalendar.open) window.zijCalendar.open(); }); }
     g.addEventListener('click', function (e) {
@@ -136,6 +141,28 @@
     });
   }
 
+  /* Hassan 19 Nov 18:10 («خلّي القمر فيها + القمر من صورة ناسا، اسمه، وقته أو طوره، ورتّبها»): the moon picture is drawn by the Sky page
+     (NASA map lit by the real Sun) — asked for once, kept for three hours; until then the simple drawn moon stands in. */
+  var MK = 'zijMoonHome', moonAsked = false;
+  function moonCache() { try { var c = JSON.parse(localStorage.getItem(MK) || 'null'), o = window.observer || {};
+      if (c && c.b === Math.floor(Date.now() / 108e5) && Math.abs(c.lat - o.lat) < .05 && Math.abs(c.lon - o.lon) < .05) return c; } catch (e) {} return null; }
+  function askMoon() {
+    if (moonAsked || !window.zijLoadMod) return; moonAsked = true;
+    window.zijLoadMod('sky', function (w) { var n = 0; (function go() {
+      var c = null; try { c = w.zijMoonCard && w.zijMoonCard(152); } catch (e) {}
+      if (!c) { if (++n < 40) setTimeout(go, 500); else moonAsked = false; return; }
+      c.b = Math.floor(Date.now() / 108e5); try { localStorage.setItem(MK, JSON.stringify(c)); } catch (e) {} lastMoon = ''; tick(); })(); });
+  }
+  var lastMoon = '';
+  function moonHtml(ph, f) {
+    var EN = window.ZIJ_LANG === 'en', c = moonCache(), pct = dgt(Math.round(f * 100)) + (EN ? '%' : '٪'), ev = '';
+    if (!c) setTimeout(askMoon, 1500);
+    if (c && c.ev && c.ev.t > Date.now()) { var d = new Date(c.ev.t + ((window.observer && observer.tz) || 0) * 36e5), h = d.getUTCHours(), m = d.getUTCMinutes();
+      ev = (c.ev.k === 'rise' ? (EN ? 'Rises ' : 'يشرق ') : (EN ? 'Sets ' : 'يغرب ')) + dgt(h % 12 || 12) + ':' + dgt(String(m).padStart(2, '0')) + ' ' + (EN ? (h < 12 ? 'AM' : 'PM') : (h < 12 ? 'ص' : 'م')); }
+    var key = (c ? c.url.length + '|' + c.b : 'svg') + '|' + pct + '|' + ev + '|' + (EN ? 1 : 0);
+    if (key === lastMoon) return null; lastMoon = key;
+    return (c ? '<img alt="" src="' + c.url + '">' : moonSvg2(ph)) + '<div class="nm">' + (c ? c.name : (EN ? 'Moon' : 'القمر')) + '</div><div>' + pct + '</div>' + (ev ? '<div class="ev">' + ev + '</div>' : '');
+  }
   function tick() {
     var v = get(); if (v !== 'a' && v !== 'b' && v !== 'c') return;
     var $ = function (i) { return document.getElementById(i); };
@@ -145,6 +172,7 @@
     if ($('zGr') && gr) $('zGr').textContent = gr.textContent || '—';
     try { var ht = $('hTime'); if ($('zTm') && ht) { var raw = String(ht.textContent || '').replace(/[٠-٩]/g, function (x) { return x.charCodeAt(0) - 1632; }).match(/(\d{1,2}):(\d{2})/);
         if (raw) $('zTm').textContent = dgt(+raw[1]) + ':' + dgt(raw[2]); }
+      if ($('zSc')) $('zSc').textContent = ':' + dgt(String(new Date().getSeconds()).padStart(2, '0'));   // Hassan 19 Nov: «ضيف الثواني للساعة»
       if ($('zPd')) $('zPd').textContent = period(); } catch (e) {}
     var n = daysToRamadan();
     if ($('zRm')) $('zRm').textContent = window.ZIJ_LANG === 'en' ? (n > 0 ? 'Ramadan in ' + n + (n === 1 ? ' day' : ' days') : (n === 0 ? 'Ramadan Kareem' : '')) : (n > 0 ? 'رمضان بعد ' + AR(n) + ' يومًا' : (n === 0 ? 'رمضان كريم' : ''));
@@ -154,7 +182,7 @@
         var f = ph.illum != null ? ph.illum : 0.5;
         if (f > 1) f = f / 100;
         var waxing = ph.waxing != null ? ph.waxing : (ph.age != null ? ph.age < 14.77 : true);
-        $('zMn').innerHTML = moonSvg2(ph) + 'القمر<br>' + dgt(Math.round(f * 100)) + '٪';
+        var mh = moonHtml(ph, f); if (mh !== null) $('zMn').innerHTML = mh;
       } else if ($('zMn')) { var mt = $('glMoonTxt'); $('zMn').textContent = mt ? mt.textContent : ''; }
     } catch (e) {}
     try { var d = new Date(), h = d.getHours() % 12 + d.getMinutes() / 60, m = d.getMinutes();
