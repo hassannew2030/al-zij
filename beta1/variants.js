@@ -44,6 +44,10 @@
     '#glSky{display:none!important}',
     /* د: the countdown in words — #hCd stays (other layouts read it), #hCdW is what is shown */
     '#hCdW{font:700 44px/1.25 Amiri,serif;color:inherit}','#hCdW[hidden],#hCd[hidden]{display:none!important}',
+    'body.zv-clock #zTiles button.zij{background:linear-gradient(180deg,#3a2f17,#241c0e);box-shadow:0 0 0 1px #e6c287 inset}',
+    '#zDialNow{display:none;text-align:center;font:700 22px Amiri,serif;color:#f5e6b4;margin:16px 0 0}',
+    'body.zv-a.zv-clock #zDialNow,body.zv-b.zv-clock #zDialNow{display:block;order:9}',
+    'body.zv-a.zv-clock #zDial,body.zv-b.zv-clock #zDial{padding-bottom:28px}',
     'body.zv-b #zTiles{grid-template-columns:1fr}','body.zv-b #zTiles button:not(.zij){display:none}','body.zv-b #zTiles button{flex-direction:row;justify-content:center;gap:10px;padding:10px;font-size:20px}','body.zv-b #zTiles button svg{width:30px;height:30px}',
     /* the next prayer: one size down from the time (29), countdown no longer the focal point */
     'body.zv-a #zHeroWrap .hero,body.zv-c #zHeroWrap .hero{background:none!important;border:0!important;box-shadow:none!important;padding:0!important}',
@@ -147,7 +151,7 @@
       if (z === 'qibla') tab('qibla');
       else if (z === 'cal') { if (window.zijCalendar && window.zijCalendar.open) window.zijCalendar.open(); }
       else if (z === 'alerts') { tab('prayer'); setTimeout(function () { var a = document.getElementById('pAlert'); if (a) a.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 250); }
-      else if (z === 'zij') { document.body.classList.toggle('zv-clock'); var w = document.getElementById('zDial'); if (w && document.body.classList.contains('zv-clock')) setTimeout(function () { w.scrollIntoView({ behavior: 'smooth' }); }, 60); }
+      else if (z === 'zij') { document.body.classList.toggle('zv-clock'); zijBtn(); var w = document.getElementById('zDial'); if (w && document.body.classList.contains('zv-clock')) setTimeout(function () { w.scrollIntoView({ behavior: 'smooth' }); }, 60); }
     });
   }
 
@@ -193,6 +197,14 @@
     else { w.hidden = true; cd.style.cssText = ''; }
   }
   setInterval(syncCd, 1000);
+  /* بيتا ١ (Hassan 19 Nov 22:23 «+»): ① the Zij button shows the dial is open and that a tap hides it ② a line with the time now above
+     the dial — the big clock has scrolled away and the ring is 24 h ③ room under the day/night line, clear of the bar */
+  function zijBtn() {
+    var on = document.body.classList.contains('zv-clock'), en = window.ZIJ_LANG === 'en', b = document.querySelector('#zTiles button.zij span');
+    if (b) { b.setAttribute('data-notr', ''); b.textContent = on ? (en ? 'Hide Al-Zij' : 'إخفاء الزيج') : (en ? 'Al-Zij' : 'الزيج'); }
+    var d = document.getElementById('zDial'), n = document.getElementById('zDialNow');
+    if (d && !n) { n = document.createElement('div'); n.id = 'zDialNow'; n.setAttribute('data-notr', ''); d.parentNode.insertBefore(n, d); }
+  }
   function tick() {
     var v = get(); if (v !== 'a' && v !== 'b' && v !== 'c') return;
     var $ = function (i) { return document.getElementById(i); };
@@ -203,7 +215,8 @@
     try { var ht = $('hTime'); if ($('zTm') && ht) { var raw = String(ht.textContent || '').replace(/[٠-٩]/g, function (x) { return x.charCodeAt(0) - 1632; }).match(/(\d{1,2}):(\d{2})/);
         if (raw) { $('zTm').textContent = dgt(+raw[1]) + ':' + dgt(raw[2]); $('zTm').classList.toggle('long', +raw[1] >= 10); } }
       if ($('zSc')) $('zSc').textContent = ':' + dgt(String(new Date().getSeconds()).padStart(2, '0'));   // Hassan 19 Nov: «ضيف الثواني للساعة»
-      if ($('zPd')) $('zPd').textContent = period(); } catch (e) {}
+      if ($('zPd')) $('zPd').textContent = period();
+      var dn = $('zDialNow'); if (dn && document.body.classList.contains('zv-clock')) { var tn = (window.ZIJ_LANG === 'en' ? 'The time now ' : 'الساعة الآن ') + $('zTm').textContent + ' ' + $('zPd').textContent; if (dn.textContent !== tn) dn.textContent = tn; } } catch (e) {}
     var n = daysToRamadan();
     if ($('zRm')) $('zRm').textContent = window.ZIJ_LANG === 'en' ? (n > 0 ? 'Ramadan in ' + n + (n === 1 ? ' day' : ' days') : (n === 0 ? 'Ramadan Kareem' : '')) : (n > 0 ? 'رمضان بعد ' + AR(n) + ' يومًا' : (n === 0 ? 'رمضان كريم' : ''));
     try {
