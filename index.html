@@ -154,6 +154,7 @@ window.zijPrIcon=function(k){
 <script>window.ZIJ_EN={
 "⚙️ إعداداتي": "⚙️ My settings",
 "📖 مساعدة": "📖 Help",
+"التنبيهات": "Alerts",
 "مسار القمر اليوم": "The Moon's path today",
 "🔬 للمتخصصين": "🔬 For specialists",
 "ℹ️ عن الزيج": "ℹ️ About Al-Zij",
@@ -7259,6 +7260,7 @@ ${clipDefs}<clipPath id="zdMoonClip"><circle r="13"/></clipPath></defs><g id="zd
     const EV=[];[[py,-1440],[p,0],[pt,1440]].forEach(([q,o])=>KEYS.forEach((k,i)=>EV.push({i,k,t:q[k]+o})));EV.sort((x,y)=>x.t-y.t);
     const aftM=false;   // 24 h: no switch to tomorrow's Fajr after Maghrib any more — today's stays (dimmed) until midnight
     const T=KEYS.map(k=>p[k]);
+    drawnSig=T.join(',');   // what this drawing shows — tick() redraws whenever the live times differ (19 Nov: «العصر ٣:١٨» on the ring, ٣:١٩ on the card)
     // the night in progress (or tonight): Maghrib → Fajr — the same as the prayer tab (#51)
     let mN=p.maghrib,fN=pt.fajr+1440;if(nm<p.fajr){mN=py.maghrib-1440;fN=p.fajr;}
     const midN=(mN+fN)/2,third=mN+(fN-mN)*2/3;
@@ -7415,14 +7417,14 @@ ${clipDefs}<clipPath id="zdMoonClip"><circle r="13"/></clipPath></defs><g id="zd
       `<line x1="${cx2}" y1="${cy2}" x2="${sx}" y2="${sy}" stroke="#d6453a" stroke-width="2.4" stroke-linecap="round"/><circle cx="${cw}" cy="${ch}" r="6" fill="#d6453a"/>`+
       `<circle cx="${C}" cy="${C}" r="10" fill="url(#zdGold)" stroke="#6f5229"/><circle cx="${C}" cy="${C}" r="3.5" fill="#d6453a"/>`;
   }
-  let sigT=0,sig='';
+  let sigT=0,sig='',drawnSig='';
   function tick(){const now=new Date();
     /* the times can change without the minute changing — the official Umm al-Qura table is loaded after the first draw, and the
        dial then kept the first (calculated) minutes: «المغرب ٥:٤٢» on the ring against «٥:٤٣» on the card. Every second the six
        times are read again; a change redraws the dial. */
     if(now-sigT>1000){sigT=+now;try{const q=observer.realPrayerTimes(now,hijriCal.fromGregorian(now));sig=['fajr','sunrise','dhuhr','asr','maghrib','isha'].map(k=>q[k]).join(',');}catch(e){}}
     const key=Math.floor(now.getTime()/60000)+'|'+(window.ZIJ_LANG||'')+'|'+(typeof observer!=='undefined'&&observer.lat)+'|'+D24()+'|'+sig;
-    if(key!==lastKey){lastKey=key;drawStatic(now);}drawHands(now);}
+    if(key!==lastKey||(sig&&sig!==drawnSig)){lastKey=key;drawStatic(now);}drawHands(now);}
   /* beta test switch «١٢ ساعة / ٢٤ ساعة» under the dial — the 12-hour dial stays one tap away (#29); the choice is kept on this phone */
   {const sw=document.createElement('div');sw.id='zd24Sw';sw.setAttribute('data-notr','');sw.setAttribute('data-nodigit','');
     sw.setAttribute('role','group');sw.setAttribute('aria-label',EN()?'Dial: 12 or 24 hours':'الساعة: ١٢ أو ٢٤ ساعة');
@@ -7812,7 +7814,7 @@ html[data-lang=en] .zSh .sh{font-family:'EB Garamond',Amiri,serif}
   // home glance: a «Calendar» chip where the duplicate Qibla chip was
   const gq=document.getElementById('glQibla');
   if(gq){const a=document.createElement('a');a.className='gl';a.id='glCal';a.href='#';a.setAttribute('data-notr','');
-    a.innerHTML='<span style="font-size:17px">📅</span><span>'+L('التقويم','Calendar')+'</span>';a.onclick=e=>{e.preventDefault();openCal();};gq.after(a);}
+    a.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/></svg><span>'+L('التقويم','Calendar')+'</span>';a.onclick=e=>{e.preventDefault();openCal();};gq.after(a);}
   // prayer tab: the monthly timetable and the calendar
   const pd=document.getElementById('pDay');
   if(pd){const w=document.createElement('div');w.className='acts';w.setAttribute('data-notr','');w.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0 0';
@@ -8115,12 +8117,11 @@ ${c.friIqama?friBlk(k,c.friIqama):''}
 (function(){
   /* Hassan 19 Nov 18:57 («قراري حذف وحدة مكررة، وتعديل وحدة، والشاشة التي فيها القمر تذهب إلى القمر»): «الساعة أولًا» is removed (the
      duplicate), «القائمة» is the edited one and the entry home, «منحنى القمر» lives in السماء ← القمر. All the others stay as they were. */
+  /* بيتا ١ (أفكار واجهات أبوس، 19 Nov): four layouts, one idea each — list, dial, curve, sentence. «اليوم»، «الساعة تحت»،
+     «الأفق والشمس» are left out of the menu here only; a phone that already uses one keeps it (nothing is rewritten). */
   const O=[['b','القائمة','List','الوقت والتاريخ ثم الصلوات في قائمة كبيرة','The time and date, then the prayers in a large list'],
     ['orig','الأصل','Original','الساعة كما هي','The clock as it is'],
-    ['a','اليوم','Today','الصلاة القادمة ثم الصلوات ثم اليوم','Next prayer, the prayers, then the day'],
-    ['c','الساعة تحت','Clock below','الصلوات أولًا والساعة تحتها','Prayers first, the clock below'],
     ['e','الأفق','Horizon','اليوم كله مسار الشمس','The whole day as the Sun’s path'],
-    ['g','الأفق والشمس','Horizon and Sun','مسار الشمس الحقيقي اليوم','Today’s real path of the Sun'],
     ['f','الجملة','Sentence','المعلومة كما يقولها إنسان','Said the way a person would say it']];
   /* Hassan, 13 Nov 15:06 («لا تحذف ولا تخفيها — نعتمد شكلًا واحدًا رئيسًا للدخول، والتغيير قرار المستخدم»): all nine stay in the
      list; «الساعة أولًا» is the home everyone lands on until they pick another (a pick — «الأصل» included — is kept). */
