@@ -35,7 +35,8 @@
     'body.zv-a.zv-clock #zDial,body.zv-b.zv-clock #zDial{order:9}',
     'body.zv-a .glance,body.zv-b .glance,body.zv-c .glance{display:none!important}',
     'body:not(.zv-a):not(.zv-b):not(.zv-c) #zToday,body:not(.zv-a):not(.zv-b) #zTiles{display:none!important}',
-    'body.zv-c #zToday .mn{display:none}',
+    'body.zv-c #zToday .mn,body.zv-a #zToday .mn,body.zv-b #zToday .mn{display:none}',   /* Hassan 19 Nov: the Moon is off the home screen (it is in السماء) */
+    'body.zv-a #zTiles,body.zv-b #zTiles{grid-template-columns:1fr}','body.zv-a #zTiles button,body.zv-b #zTiles button{flex-direction:row;justify-content:center;gap:10px;padding:10px;font-size:20px}','body.zv-a #zTiles button svg,body.zv-b #zTiles button svg{width:30px;height:30px}',
     /* the next prayer: one size down from the time (29), countdown no longer the focal point */
     'body.zv-a #zHeroWrap .hero,body.zv-c #zHeroWrap .hero{background:none!important;border:0!important;box-shadow:none!important;padding:0!important}',
     'body.zv-a #zHeroWrap .hero .lbl,body.zv-c #zHeroWrap .hero .lbl{font-size:18px!important;color:#d8ccaa!important}',
@@ -102,6 +103,7 @@
   }
   // the period word instead of ص/م (فجرًا · صباحًا · ظهرًا · عصرًا · مساءً · ليلًا), from the app's own six times
   function period() {
+    if (window.ZIJ_LANG === 'en') return new Date().getHours() < 12 ? 'AM' : 'PM';   // the Arabic period words have no English twin
     var cells = document.querySelectorAll('#hRow .pc .pt'), d = new Date(), now = d.getHours() * 60 + d.getMinutes();
     var M = [].map.call(cells, function (c, i) { var t = String(c.textContent).replace(/[٠-٩]/g, function (x) { return x.charCodeAt(0) - 1632; }).match(/(\d{1,2}):(\d{2})/);
       if (!t) return null; var h = +t[1], m = +t[2]; if (i >= 2 && h < 12) h += 12; if (i < 2 && h === 12) h = 0; return h * 60 + m; });
@@ -115,14 +117,15 @@
     var g = document.createElement('section'); g.id = 'zTiles';
     var dial = '<svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="27" fill="#0f1424" stroke="#c9a35d" stroke-width="2.5"/><circle cx="30" cy="30" r="20" fill="none" stroke="#7c5f30" stroke-dasharray="1.5 3"/><path id="zMiniH" d="M30 30V18" stroke="#eddba0" stroke-width="3" stroke-linecap="round"/><path id="zMiniM" d="M30 30V11" stroke="#eddba0" stroke-width="2" stroke-linecap="round"/><circle cx="30" cy="30" r="2.5" fill="#c9a35d"/></svg>';
     var I = function (p) { return '<svg viewBox="0 0 24 24" fill="none" stroke="#e6c983" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' + p + '</svg>'; };
+    /* Hassan 19 Nov: every function has one place — القبلة is the centre tab, التنبيهات are in الصلاة, التقويم opens from the date.
+       Only «الزيج» stays here. */
     g.innerHTML =
-      '<button type="button" data-z="qibla">' + I('<circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2.2 5-4.8 2 2.2-5z"/>') + '<span>القبلة</span></button>' +
-      '<button type="button" data-z="cal">' + I('<rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/>') + '<span>التقويم</span></button>' +
-      '<button type="button" data-z="alerts">' + I('<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>') + '<span>التنبيهات</span></button>' +
       '<button type="button" data-z="zij" class="zij">' + dial + '<span>الزيج</span></button>';
     var hb = document.getElementById('hBottom');
     (hb && hb.parentNode ? hb.parentNode : document.body).insertBefore(t, hb ? hb.nextSibling : null);
     t.parentNode.insertBefore(g, t.nextSibling);
+    var dt = t.querySelector('.dt'); if (dt) { dt.setAttribute('role', 'button'); dt.tabIndex = 0; dt.style.cursor = 'pointer';
+      dt.addEventListener('click', function () { if (window.zijCalendar && window.zijCalendar.open) window.zijCalendar.open(); }); }
     g.addEventListener('click', function (e) {
       var b = e.target.closest('button'); if (!b) return;
       var z = b.dataset.z, tab = function (s) { var x = document.querySelector('[data-go="' + s + '"]'); if (x) x.click(); };
@@ -144,7 +147,7 @@
         if (raw) $('zTm').textContent = dgt(+raw[1]) + ':' + dgt(raw[2]); }
       if ($('zPd')) $('zPd').textContent = period(); } catch (e) {}
     var n = daysToRamadan();
-    if ($('zRm')) $('zRm').textContent = n > 0 ? 'رمضان بعد ' + AR(n) + ' يومًا' : (n === 0 ? 'رمضان كريم' : '');
+    if ($('zRm')) $('zRm').textContent = window.ZIJ_LANG === 'en' ? (n > 0 ? 'Ramadan in ' + n + (n === 1 ? ' day' : ' days') : (n === 0 ? 'Ramadan Kareem' : '')) : (n > 0 ? 'رمضان بعد ' + AR(n) + ' يومًا' : (n === 0 ? 'رمضان كريم' : ''));
     try {
       if ($('zMn') && typeof Ephemeris !== 'undefined' && Ephemeris.moonPhase) {
         var ph = Ephemeris.moonPhase(new Date());

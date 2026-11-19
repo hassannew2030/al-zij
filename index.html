@@ -8112,17 +8112,19 @@ ${c.friIqama?friBlk(k,c.friIqama):''}
 /* المزيد ← شكل الصفحة الرئيسية (Hassan, 13 Nov: «حتى الواجهات اعمل زر في المزيد وانقلها») — the home layouts that were tried in
    beta, now chosen here. «الأصل» stays everyone's home until they pick another; a pick opens the clock tab to show it. */
 (function(){
-  /* Hassan 19 Nov («الواجهات فيها تكرار… هذه ثلاث واجهات راحت»): three layouts stay — الأصل، الساعة أولًا (the entry home), الأفق والشمس.
+  /* Hassan 19 Nov («الواجهات فيها تكرار… هذه ثلاث واجهات راحت»، ثم 18:00 «نعتمد هذي» على صورة «القائمة»): three layouts stay —
+     القائمة (the entry home), الأفق والشمس, الأصل.
      The Moon's path moved to السماء ← القمر. The code of the removed ones stays in the files until the clean-up (#85). */
-  const O=[['d','الساعة أولًا','Time first','الوقت الآن كبيرًا ثم الصلاة القادمة','The time now, large, then the next prayer'],
+  const O=[['b','القائمة','List','الوقت والتاريخ ثم الصلوات في قائمة كبيرة','The time and date, then the prayers in a large list'],
     ['g','الأفق والشمس','Horizon and Sun','مسار الشمس الحقيقي اليوم','Today’s real path of the Sun'],
     ['orig','الأصل','Original','الساعة كما هي','The clock as it is']];
   /* Hassan, 13 Nov 15:06 («لا تحذف ولا تخفيها — نعتمد شكلًا واحدًا رئيسًا للدخول، والتغيير قرار المستخدم»): all nine stay in the
      list; «الساعة أولًا» is the home everyone lands on until they pick another (a pick — «الأصل» included — is kept). */
   try{const L=localStorage,hd=L.getItem('zijHomeDesign'),bv=L.getItem('zijBetaVariant');
-    if(hd==null&&bv==null)L.setItem('zijHomeDesign','d');                       // before the layout scripts start
-    if(/^[efh]$/.test(hd||''))L.setItem('zijHomeDesign','d');                     // a removed layout → «الساعة أولًا»
-    if(/^[abc]$/.test(bv||'')){L.setItem('zijBetaVariant','orig');L.setItem('zijHomeDesign','d');}
+    const toToday=()=>{L.setItem('zijHomeDesign','off');L.setItem('zijBetaVariant','b');};   // before the layout scripts start
+    if(hd==null&&bv==null)toToday();                                             // first visit → «القائمة»
+    else if(/^[defh]$/.test(hd||''))toToday();                                   // a removed layout → «القائمة»
+    else if(/^[ac]$/.test(bv||'')&&!/^g$/.test(hd||''))toToday();
   }catch(e){}
   /* السماء ← القمر: the Moon's path of today, drawn by home-designs.js (one drawing, one place) into the Sky page's card */
   setInterval(()=>{try{if(document.body.dataset.scr!=='sky'||!window.zijMoonCurve)return;const f=document.getElementById('mod-sky');
