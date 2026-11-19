@@ -156,8 +156,7 @@
   function actsHtml() {
     return '<div class="acts">' +
       '<button type="button" class="zij s1" data-a="zij">' + DIAL + '<span>' + T('الزيج', 'Al-Zij') + '</span></button>' +
-      '<button type="button" class="s1" data-a="cal">' + CAL + '<span>' + T('التقويم', 'Calendar') + '</span></button>' +
-      '<button type="button" class="dgt s1" data-a="dgt" data-nodigit aria-label="' + T('شكل الأرقام', 'Digits') + '"><span data-k="dgt"></span></button>' +
+      /* بيتا ١ — ط: «الزيج» alone, as in «القائمة»: digits are in المزيد ← العرض, the calendar opens from the date */
       '</div>';
   }
   function topHtml() { return '<div class="top"><button type="button" class="city s1" data-a="city">' + PIN + '<span data-k="city"></span></button></div>'; }
@@ -177,7 +176,7 @@
     },
     e: function () {
       return topHtml() +
-        '<div class="day"><div class="s1"><span class="wd b" data-k="wd"></span> · <span data-k="hj"></span></div><div class="gr s1" data-k="gr"></div></div>' +
+        '<div class="day" data-a="cal" role="button" tabindex="0" style="cursor:pointer"><div class="s1"><span class="wd b" data-k="wd"></span> · <span data-k="hj"></span></div><div class="gr s1" data-k="gr"></div></div>' +
         '<div class="g1"></div>' +
         '<div class="clock"><span class="tm s3 n" data-k="tm"></span><span class="per s2" data-k="per"></span></div>' +
         nextHtml() +
@@ -186,7 +185,7 @@
     },
     f: function () {
       return topHtml() +
-        '<div class="day"><div class="s2 b wdl">' + T('اليوم ', '') + '<span class="wd" data-k="wd"></span></div><div class="s1"><span data-k="hj"></span>' + T('، الموافق', ',') + '</div><div class="gr s1" data-k="gr"></div></div>' +
+        '<div class="day" data-a="cal" role="button" tabindex="0" style="cursor:pointer"><div class="s2 b wdl">' + T('اليوم ', '') + '<span class="wd" data-k="wd"></span></div><div class="s1"><span data-k="hj"></span>' + T('، الموافق', ',') + '</div><div class="gr s1" data-k="gr"></div></div>' +
         '<div class="g1"></div>' +
         '<div class="say s1">' + T('الساعة الآن', 'The time now') + '</div>' +
         '<div class="clock"><span class="tm s3 n" data-k="tm"></span><span class="per s2" data-k="per"></span></div>' +

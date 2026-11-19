@@ -36,6 +36,14 @@
     'body.zv-a .glance,body.zv-b .glance,body.zv-c .glance{display:none!important}',
     'body:not(.zv-a):not(.zv-b):not(.zv-c) #zToday,body:not(.zv-a):not(.zv-b) #zTiles{display:none!important}',
     'body.zv-c #zToday .mn{display:none}',   /* Hassan 19 Nov: the Moon is off the home screen (it is in السماء) */
+    /* بيتا ١ — أ: a two-digit hour keeps «صباحًا» and the Moon's time on their lines */
+    '#zToday .tm.long{font-size:64px}','#zToday .tw,#zToday .pd{white-space:nowrap}','#zToday .mn{min-width:104px;max-width:112px}','#zToday .mn .nm,#zToday .mn .ev{white-space:nowrap}',
+    /* ب: «القائمة» fits one screen — the Zij button above the bar */
+    'body.zv-b .pc{padding:6px 16px!important}','body.zv-b .prow{gap:5px!important}','body.zv-b .pc .pt{font-size:27px!important}','body.zv-b #zTiles{margin-top:10px}',
+    /* و: the sunset/sunrise chip repeats a time already on the ring and in the row */
+    '#glSky{display:none!important}',
+    /* د: the countdown in words — #hCd stays (other layouts read it), #hCdW is what is shown */
+    '#hCdW{font:700 44px/1.25 Amiri,serif;color:inherit}','#hCdW[hidden],#hCd[hidden]{display:none!important}',
     'body.zv-b #zTiles{grid-template-columns:1fr}','body.zv-b #zTiles button:not(.zij){display:none}','body.zv-b #zTiles button{flex-direction:row;justify-content:center;gap:10px;padding:10px;font-size:20px}','body.zv-b #zTiles button svg{width:30px;height:30px}',
     /* the next prayer: one size down from the time (29), countdown no longer the focal point */
     'body.zv-a #zHeroWrap .hero,body.zv-c #zHeroWrap .hero{background:none!important;border:0!important;box-shadow:none!important;padding:0!important}',
@@ -70,7 +78,7 @@
     'body.zv-b .pc .pri{margin:0!important;width:26px!important;height:26px!important}',
     'body.zv-b .pc .pn{font-size:18px!important}',
     'body.zv-b .pc .pt{font-size:29px!important}',
-    'body.zv-b .pc.cur::after{content:var(--zcd,"");grid-column:1/-1;font:700 18px Amiri,serif;color:#b8eee2}',
+    'body.zv-b .pc.cur::after{content:var(--zcd,"");grid-column:1/-1;font:700 18px Amiri,serif;color:#f5e6b4}',
     'body.zv-a #hBottom,body.zv-b #hBottom,body.zv-c #hBottom,body.zv-a #zHeroWrap,body.zv-b #zHeroWrap,body.zv-c #zHeroWrap{width:100%;max-width:560px;box-sizing:border-box;margin-left:auto;margin-right:auto;align-self:center}'
   ].join('\n');
   document.head.appendChild(css);
@@ -167,12 +175,24 @@
   }
   // «ساعة و٢٠ دقيقة» — Arabic counting: 1 · 2 (dual) · 3–10 (plural) · 11+ (singular)
   function inWords(h, m) {
-    if (window.ZIJ_LANG === 'en') return !h && !m ? 'less than a minute' : [h ? h + ' hr' : '', m ? m + ' min' : ''].filter(Boolean).join(' ');
+    if (window.ZIJ_LANG === 'en') return !h && !m ? 'less than a minute' : [h ? h + ' h' : '', m ? m + ' min' : ''].filter(Boolean).join(' ');   // «h» like the other layouts
     var w = function (n, one, two, few) { return n === 1 ? one : n === 2 ? two : dgt(n) + ' ' + (n <= 10 ? few : one); };
     if (!h && !m) return 'أقل من دقيقة';
     var hs = h ? w(h, 'ساعة', 'ساعتين', 'ساعات') : '', ms = m ? w(m, 'دقيقة', 'دقيقتين', 'دقائق') : '';
     return hs && ms ? hs + ' و' + ms : hs || ms;
   }
+  /* بيتا ١ — د: «الظهر بعد ساعتين و٣ دقائق» in the big card too («٢:٠٣:٥١» reads like a clock time). #hCd keeps its digits for
+     the layouts that read it (home-designs.js, «القائمة» above); #hCdW beside it is the one shown. The adhan sentence («حان الآن…») stays. */
+  function syncCd() {
+    var $ = function (i) { return document.getElementById(i); };
+    var cd = $('hCd'); if (!cd) return;
+    var w = $('hCdW'); if (!w) { w = document.createElement('div'); w.id = 'hCdW'; w.setAttribute('aria-hidden', 'true'); cd.parentNode.insertBefore(w, cd.nextSibling); }
+    var raw = String(cd.textContent).replace(/[٠-٩]/g, function (x) { return x.charCodeAt(0) - 1632; }).trim();
+    if (/^\d+(:\d{2}){1,2}$/.test(raw)) { var pp = raw.split(':').map(Number), H = pp.length === 3 ? pp[0] : 0, M = pp.length === 3 ? pp[1] : pp[0];
+      var t = inWords(H, M); if (w.textContent !== t) w.textContent = t; w.hidden = false; cd.style.cssText = 'position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)'; }
+    else { w.hidden = true; cd.style.cssText = ''; }
+  }
+  setInterval(syncCd, 1000);
   function tick() {
     var v = get(); if (v !== 'a' && v !== 'b' && v !== 'c') return;
     var $ = function (i) { return document.getElementById(i); };
@@ -181,7 +201,7 @@
     if ($('zHj') && hj) $('zHj').textContent = hj.textContent || '—';
     if ($('zGr') && gr) $('zGr').textContent = gr.textContent || '—';
     try { var ht = $('hTime'); if ($('zTm') && ht) { var raw = String(ht.textContent || '').replace(/[٠-٩]/g, function (x) { return x.charCodeAt(0) - 1632; }).match(/(\d{1,2}):(\d{2})/);
-        if (raw) $('zTm').textContent = dgt(+raw[1]) + ':' + dgt(raw[2]); }
+        if (raw) { $('zTm').textContent = dgt(+raw[1]) + ':' + dgt(raw[2]); $('zTm').classList.toggle('long', +raw[1] >= 10); } }
       if ($('zSc')) $('zSc').textContent = ':' + dgt(String(new Date().getSeconds()).padStart(2, '0'));   // Hassan 19 Nov: «ضيف الثواني للساعة»
       if ($('zPd')) $('zPd').textContent = period(); } catch (e) {}
     var n = daysToRamadan();
