@@ -11,7 +11,9 @@ const FILES_TO_CACHE = ['./index.html', './manifest.json', './version.json', './
 
 // one key per file: no query, and a folder means its index.html
 const keyOf = (u) => { const x = new URL(u, self.location.href); let p = x.pathname; if (p.endsWith('/')) p += 'index.html'; return x.origin + p; };
-const isBeta = (u) => new URL(u, self.location.href).pathname.startsWith('/beta/');
+// /beta/ (the backup) and /beta1/, /beta2/… (idea copies, 19 Nov): each opens only its own saved page, never the main one
+const betaDir = (u) => { const m = new URL(u, self.location.href).pathname.match(/^\/(beta\d*)\//); return m ? m[1] : ''; };
+const isBeta = (u) => !!betaDir(u);
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then((cache) => Promise.all(FILES_TO_CACHE.map((f) =>
@@ -35,7 +37,7 @@ const saved = (key) => caches.open(CACHE_NAME).then((c) => c.match(key));
 // no network and nothing saved for this address: a page opens the right saved page; anything else simply fails (the page handles it)
 const fallback = (req, key) => saved(key).then((hit) => {
   if (hit || req.mode !== 'navigate') return hit || Response.error();
-  if (isBeta(req.url)) return saved(keyOf('./beta/index.html')).then((b) => b || new Response(
+  if (isBeta(req.url)) return saved(keyOf('./' + betaDir(req.url) + '/index.html')).then((b) => b || new Response(
     '<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><body style="background:#0a0c12;color:#e8d5a8;font:18px/1.8 serif;padding:24px;text-align:center" dir="rtl">' +
     'نسخة التجربة غير محفوظة على هذا الجوال بعد.<br>افتحها مرة واحدة والإنترنت متصل.<br><br><a style="color:#c9a35d" href="/">افتح الزيج</a></body>',
     { headers: { 'Content-Type': 'text/html; charset=utf-8' } }));

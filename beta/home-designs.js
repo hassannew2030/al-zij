@@ -156,6 +156,8 @@
   function actsHtml() {
     return '<div class="acts">' +
       '<button type="button" class="zij s1" data-a="zij">' + DIAL + '<span>' + T('الزيج', 'Al-Zij') + '</span></button>' +
+      '<button type="button" class="s1" data-a="cal">' + CAL + '<span>' + T('التقويم', 'Calendar') + '</span></button>' +
+      '<button type="button" class="dgt s1" data-a="dgt" data-nodigit aria-label="' + T('شكل الأرقام', 'Digits') + '"><span data-k="dgt"></span></button>' +
       '</div>';
   }
   function topHtml() { return '<div class="top"><button type="button" class="city s1" data-a="city">' + PIN + '<span data-k="city"></span></button></div>'; }
@@ -492,7 +494,7 @@
     else { setK('lbl', (cur === 'f' && !EN() && D.lbl ? 'و' : '') + (D.lbl ? D.lbl + ' ' : '') + words(D.left)); }
     // «كيرف الشمس»: the adhan time and the Moon are already drawn on the curve, so they are not repeated in text
     setK('sub', (cur === 'd' || cur === 'e' || cur === 'g' || cur === 'h') ? '' : (EN() ? D.sub : D.sub.replace(/\s+[صم]$/, ''))); // the prayer name already says which half of the day
-    var note = D.note;   // Hassan 19 Nov: the Moon is off the home screen — it lives in السماء (the moon-path card there)
+    var note = (cur === 'e' || cur === 'g' || cur === 'h') ? D.note : [D.note, D.moon && !/—/.test(D.moon) && D.note.indexOf(D.moon) < 0 ? T('القمر: ', 'Moon: ') + D.moon : ''].filter(Boolean).join(' · ');
     setK('note', note);
     var dt = root.querySelector('[data-k="dgt"]'); if (dt) { var en = digitsEn(); if (dt.dataset.m !== String(en)) { dt.dataset.m = String(en); dt.innerHTML = '<b class="' + (en ? '' : 'on') + '">١٢٣</b><i>|</i><b class="' + (en ? 'on' : '') + '">123</b>'; } }
     var lb = root.querySelector('.next .l'); if (lb) lb.classList.toggle('nowmsg', D.nowState);

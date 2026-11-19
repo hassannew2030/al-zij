@@ -2,6 +2,7 @@
 User-agent: *
 Allow: /
 Disallow: /beta/
+Disallow: /beta1/
 Disallow: /claude/
 Disallow: /fable/
 Disallow: /al-zij-v2.html
