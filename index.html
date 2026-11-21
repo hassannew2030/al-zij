@@ -7171,7 +7171,7 @@ body[data-scr]:not([data-scr="clock"]) #zInsBar{display:none!important}
   const ang=m=>180+m/1440*360;   // the day: noon on top, midnight at the bottom
   const norm=a=>((a%360)+360)%360;
   /* Hassan, 13 Nov 15:44: «اعتمد نظام ٢٤ ساعة فقط» — the dial is 24-hour only; the 12-hour code stays (not deleted) but is never used */
-  const D24=()=>true;
+  const D24=()=>false;   // Hassan 22 Nov: back to 12 h — «حرّك الصلوات على القرص بكود ١٢ فتجلس في مكانها الطبيعي على وقتها، بترتيب الظهور» (the plain user needs no explanation)
   function band(a1,a2,r1,r2){const [a,b]=P(a1,r2),[c,d]=P(a2,r2),[e,f]=P(a2,r1),[g,h]=P(a1,r1),L=(a2-a1)>180?1:0;
     return `M${a} ${b}A${r2} ${r2} 0 ${L} 1 ${c} ${d}L${e} ${f}A${r1} ${r1} 0 ${L} 0 ${g} ${h}Z`;}
   // a word inside a ring: ordinary text turned along the ring (upright on the lower half)
@@ -7254,7 +7254,9 @@ ${clipDefs}<clipPath id="zdMoonClip"><circle r="13"/></clipPath></defs><g id="zd
     /* Hassan, 13 Nov: the day runs from midnight to midnight — the prayers on the dial are TODAY's until 12 at night, past ones dimmed;
        the night in progress (Maghrib → Fajr: midnight, the last third) stays with it until Fajr.
        12 h: the dial shows the half of the day we are in — midnight → noon (with Dhuhr at the top), noon → midnight. */
-    const RBm=(RB[0]+RB[1])/2,H0=nm<720?0:720,W1=H0?1440:Math.max(720,p.dhuhr+1),CW=H0+720;
+    /* 12 h (Hassan 22 Nov «بناء على ترتيب الظهور»): the ring is the coming 12 hours, from the hand round to the hand —
+       each prayer and night mark sits on its own time on the numerals, in the order they will come; what has passed leaves. */
+    const RBm=(RB[0]+RB[1])/2,H0=nm,W1=nm+720,CW=nm+720;
     // every prayer of yesterday, today and tomorrow, in order (minutes from today's midnight)
     const EV=[];[[py,-1440],[p,0],[pt,1440]].forEach(([q,o])=>KEYS.forEach((k,i)=>EV.push({i,k,t:q[k]+o})));EV.sort((x,y)=>x.t-y.t);
     const aftM=false;   // 24 h: no switch to tomorrow's Fajr after Maghrib any more — today's stays (dimmed) until midnight
@@ -7282,7 +7284,7 @@ ${clipDefs}<clipPath id="zdMoonClip"><circle r="13"/></clipPath></defs><g id="zd
     // the hour marks, quietly on the inner edge (every 3 hours a longer one): 24 h — the day's 24 hours; 12 h — the dial's 12
     for(let k=0;k<(d24?24:12);k++){const a=d24?ang(k*60):k*30,[x1,y1]=P(a,RB[0]+1),[x2,y2]=P(a,RB[0]+(k%3?5:9));s+=`<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="#080b13" stroke-opacity=".55" stroke-width="${k%3?1.2:2}"/>`;}
     // 12 h: where the 12 hours end and begin again — at the hand (the «now» Sun sits on it)
-    if(!d24){const [x1,y1]=P(0,RB[0]-1),[x2,y2]=P(0,RB[1]+1);s+=`<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="#080b13" stroke-width="3"/>`;}
+    if(!d24){const [x1,y1]=P(ga(nm),RB[0]-1),[x2,y2]=P(ga(nm),RB[1]+1);s+=`<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="#080b13" stroke-width="3"/>`;}
     /* the labels: name over time, placed just outside the ring, then nudged apart so no two touch */
     const L=[];
     /* the same language as «كيرف الشمس» (home-designs.js, هـ): name and time the same size, next prayer gold and bold with a ring
