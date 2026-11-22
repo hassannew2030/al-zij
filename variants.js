@@ -139,18 +139,28 @@
     'body.zv-k[data-kc=C] #zToday .hj2,body.zv-k[data-kc=C] #zToday .gr2{display:flex;flex-direction:column;justify-content:center;font-size:17px;line-height:1.35;color:var(--k-dim);padding-bottom:26px}',
     'body.zv-k[data-kc=C] #zToday .hj2{grid-area:hj;text-align:start}', 'body.zv-k[data-kc=C] #zToday .gr2{grid-area:gr;text-align:end}',
     'body.zv-k[data-kc=C] #zHjA,body.zv-k[data-kc=C] #zGrA{font-size:20px;color:var(--k-ink)}',
-    'body.zv-k[data-kc=C] #zToday .mn{margin:18px 10px 0;text-align:center}',
-    'body.zv-k[data-kc=C] #zToday .mn img,body.zv-k[data-kc=C] #zToday .mn svg{width:80px;height:80px}',
+    'body.zv-k[data-kc=C] #zToday .mn{margin:var(--k-mt) 12px 0;text-align:center}',
+    'body.zv-k[data-kc=C] #zToday .mn img,body.zv-k[data-kc=C] #zToday .mn svg{width:var(--k-mi);height:var(--k-mi)}',
     'body.zv-k[data-kc=C] #zToday .tr{justify-content:center}', 'body.zv-k[data-kc=C] #zToday .tm{font-size:88px}',
     'body.zv-k[data-kc=C] #zToday .rm{text-align:center;margin-top:6px}',
+    /* the horizon: one hairline through the centre of the Moon, from the Hijri date to the Gregorian — each date's day and month
+       stand on it, its year hangs under it, and the Moon sits on it between the two calendars */
+    'body.zv-k[data-kc=C]{--k-mt:18px;--k-mi:80px}',
+    'body.zv-k[data-kc=C] #zToday::before{content:"";grid-row:4;grid-column:1/-1;align-self:start;height:1px;margin-top:calc(var(--k-mt) + var(--k-mi) / 2);' +
+      'background:linear-gradient(90deg,transparent,var(--k-line) 14%,var(--k-brass) 50%,var(--k-line) 86%,transparent);opacity:.75;pointer-events:none}',
+    'body.zv-k[data-kc=C] #zToday .mn{position:relative;z-index:1}',
+    /* two rows: the first ends exactly on the line (a long English month may take two lines — it grows upwards), the year under it */
+    'body.zv-k[data-kc=C] #zToday .hj2,body.zv-k[data-kc=C] #zToday .gr2{display:grid!important;grid-template-columns:minmax(0,1fr);justify-content:stretch;grid-template-rows:calc(var(--k-mt) + var(--k-mi) / 2) auto;align-self:start;padding:0}',
+    'body.zv-k[data-kc=C] #zHjA,body.zv-k[data-kc=C] #zGrA,body.zv-k[data-kc=C] #zHjB,body.zv-k[data-kc=C] #zGrB{justify-self:stretch}',
+    'body.zv-k[data-kc=C] #zHjA,body.zv-k[data-kc=C] #zGrA{align-self:end;line-height:1.25;padding-bottom:6px}', 'body.zv-k[data-kc=C] #zHjB,body.zv-k[data-kc=C] #zGrB{align-self:start;padding-top:3px;line-height:1.35}',
     'body.zv-k[data-kc=C] #zNx{text-align:center;margin-bottom:4px}',
     /* a short phone (iPhone SE, 667 px): the same page, tighter — the dial keeps at least ~320 px so its words stay ≥ 15 px */
     '@media (max-height:740px){' +
       'body.zv-k[data-kc=C] #zToday .tm{font-size:62px}body.zv-k #zToday .sc{font-size:22px}' +
       'body.zv-k[data-kc=C] #zToday .wp{font-size:20px;margin-top:0}' +
-      'body.zv-k[data-kc=C] #zToday .mn{margin-top:8px}body.zv-k[data-kc=C] #zToday .mn img,body.zv-k[data-kc=C] #zToday .mn svg{width:54px;height:54px;margin-bottom:2px}' +
+      'body.zv-k[data-kc=C]{--k-mt:8px;--k-mi:56px}body.zv-k[data-kc=C] #zToday .mn img,body.zv-k[data-kc=C] #zToday .mn svg{margin-bottom:2px}' +
       'body.zv-k[data-kc=C] #zToday .mn .ev{display:none}body.zv-k[data-kc=C] #zToday .mn .nm{font-size:16px}' +
-      'body.zv-k[data-kc=C] #zHjA,body.zv-k[data-kc=C] #zGrA{font-size:18px}body.zv-k[data-kc=C] #zToday .hj2,body.zv-k[data-kc=C] #zToday .gr2{font-size:16px;padding-bottom:20px}' +
+      'body.zv-k[data-kc=C] #zHjA,body.zv-k[data-kc=C] #zGrA{font-size:18px}body.zv-k[data-kc=C] #zToday .hj2,body.zv-k[data-kc=C] #zToday .gr2{font-size:16px}' +
       'body.zv-k[data-kc=C] #zToday .rm{font-size:16px;margin-top:2px}body.zv-k #zNx{font-size:17px}' +
       KS.split(',').join(',') + '{padding-top:calc(8px + env(safe-area-inset-top,0px))!important}}',
     /* one rule for the big digits: Arabic-Indic digits sit a little tighter so «١٠:٠٠» reads as one number */
@@ -238,19 +248,21 @@
   /* Hassan 19 Nov 18:10 («خلّي القمر فيها + القمر من صورة ناسا، اسمه، وقته أو طوره، ورتّبها»): the moon picture is drawn by the Sky page
      (NASA map lit by the real Sun) — asked for once, kept for three hours; until then the simple drawn moon stands in. */
   var MK = 'zijMoonHome', moonAsked = false;
-  function moonCache() { try { var c = JSON.parse(localStorage.getItem(MK) || 'null'), o = window.observer || {};
-      if (c && c.b === Math.floor(Date.now() / 108e5) && Math.abs(c.lat - o.lat) < .05 && Math.abs(c.lon - o.lon) < .05) return c; } catch (e) {} return null; }
+  /* stale: the picture of the last three hours may stand in while the new one is drawn (the Moon hardly changes in that time),
+     so the page never falls back to the plain drawing at midnight or on the hour the cache turns over */
+  function moonCache(stale) { try { var c = JSON.parse(localStorage.getItem(MK) || 'null'), o = window.observer || {}, b = Math.floor(Date.now() / 108e5);
+      if (c && (c.b === b || (stale && b - c.b === 1)) && Math.abs(c.lat - o.lat) < .05 && Math.abs(c.lon - o.lon) < .05) return c; } catch (e) {} return null; }
   function askMoon() {
     if (moonAsked || !window.zijLoadMod) return; moonAsked = true;
     window.zijLoadMod('sky', function (w) { var n = 0; (function go() {
       var c = null; try { c = w.zijMoonCard && w.zijMoonCard(152); } catch (e) {}
       if (!c) { if (++n < 40) setTimeout(go, 500); else moonAsked = false; return; }
-      c.b = Math.floor(Date.now() / 108e5); try { localStorage.setItem(MK, JSON.stringify(c)); } catch (e) {} lastMoon = ''; tick(); })(); });
+      c.b = Math.floor(Date.now() / 108e5); try { localStorage.setItem(MK, JSON.stringify(c)); } catch (e) {} moonAsked = false; lastMoon = ''; tick(); })(); });   // asked again when the three hours are up
   }
   var lastMoon = '';
   function moonHtml(ph, f) {
     var EN = window.ZIJ_LANG === 'en', c = moonCache(), pct = dgt(Math.round(f * 100)) + (EN ? '%' : '٪'), ev = '';
-    if (!c) setTimeout(askMoon, 1500);
+    if (!c) { setTimeout(askMoon, 1500); c = moonCache(true); }
     if (c && c.ev && c.ev.t > Date.now()) { var d = new Date(c.ev.t + ((window.observer && observer.tz) || 0) * 36e5), h = d.getUTCHours(), m = d.getUTCMinutes();
       ev = (c.ev.k === 'rise' ? (EN ? 'Rises ' : 'يشرق ') : (EN ? 'Sets ' : 'يغرب ')) + dgt(h % 12 || 12) + ':' + dgt(String(m).padStart(2, '0')) + ' ' + (EN ? (h < 12 ? 'AM' : 'PM') : (h < 12 ? 'ص' : 'م')); }
     var key = (c ? c.url.length + '|' + c.b : 'svg') + '|' + pct + '|' + ev + '|' + (EN ? 1 : 0);
@@ -293,7 +305,7 @@
     if (v === 'b') { var row = $('hRow'); if (row) row.style.setProperty('--zcd', JSON.stringify(nextText())); }
     if (KV(v)) {
       document.body.classList.toggle('zk-night', isNight());
-      var nx = $('zNx'), nt = nextText(); if (nx && nx.textContent !== nt) nx.textContent = nt;
+      var nx = $('zNx'), nt = nextText(true); if (nx && nx.textContent !== nt) nx.textContent = nt;
       // «الأحد صباحًا»: the day and the part of the day in one line (English keeps AM/PM beside the time)
       setTxt('zAp', window.ZIJ_LANG === 'en' ? period() : '');
       setTxt('zWp', window.ZIJ_LANG === 'en' ? ($('zWd') ? $('zWd').textContent : '') : (($('zWd') ? $('zWd').textContent : '') + ' ' + period()).trim());
@@ -306,8 +318,10 @@
   function splitYear(x) { x = String(x || '').replace(/-/g, '-\u2060');   // «al-Akhirah» never breaks after its hyphen
     var m = x.trim().match(/^(.*?)\s+([0-9٠-٩]{3,4}\s*(?:هـ|م|AH|CE|AD)?)$/); return m ? [m[1], m[2]] : [String(x || ''), '']; }
   // the next prayer in words, read from the hero card: «العصر بعد ساعتين و١٠ دقائق», or «حان الآن أذان العصر» in its first minutes
-  function nextText() {
+  function nextText(short) {
     var $ = function (i) { return document.getElementById(i); }, hw = $('zHeroWrap'), txt = '';
+    // in the minutes after the adhan, one short line: «حان الآن أذان العصر» (its time is on the dial)
+    if (short) { var hh = $('hHero'), cd0 = $('hCd'); if (hh && hh.classList.contains('now') && cd0 && cd0.textContent.trim()) return cd0.textContent.trim(); }
     if (hw) { var ln = (hw.textContent || '').split(/\n+/).map(function (x) { return x.trim(); }).filter(Boolean); txt = ln.slice(0, 2).join(' '); }
     if (!txt) { var cd = $('hCd'), lb = $('hLbl'); txt = (lb ? lb.textContent : '') + ' ' + (cd ? cd.textContent : ''); }
     // Hassan 19 Nov 18:31 («اكتبه بعد»): «العشاء بعد ٥٧ دقيقة», not «٥٧:٠١» that reads like a clock time

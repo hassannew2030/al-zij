@@ -8195,6 +8195,10 @@ ${c.friIqama?friBlk(k,c.friIqama):''}
   /* Hassan 19 Nov 18:57 («قراري حذف وحدة مكررة، وتعديل وحدة، والشاشة التي فيها القمر تذهب إلى القمر»): «الساعة أولًا» is removed (the
      duplicate), «القائمة» is the edited one and the entry home, «منحنى القمر» lives in السماء ← القمر. All the others stay as they were. */
   const O=[['b','القائمة','List','الوقت والتاريخ ثم الصلوات في قائمة كبيرة','The time and date, then the prayers in a large list'],
+    /* Hassan 22 Nov («بدون قوائم ونوافذ الصلاة»): the time, the date, the Moon and the dial only — variants.js k (with one line for
+       the next prayer) and l (without it). Which layout is the default stays Hassan's decision; nothing here changes it. */
+    ['k','الساعة والقمر','Clock and Moon','الوقت والتاريخ والقمر والزيج، وسطر للصلاة القادمة','The time, the date, the Moon and the dial, with one line for the next prayer'],
+    ['l','الساعة والقمر فقط','Clock and Moon only','الشاشة نفسها بلا سطر الصلاة القادمة','The same screen without the next-prayer line'],
     ['orig','الأصل','Original','الساعة كما هي','The clock as it is'],
     ['a','اليوم','Today','الصلاة القادمة ثم الصلوات ثم اليوم','Next prayer, the prayers, then the day'],
     ['c','الساعة تحت','Clock below','الصلوات أولًا والساعة تحتها','Prayers first, the clock below'],
