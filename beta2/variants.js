@@ -83,7 +83,7 @@
   var ks = function (sfx) { return KS.split(',').map(function (x) { return x + sfx; }).join(','); };
   css.textContent += '\n' + [
     '#zNx{display:none}', '#zToday .hj2,#zToday .gr2,#zToday .wp,#zToday .ap{display:none}',
-    'body.zv-k #hTop,body.zv-k #hNote,body.zv-k #zHeroWrap,body.zv-k #hBottom,body.zv-k #zTiles,body.zv-k #zdLen,body.zv-k>noscript,body.zv-k #zd24Sw{display:none!important}',
+    'body.zv-k #zHeroWrap,body.zv-k #hBottom,body.zv-k #zTiles,body.zv-k #zdLen,body.zv-k>noscript,body.zv-k #zd24Sw{display:none!important}',
     'body.zv-k{--k-ink:#fbf4e2;--k-gold:#f5e6b4;--k-dim:#d8ccaa;--k-brass:#c9a35d;--k-teal:#e6c983;--k-line:rgba(201,163,93,.28)}',
     'body.zv-k.zk-night{--k-ink:#f0cf94;--k-gold:#e6c287;--k-dim:#cdb185;--k-brass:#a8813f;--k-teal:#cdb185;--k-line:rgba(168,129,63,.26);background:#030406!important}',
     'html:has(body.zv-k.zk-night){background:#030406!important}',
@@ -129,9 +129,15 @@
     'body.zv-k[data-kc=B] #zToday .tm{font-size:80px}', 'body.zv-k[data-kc=B] #zToday .mn{width:104px}', 'body.zv-k[data-kc=B] #zNx{margin-top:6px}',
     /* ---- C «القمر بين التاريخين»: one axis — the time and «الأحد صباحًا» on top; the Hijri date | the Moon | the Gregorian date;
        the dial; the next prayer as the dial's caption */
-    'body.zv-k[data-kc=C]{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);grid-template-areas:"tr tr tr" "wp wp wp" ". . ." "hj mn gr" "rm rm rm" ". . ." "dial dial dial" "nx nx nx";' +
+    /* Hassan 23 Nov: from «الأصل» — the place (one small line on top) and the day's occasion («اليوم من الأيام البيض») */
+    'body.zv-k #hTop{grid-area:loc;margin:0 auto!important;padding:0!important;display:flex;justify-content:center;background:none!important;border:0!important}',
+    'body.zv-k #hTop>*:not(#hCity){display:none!important}',
+    'body.zv-k #hCity{font-size:14px!important;padding:2px 12px!important;opacity:.85}',
+    '#zNote{display:none}',
+    'body.zv-k #zNote:not(:empty){display:block;grid-area:note;justify-self:center;margin:8px auto 0;padding:3px 14px;font:400 16px/1.4 Amiri,serif;color:var(--k-gold);border:1px solid var(--k-line);border-radius:14px;max-width:calc(100vw - 32px)}',
+    'body.zv-k[data-kc=C]{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);grid-template-areas:"loc loc loc" "tr tr tr" "wp wp wp" ". . ." "hj mn gr" "rm rm rm" "note note note" ". . ." "dial dial dial" "nx nx nx";' +
       /* the dial's row is never taller than the dial itself (744 × 692); what is left over is shared by the two quiet gaps */
-      'grid-template-rows:auto auto minmax(0,1fr) auto auto minmax(0,1fr) minmax(0,calc(min(100vw - 8px,600px) * .93)) auto;text-align:center}',
+      'grid-template-rows:auto auto auto minmax(0,1fr) auto auto auto minmax(0,1fr) minmax(0,calc(min(100vw - 8px,600px) * .93)) auto;text-align:center}',
     'body.zv-k[data-kc=C] #zToday .wd{display:none}',
     'body.zv-k[data-kc=C] #zToday .wp{display:block;grid-area:wp;font-size:24px;line-height:1.3;color:var(--k-gold);font-weight:700;margin-top:2px}',
     'html:not([data-lang=en]) body.zv-k[data-kc=C] #zToday .pd{display:none}',
@@ -146,7 +152,7 @@
     /* the horizon: one hairline through the centre of the Moon, from the Hijri date to the Gregorian — each date's day and month
        stand on it, its year hangs under it, and the Moon sits on it between the two calendars */
     'body.zv-k[data-kc=C]{--k-mt:18px;--k-mi:80px}',
-    'body.zv-k[data-kc=C] #zToday::before{content:"";grid-row:4;grid-column:1/-1;align-self:start;height:1px;margin-top:calc(var(--k-mt) + var(--k-mi) / 2);' +
+    'body.zv-k[data-kc=C] #zToday::before{content:"";grid-row:5;grid-column:1/-1;align-self:start;height:1px;margin-top:calc(var(--k-mt) + var(--k-mi) / 2);' +
       'background:linear-gradient(90deg,transparent,var(--k-line) 14%,var(--k-brass) 50%,var(--k-line) 86%,transparent);opacity:.75;pointer-events:none}',
     'body.zv-k[data-kc=C] #zToday .mn{position:relative;z-index:1}',
     /* two rows: the first ends exactly on the line (a long English month may take two lines — it grows upwards), the year under it */
@@ -285,6 +291,9 @@
     var $ = function (i) { return document.getElementById(i); };
     // Hassan 22 Nov (beta2 on his phone showed the grand Zij): this screen is built around the simple clock — always
     // show it here, whatever «الزيج الكبرى» was left on (not saved, so the other layouts keep the user's choice)
+    // the day's occasion (from #hNote, which lives in the hidden hero) as one quiet line on this screen
+    if (KV(v)) { var zt = $('zToday'), zn = $('zNote'); if (zt && !zn) { zn = document.createElement('div'); zn.id = 'zNote'; zt.appendChild(zn); }
+      var hn = $('hNote'); if (zn) { var tx = hn && !hn.hidden ? (hn.textContent || '') : ''; if (zn.textContent !== tx) zn.textContent = tx; } }
     if (KV(v) && !document.body.classList.contains('simple-view') && !document.fullscreenElement) document.body.classList.add('simple-view');
     var wd = $('hWd'), hj = $('hHijri'), gr = $('hGreg');
     if ($('zWd') && wd) $('zWd').textContent = wd.textContent || '—';
