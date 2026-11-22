@@ -280,6 +280,9 @@
   function tick() {
     var v = get(); if (v !== 'a' && v !== 'b' && v !== 'c' && !KV(v)) return;
     var $ = function (i) { return document.getElementById(i); };
+    // Hassan 22 Nov (beta2 on his phone showed the grand Zij): this screen is built around the simple clock — always
+    // show it here, whatever «الزيج الكبرى» was left on (not saved, so the other layouts keep the user's choice)
+    if (KV(v) && !document.body.classList.contains('simple-view') && !document.fullscreenElement) document.body.classList.add('simple-view');
     var wd = $('hWd'), hj = $('hHijri'), gr = $('hGreg');
     if ($('zWd') && wd) $('zWd').textContent = wd.textContent || '—';
     if ($('zHj') && hj) $('zHj').textContent = hj.textContent || '—';
