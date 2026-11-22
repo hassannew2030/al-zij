@@ -7342,9 +7342,12 @@ ${clipDefs}<clipPath id="zdMoonClip"><circle r="13"/></clipPath></defs><g id="zd
       const EVh=KEYS.map((k,i)=>({i,k,t:p[k]}));let nx12=-1;EVh.forEach((e,j)=>{if(nx12<0&&e.t>nm-10)nx12=j;});
       EVh.forEach((e,j)=>{const tmr=e.t>=1440,tl=(tmr?(en?'tomorrow ':'غدًا '):'')+f12(e.t);
         L.push({a:ga(e.t),t:e.t,key:e.k,name:nmOf(e.i,Math.floor(e.t/1440)),time:tl,fs:33,ft:33,next:j===nx12,past:e.t<nm-10,kind:'p'});});
+      /* midnight and the last third: only at night, from Maghrib to Fajr (Hassan 22 Nov: at 2 pm «the last third of the
+         night» means nothing to a plain user) */
+      const NIGHT=nm>=p.maghrib||nm<p.fajr;
       // midnight and the last third of last night and of tonight, when they fall in the 12 hours
       [[py.maghrib-1440,p.fajr],[p.maghrib,pt.fajr+1440]].forEach(([m0,f0])=>[[(m0+f0)/2,'mid',MIDN],[m0+(f0-m0)*2/3,'third',THIRD]].forEach(([t,key,name])=>{
-        if(t>=H0&&t<W1)L.push({a:ga(t),t,key,name,time:f12(t),fs:25,ft:25,kind:'n',past:t<nm});}));
+        if(t>=H0&&t<W1&&NIGHT)L.push({a:ga(t),t,key,name,time:f12(t),fs:25,ft:25,kind:'n',past:t<nm});}));
       // inside the last third (its start has passed): «الثلث الأخير — حتى ٥:٢٠» over the lit ring, like a prayer (Hassan 22 Nov, from بيتا ٢)
       {const th3=mN+(fN-mN)*2/3;if(nm>=th3&&nm<fN){const t=(nm+fN)/2;L.push({a:ga(t),t,key:'third',name:THIRD,time:(en?'until ':'حتى ')+f12(fN),fs:30,ft:30,kind:'span',past:false});}}
     }
