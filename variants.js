@@ -6,8 +6,8 @@
 (function () {
   /* 13 Nov (Hassan: «كل العمل على الرئيسي فقط»): runs on the main site too; the choice is made in المزيد ← شكل الصفحة الرئيسية */
   var KEY = 'zijBetaVariant';
-  var V = ['a', 'b', 'c', 'k', 'l', 'orig'];
-  var NAMES = { a: 'أ', b: 'ب', c: 'ج', k: 'س', l: 'س٢', orig: 'الأصل' };
+  var V = ['a', 'b', 'c', 'k', 'l', 'h', 'orig'];   // h «ساعة ٢٤» (Hassan 22 Nov): the original page with the 24-hour clock (dial24.js)
+  var NAMES = { a: 'أ', b: 'ب', c: 'ج', k: 'س', l: 'س٢', h: '٢٤', orig: 'الأصل' };
   /* «الساعة والقمر» (k), Hassan 22 Nov: the entry screen with only the time, the date, the Moon and the dial — no lists, no cards.
      «l» is the same screen without the one line for the next prayer. Both are body.zv-k; l adds body.zv-l. */
   var KV = function (v) { return v === 'k' || v === 'l'; };
@@ -278,7 +278,9 @@
     return hs && ms ? hs + ' و' + ms : hs || ms;
   }
   function tick() {
-    var v = get(); if (v !== 'a' && v !== 'b' && v !== 'c' && !KV(v)) return;
+    var v = get();
+    if (v === 'h' && !document.body.classList.contains('simple-view') && !document.fullscreenElement) document.body.classList.add('simple-view');   // «ساعة ٢٤» is a simple clock too
+    if (v !== 'a' && v !== 'b' && v !== 'c' && !KV(v)) return;
     var $ = function (i) { return document.getElementById(i); };
     // Hassan 22 Nov (beta2 on his phone showed the grand Zij): this screen is built around the simple clock — always
     // show it here, whatever «الزيج الكبرى» was left on (not saved, so the other layouts keep the user's choice)
