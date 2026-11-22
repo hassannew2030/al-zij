@@ -167,7 +167,7 @@
   }
   // «ساعة و٢٠ دقيقة» — Arabic counting: 1 · 2 (dual) · 3–10 (plural) · 11+ (singular)
   function inWords(h, m) {
-    if (window.ZIJ_LANG === 'en') return !h && !m ? 'less than a minute' : [h ? h + ' hr' : '', m ? m + ' min' : ''].filter(Boolean).join(' ');
+    if (window.ZIJ_LANG === 'en') return !h && !m ? 'less than a minute' : [h ? h + ' h' : '', m ? m + ' min' : ''].filter(Boolean).join(' ');
     var w = function (n, one, two, few) { return n === 1 ? one : n === 2 ? two : dgt(n) + ' ' + (n <= 10 ? few : one); };
     if (!h && !m) return 'أقل من دقيقة';
     var hs = h ? w(h, 'ساعة', 'ساعتين', 'ساعات') : '', ms = m ? w(m, 'دقيقة', 'دقيقتين', 'دقائق') : '';
@@ -185,7 +185,7 @@
       if ($('zSc')) $('zSc').textContent = ':' + dgt(String(new Date().getSeconds()).padStart(2, '0'));   // Hassan 19 Nov: «ضيف الثواني للساعة»
       if ($('zPd')) $('zPd').textContent = period(); } catch (e) {}
     var n = daysToRamadan();
-    if ($('zRm')) $('zRm').textContent = window.ZIJ_LANG === 'en' ? (n > 0 ? 'Ramadan in ' + n + (n === 1 ? ' day' : ' days') : (n === 0 ? 'Ramadan Kareem' : '')) : (n > 0 ? 'رمضان بعد ' + AR(n) + ' يومًا' : (n === 0 ? 'رمضان كريم' : ''));
+    if ($('zRm')) $('zRm').textContent = window.ZIJ_LANG === 'en' ? (n > 0 ? 'Ramadan in ' + n + (n === 1 ? ' day' : ' days') : (n === 0 ? 'Ramadan Kareem' : '')) : (n === 1 ? 'رمضان غدًا' : n > 0 ? 'رمضان بعد ' + (window.zijCount ? zijCount(n, ZIJ_CN.day, 'gen') : AR(n) + ' يومًا') : (n === 0 ? 'رمضان كريم' : ''));
     try {
       if ($('zMn') && typeof Ephemeris !== 'undefined' && Ephemeris.moonPhase) {
         var ph = Ephemeris.moonPhase(new Date());
