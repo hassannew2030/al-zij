@@ -43,9 +43,10 @@ s = s.replace("fetch('version.json?", "fetch('%s/version.json?" % D)
 s = re.sub(r'<link rel="(canonical|alternate)"[^>]*>\n?', '', s)
 s = re.sub(r'<meta (property|name)="(og:|twitter:)[^"]*"[^>]*>\n?', '', s)
 s = re.sub(r'<script type="application/ld\+json">.*?</script>\n?', '', s, flags=re.S)
-# the page's own scripts → the backup's copies
+# the page's own scripts → the backup's copies (dial24.js «ساعة ٢٤», 22 Nov, only where the copied page has it)
 os.makedirs(D, exist_ok=True)
-for js in ('variants.js', 'voice.js', 'home-designs.js'):
+JS = ('variants.js', 'voice.js', 'home-designs.js') + (('dial24.js',) if 'src="dial24.js' in s else ())
+for js in JS:
     open(D + '/' + js, 'w', encoding='utf-8').write(head_file(js))
     s = re.sub(r'<script src="%s(\?v=\d+)?"' % re.escape(js), '<script src="%s/%s?v=%s"' % (D, js, build), s)
 head = ('<base href="/">\n<meta name="robots" content="noindex,nofollow">\n'
@@ -55,7 +56,7 @@ s = s.replace('<head>', '<head>\n' + head, 1)
 # checks: never write a broken backup
 assert n == 2, 'expected 2 version.json fetches, found %d' % n
 assert 'rel="canonical"' not in s and 'og:' not in s and 'ld+json' not in s, 'search tags left in the backup'
-for js in ('variants.js', 'voice.js', 'home-designs.js'):
+for js in JS:
     assert 'src="%s/%s' % (D, js) in s, js + ' not pointed at ' + D + '/'
 open(D + '/index.html', 'w', encoding='utf-8').write(s)
 json.dump({'build': build}, open(D + '/version.json', 'w'))
