@@ -7161,8 +7161,8 @@ body[data-scr]:not([data-scr="clock"]) #zInsBar{display:none!important}
    ① the ring: the coming 12 hours from the hour hand, day and night in two tones (gold by day, brightest at Dhuhr; indigo by night),
      every prayer a short mark on its outer edge with its name and time outside; at night it stops at sunrise
    ② the face: minute track, numerals 1–12 (following the app's digits button), the Moon in a window at 6
-   ③ the hands: hour, minute, slim gold seconds, and the green prayer hand on the next prayer.
-   Removed on Hassan's word: the 24-hour face and ring, the Moon's ring, the dots and diamonds, the suns, the gold arc, the red dot,
+   ③ the hands: hour, minute, slim gold seconds, and the green prayer hand on the next prayer; the Sun on the ring at «now».
+   Removed on Hassan's word: the 24-hour face and ring, the Moon's ring, the dots and diamonds, the two suns in the face, the gold arc, the red dot,
    the tap that jumped to the prayer tab. The old full clock is still in «الزيج الكبرى». */
 (function(){
   const EN=()=>window.ZIJ_LANG==='en';
@@ -7243,6 +7243,10 @@ body.simple-view .wrap{display:none!important}`;
     [[py.maghrib-1440,p.fajr],[p.maghrib,pt.fajr+1440]].forEach(([m0,f0])=>[[(m0+f0)/2,MIDN],[m0+(f0-m0)*2/3,THIRD]].forEach(([t,name])=>{
       if(t>nm&&t<nm+720)EV.push({t,kind:'n',name});}));
     if(nm>=p.isha||nm<p.fajr){const lim=nm<p.fajr?p.sunrise:pt.sunrise+1440;for(let i=EV.length-1;i>=0;i--)if(EV[i].t>lim)EV.splice(i,1);}
+    /* inside the last third of the night (Hassan 22 Nov, 2:57 «لماذا لا تعرض من قبل الفجر ماذا يوجد»): its start has passed, so the
+       ring from the hand to Fajr is lit, and «الثلث الأخير — حتى الفجر» is written there like a prayer */
+    const th=mN+(fN-mN)*2/3,inThird=nm>=th&&nm<fN;
+    if(inThird)EV.push({t:(nm+fN)/2,kind:'n',name:THIRD,until:fN,lit:true});
     EV.sort((a,b)=>a.t-b.t);
     const nx=EV.find(e=>e.kind==='p'&&e.i!==1);   // the next prayer — sunrise is not a prayer
     nextT=nx?nx.t:null;
@@ -7256,13 +7260,22 @@ body.simple-view .wrap{display:none!important}`;
     let s=`<circle cx="${C}" cy="${C}" r="${RB[1]+5}" fill="none" stroke="url(#zdGold)" stroke-width="4"/>`;
     for(let t=nm;t<nm+720;t+=3){const a1=A(t),a2=a1+1.6,[x1,y1]=P(a1,RB[1]),[x2,y2]=P(a2,RB[1]),[x3,y3]=P(a2,RB[0]),[x4,y4]=P(a1,RB[0]);
       s+=`<path d="M${x1.toFixed(1)} ${y1.toFixed(1)}A${RB[1]} ${RB[1]} 0 0 1 ${x2.toFixed(1)} ${y2.toFixed(1)}L${x3.toFixed(1)} ${y3.toFixed(1)}A${RB[0]} ${RB[0]} 0 0 0 ${x4.toFixed(1)} ${y4.toFixed(1)}Z" fill="${colAt(t)}"/>`;}
+    if(inThird){const LIT='#5a6cc4';for(let t=nm;t<fN;t+=3){const a1=A(t),a2=a1+Math.min(1.6,(fN-t)/2+.1),[x1,y1]=P(a1,RB[1]),[x2,y2]=P(a2,RB[1]),[x3,y3]=P(a2,RB[0]),[x4,y4]=P(a1,RB[0]);
+      s+=`<path d="M${x1.toFixed(1)} ${y1.toFixed(1)}A${RB[1]} ${RB[1]} 0 0 1 ${x2.toFixed(1)} ${y2.toFixed(1)}L${x3.toFixed(1)} ${y3.toFixed(1)}A${RB[0]} ${RB[0]} 0 0 0 ${x4.toFixed(1)} ${y4.toFixed(1)}Z" fill="${mix(LIT,colAt(t),Math.max(0,(t-(fN-25))/25))}"/>`;}}
     // where the 12 hours begin and end — at the hour hand, wide (Hassan 22 Nov)
     {const [x1,y1]=P(A(nm),RB[0]-2),[x2,y2]=P(A(nm),RB[1]+2);s+=`<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="#05070d" stroke-width="8"/>`;}
+    /* the Sun on the ring where «now» is: it moves with the time (Hassan 22 Nov: «كود الشمس أساسي … حركة الشمس متلازمة مع الوقت»);
+       bright between sunrise and Maghrib, pale at night; no dark disc round it, so the ring's colour is not cut */
+    {const up=nm>=p.sunrise&&nm<p.maghrib,[x,y]=P(A(nm)+3.2,(RB[0]+RB[1])/2);
+      const ray=Array.from({length:12},(_,k)=>{const q=k*30*Math.PI/180,r1=8.4,r2=k%2?11:12.6;return `<line x1="${(r1*Math.sin(q)).toFixed(2)}" y1="${(-r1*Math.cos(q)).toFixed(2)}" x2="${(r2*Math.sin(q)).toFixed(2)}" y2="${(-r2*Math.cos(q)).toFixed(2)}"/>`;}).join('');
+      s+=`<g id="zdSunDisc" transform="translate(${x.toFixed(2)} ${y.toFixed(2)})"><circle r="13.5" fill="#05070d" fill-opacity=".28"/>`+
+        `<g stroke="${up?'#ffd25a':'#c9b07a'}" stroke-width="2" stroke-linecap="round">${ray}</g>`+
+        `<circle r="6.8" fill="${up?'url(#zdSun)':'#a8915e'}" stroke="${up?'#f3c45a':'#6f5229'}" stroke-width=".8"/></g>`;}
     /* the labels: name over time just outside the ring, a short mark on the ring's outer edge at the moment (Hassan 22 Nov:
        no dots, no long white lines), nudged apart so no two touch */
     const K={ink:'#efe4c6',dim:'#b9ad8e',bg:'#080b13'};
     const R0=RB[1]+16,PAD=4,VB=[-72,-46,672,646];
-    const L=EV.map(e=>({...e,a:A(e.t),b:A(e.t),fs:e.kind==='p'?33:25,ft:e.kind==='p'?33:25,time:f12(e.t),next:e===nx}));
+    const L=EV.map(e=>({...e,a:A(e.t),b:A(e.t),fs:e.kind==='p'||e.lit?33:25,ft:e.kind==='p'||e.lit?33:25,time:e.until?(en?'until ':'حتى ')+f12(e.until):f12(e.t),next:e===nx}));
     const size=l=>{l.w=Math.max(tw(l.name,l.fs,700),tw(l.time,l.ft,700))+8;l.h=l.fs*1.08+l.ft*1.16;};
     const place=l=>{for(let k=0;;k++){let r=R0;for(;r<R0+200;r+=1){const [x,y]=P(l.b,r),x0=x-l.w/2,x1=x+l.w/2,y0=y-l.h/2,y1=y+l.h/2;
         const nx2=Math.min(Math.max(C,x0),x1),ny=Math.min(Math.max(C,y0),y1);if(Math.hypot(nx2-C,ny-C)>=R0)break;}
@@ -7277,9 +7290,9 @@ body.simple-view .wrap{display:none!important}`;
         if(u.kind==='n'&&v.kind==='p')u.b-=s1*1.2;else if(v.kind==='n'&&u.kind==='p')v.b+=s1*1.2;else{u.b-=s1*.6;v.b+=s1*.6;}   // night marks give way to prayers
         place(u);place(v);moved=true;}
       if(!moved)break;}
-    L.forEach(l=>{const col=l.next?PC:(l.kind==='n'?K.dim:K.ink),fw=l.next?' font-weight="700"':'',halo=` stroke="${K.bg}" stroke-width="9" paint-order="stroke" stroke-linejoin="round"`;
+    L.forEach(l=>{const col=l.next?PC:(l.lit?'#c9d2ff':(l.kind==='n'?K.dim:K.ink)),fw=l.next?' font-weight="700"':'',halo=` stroke="${K.bg}" stroke-width="9" paint-order="stroke" stroke-linejoin="round"`;
       const [x1,y1]=P(l.a,RB[1]+1),[x2,y2]=P(l.a,RB[1]+13);
-      s+=`<line data-k="${l.kind==='p'?KEYS[l.i]:'n'}" data-m="${(+l.t).toFixed(2)}" x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${col}" stroke-width="${l.next?4:3}" stroke-linecap="round"/>`;
+      if(!l.lit)s+=`<line data-k="${l.kind==='p'?KEYS[l.i]:'n'}" data-m="${(+l.t).toFixed(2)}" x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${col}" stroke-width="${l.next?4:3}" stroke-linecap="round"/>`;
       const y0=l.y-l.h/2+l.fs*.86;
       // one <text> per line (Safari splits a word when one <text> holds two positioned lines)
       s+=`<text x="${l.x.toFixed(1)}" y="${y0.toFixed(1)}" font-family="${FONT}" font-size="${l.fs}" text-anchor="middle" fill="${col}"${fw}${halo}>${l.name}</text>`+
