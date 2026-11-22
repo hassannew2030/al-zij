@@ -6006,7 +6006,7 @@ const shareBox=document.querySelector('button[onclick^="shareClock"]');if(shareB
     ['الجمعة','Friday','يوم الجمعة تُكتب «الجمعة» مكان «الظهر».','On Friday, Jumu’ah is written instead of Dhuhr.'],
     ['منتصف الليل والثلث الأخير','Midnight and last third','تظهران من المغرب إلى الفجر. الليل يبدأ حين تغيب الشمس ويؤذّن المغرب، وينتهي حين يؤذّن الفجر. تخيّله حبلًا من المغرب إلى الفجر: وسطه منتصف الليل، وإذا قسمته ثلاث قطع فالقطعة الأخيرة قبل الفجر هي الثلث الأخير. لذلك منتصف الليل ليس الساعة ١٢: الليل يطول في الشتاء ويقصر في الصيف فيتحرك وسطه. منتصف الليل آخر الوقت المختار للعشاء، والثلث الأخير وقت القيام والدعاء. والزيج يحسب الليل من الغروب إلى الفجر، وهو القول الذي اختاره ابن عثيمين وأفتت به اللجنة الدائمة (﴿سَلَامٌ هِيَ حَتَّى مَطْلَعِ الْفَجْرِ﴾).','Shown from Maghrib to Fajr. The night begins when the Sun sets (Maghrib) and ends at the Fajr adhan. Think of it as a rope from Maghrib to Fajr: its middle is midnight; cut it into three equal pieces and the last piece before Fajr is the last third. So midnight is not 12 o\'clock: the night is longer in winter and shorter in summer, and its middle moves. Midnight is the end of the preferred time for Isha; the last third is the time for night prayer and supplication. Al-Zij counts the night from sunset to Fajr (the view of Ibn Uthaymeen and the Permanent Committee).'],
     ['«الثلث الأخير حتى الفجر»','“Last third until Fajr”','حين نكون فيه تضيء الحلقة بالأزرق من العقرب إلى الفجر.','While we are in it, the ring is lit blue from the hand to Fajr.'],
-    ['صلوات اليوم','Today\'s prayers','ثابتة على الحلقة طوال اليوم بلون واحد، وعند منتصف الليل تظهر صلوات اليوم الجديد.','Fixed on the ring all day in one colour; at midnight the new day\'s prayers appear.'],
+    ['الصلوات على الحلقة','The prayers on the ring','في النهار، من الشروق إلى المغرب: صلوات اليوم الست. وفي الليل، من المغرب إلى الشروق: المغرب والعشاء ومنتصف الليل والثلث الأخير والفجر والشروق. تتبدّل مرتين فقط في اليوم، والقادمة بخط بارز.','By day, sunrise to Maghrib: the six of today. By night, Maghrib to sunrise: Maghrib, Isha, midnight, the last third, Fajr and sunrise. It changes only twice a day; the next one is bold.'],
     ['سطر النهار والليل','Day and night line','النهار من الفجر إلى المغرب، والليل من المغرب إلى الفجر.','Day from Fajr to Maghrib; night from Maghrib to Fajr.']];
   const draw=()=>{const en=window.ZIJ_LANG==='en';
     box.innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:16px;line-height:1.65">`+R.map(r=>`<tr><th style="text-align:start;vertical-align:top;padding:8px 6px;color:var(--h-brass-l);width:34%;border-bottom:1px solid rgba(201,163,93,.2)">${en?r[1]:r[0]}</th><td style="padding:8px 6px;border-bottom:1px solid rgba(201,163,93,.2)">${en?r[3]:r[2]}</td></tr>`).join('')+`</table>`;};
@@ -7391,8 +7391,15 @@ ${clipDefs}<clipPath id="zdMoonClip"><circle r="13"/></clipPath></defs><g id="zd
          behind the hand, where the ring already shows the hours 12 hours ahead (the cards above still show it). */
       /* Hassan 22 Nov: the prayers of today stay fixed on the ring all day, in one colour; at 12:00:01 midnight the new
          day's open. Nothing of tomorrow is mixed in (after Isha nothing is marked as next). */
-      const EVh=KEYS.map((k,i)=>({i,k,t:p[k]}));let nx12=-1;EVh.forEach((e,j)=>{if(nx12<0&&e.t>nm-10)nx12=j;});
-      EVh.forEach((e,j)=>{const tmr=e.t>=1440,tl=(tmr?(en?'tomorrow ':'غدًا '):'')+f12(e.t);
+      /* Hassan 22 Nov 21:28 — two fixed sets, switching only twice a day:
+         the day (sunrise → Maghrib): the six of today; the night (Maghrib → sunrise; «الليل يبدأ من غروب شمس اليوم»): Maghrib,
+         Isha, midnight, the last third, Fajr and sunrise of this night (before midnight that Fajr is tomorrow's — its real time) */
+      const DAYSET=nm>=p.sunrise&&nm<p.maghrib,KI=k=>KEYS.indexOf(k);
+      const EVh=DAYSET?KEYS.map((k,i)=>({i,k,t:p[k]}))
+        :(nm>=p.maghrib?[['maghrib',p.maghrib],['isha',p.isha],['fajr',pt.fajr+1440],['sunrise',pt.sunrise+1440]]
+                       :[['maghrib',py.maghrib-1440],['isha',py.isha-1440],['fajr',p.fajr],['sunrise',p.sunrise]]).map(([k,t])=>({i:KI(k),k,t}));
+      let nx12=-1;EVh.forEach((e,j)=>{if(nx12<0&&e.t>nm-10)nx12=j;});
+      EVh.forEach((e,j)=>{const tl=f12(e.t);
         L.push({a:ga(e.t),t:e.t,key:e.k,name:nmOf(e.i,Math.floor(e.t/1440)),time:tl,fs:33,ft:33,next:j===nx12,past:e.t<nm-10,kind:'p'});});
       /* midnight and the last third: only at night, from Maghrib to Fajr (Hassan 22 Nov: at 2 pm «the last third of the
          night» means nothing to a plain user) */
