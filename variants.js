@@ -82,7 +82,7 @@
   var KS = 'body.zv-k:not([data-scr]),body.zv-k[data-scr="clock"]';
   var ks = function (sfx) { return KS.split(',').map(function (x) { return x + sfx; }).join(','); };
   css.textContent += '\n' + [
-    '#zNx{display:none}', '#zToday .hj2,#zToday .gr2,#zToday .wp{display:none}',
+    '#zNx{display:none}', '#zToday .hj2,#zToday .gr2,#zToday .wp,#zToday .ap{display:none}',
     'body.zv-k #hTop,body.zv-k #hNote,body.zv-k #zHeroWrap,body.zv-k #hBottom,body.zv-k #zTiles,body.zv-k #zdLen,body.zv-k>noscript,body.zv-k #zd24Sw{display:none!important}',
     'body.zv-k{--k-ink:#fbf4e2;--k-gold:#f5e6b4;--k-dim:#d8ccaa;--k-brass:#c9a35d;--k-teal:#b8eee2;--k-line:rgba(201,163,93,.28)}',
     'body.zv-k.zk-night{--k-ink:#f0cf94;--k-gold:#e6c287;--k-dim:#cdb185;--k-brass:#a8813f;--k-teal:#cdb185;--k-line:rgba(168,129,63,.26);background:#030406!important}',
@@ -94,10 +94,14 @@
     ks(' #zToday>*') + '{font-family:Amiri,serif}',
     'body.zv-k #zToday .wd{grid-area:wd;font-size:22px;line-height:1.3;color:var(--k-gold);font-weight:700}',
     'body.zv-k #zToday .tr{grid-area:tr;display:flex;align-items:baseline;gap:0 10px;flex-wrap:wrap;line-height:1}',
-    'body.zv-k #zToday .tm{color:var(--k-ink);font-size:84px;letter-spacing:0;font-family:"EB Garamond",Amiri,serif}',
+    'body.zv-k #zToday .tm{color:var(--k-ink);font-size:84px;letter-spacing:0;font-family:"EB Garamond",Amiri,serif;font-weight:400}',
     'body.zv-k #zToday .sc{font-size:28px;color:var(--k-dim);margin-inline-start:4px}',
     /* the seconds hang outside the hours and minutes, so «١٠:٠٠» itself stands on the centre line */
     'body.zv-k[data-kc=C] #zToday .tw{position:relative}', 'body.zv-k[data-kc=C] #zToday .sc{position:absolute;left:100%;bottom:.18em;margin-left:6px}',
+    /* English: AM/PM hangs under the seconds, like a watch's small window; the period word of Arabic is in «الأحد صباحًا» */
+    'body.zv-k[data-kc=C] #zToday .pd{display:none}',
+    'html[data-lang=en] body.zv-k[data-kc=C] #zToday .ap{display:block;position:absolute;left:100%;top:.2em;margin-left:6px;font-size:24px;color:var(--k-gold);font-family:"EB Garamond",serif;line-height:1}',
+    'html[data-lang=en] body.zv-k[data-kc=C] #zToday .sc{bottom:.12em}',
     'body.zv-k #zToday .pd{font-size:26px;color:var(--k-gold);margin:0}',
     'body.zv-k #zToday .dt{grid-area:dt;font-size:18px;line-height:1.45;color:var(--k-dim)}',
     'body.zv-k #zToday .dt #zHj{color:var(--k-ink)}',
@@ -112,14 +116,15 @@
     'body.zv-k #zDial{grid-area:dial;width:min(calc(100vw - 8px),600px)!important;justify-self:center;max-width:none;height:100%;min-height:0;margin:0!important;align-self:stretch;cursor:pointer}',
     'body.zv-k #zDial svg{width:100%;height:100%}',
     /* ---- A «الزيج أولًا»: a slim header (day and dates, the Moon), the dial as the hero, the time under it like a watch's window */
-    'body.zv-k[data-kc=A]{grid-template-areas:"wd mn" "dt mn" "rm mn" "dial dial" "tr tr" "nx nx";grid-template-rows:auto auto auto minmax(0,1fr) auto auto}',
+    'body.zv-k[data-kc=A]{grid-template-areas:"wd mn" "dt mn" "rm mn" ". ." "dial dial" "tr tr" "nx nx" ". .";grid-template-rows:auto auto auto minmax(0,1fr) minmax(0,calc(min(100vw - 8px,600px) * .93)) auto auto minmax(0,1fr)}',
     'body.zv-k[data-kc=A] #zToday .dt div{white-space:nowrap}', 'body.zv-k[data-kc=A] #zToday .mn{flex-direction:column;gap:2px!important;text-align:center!important}', 'body.zv-k[data-kc=A] #zToday .mn img,body.zv-k[data-kc=A] #zToday .mn svg{order:0!important}',
     'body.zv-k[data-kc=A] #zToday .mn{display:flex;align-items:center;gap:10px;text-align:start}',
     'body.zv-k[data-kc=A] #zToday .mn img,body.zv-k[data-kc=A] #zToday .mn svg{width:58px;height:58px;margin:0;order:2}',
     'body.zv-k[data-kc=A] #zToday .tr{justify-content:center;margin-top:4px}', 'body.zv-k[data-kc=A] #zToday .tm{font-size:64px}',
     'body.zv-k[data-kc=A] #zNx{text-align:center}',
     /* ---- B «الوقت أولًا»: the time as the hero with the day over it, the Moon in the corner, then the dial */
-    'body.zv-k[data-kc=B]{grid-template-areas:"wd mn" "tr mn" "dt mn" "rm rm" "nx nx" "dial dial";grid-template-rows:auto auto auto auto auto minmax(0,1fr)}',
+    'body.zv-k[data-kc=B]{grid-template-areas:"wd mn" "tr mn" "dt mn" "rm rm" "nx nx" ". ." "dial dial";grid-template-rows:auto auto auto auto auto minmax(0,1fr) minmax(0,calc(min(100vw - 8px,600px) * .93))}',
+    '@media (max-height:740px){body.zv-k[data-kc=B] #zToday .tm{font-size:60px}body.zv-k[data-kc=B] #zToday .mn img,body.zv-k[data-kc=B] #zToday .mn svg{width:60px;height:60px}body.zv-k[data-kc=B] #zToday .mn .ev{display:none}body.zv-k[data-kc=B] #zToday .dt{font-size:16px}}',
     'body.zv-k[data-kc=B] #zToday .mn{text-align:center;padding-top:6px}', 'body.zv-k[data-kc=B] #zToday .mn img,body.zv-k[data-kc=B] #zToday .mn svg{width:88px;height:88px}',
     'body.zv-k[data-kc=B] #zToday .tm{font-size:80px}', 'body.zv-k[data-kc=B] #zToday .mn{width:104px}', 'body.zv-k[data-kc=B] #zNx{margin-top:6px}',
     /* ---- C «القمر بين التاريخين»: one axis — the time and «الأحد صباحًا» on top; the Hijri date | the Moon | the Gregorian date;
@@ -139,6 +144,15 @@
     'body.zv-k[data-kc=C] #zToday .tr{justify-content:center}', 'body.zv-k[data-kc=C] #zToday .tm{font-size:88px}',
     'body.zv-k[data-kc=C] #zToday .rm{text-align:center;margin-top:6px}',
     'body.zv-k[data-kc=C] #zNx{text-align:center;margin-bottom:4px}',
+    /* a short phone (iPhone SE, 667 px): the same page, tighter — the dial keeps at least ~320 px so its words stay ≥ 15 px */
+    '@media (max-height:740px){' +
+      'body.zv-k[data-kc=C] #zToday .tm{font-size:62px}body.zv-k #zToday .sc{font-size:22px}' +
+      'body.zv-k[data-kc=C] #zToday .wp{font-size:20px;margin-top:0}' +
+      'body.zv-k[data-kc=C] #zToday .mn{margin-top:8px}body.zv-k[data-kc=C] #zToday .mn img,body.zv-k[data-kc=C] #zToday .mn svg{width:54px;height:54px;margin-bottom:2px}' +
+      'body.zv-k[data-kc=C] #zToday .mn .ev{display:none}body.zv-k[data-kc=C] #zToday .mn .nm{font-size:16px}' +
+      'body.zv-k[data-kc=C] #zHjA,body.zv-k[data-kc=C] #zGrA{font-size:18px}body.zv-k[data-kc=C] #zToday .hj2,body.zv-k[data-kc=C] #zToday .gr2{font-size:16px;padding-bottom:20px}' +
+      'body.zv-k[data-kc=C] #zToday .rm{font-size:16px;margin-top:2px}body.zv-k #zNx{font-size:17px}' +
+      KS.split(',').join(',') + '{padding-top:calc(8px + env(safe-area-inset-top,0px))!important}}',
     /* one rule for the big digits: Arabic-Indic digits sit a little tighter so «١٠:٠٠» reads as one number */
     'html:not([data-lang=en]) body.zv-k #zToday .tm{letter-spacing:-1px}'
   ].join('\n');
@@ -193,7 +207,7 @@
   }
   function build() {
     if (document.getElementById('zToday')) return;
-    var t = document.createElement('section'); t.id = 'zToday'; t.innerHTML = '<div class="c"><div class="l"><div class="wd" id="zWd">—</div><div class="wp" id="zWp"></div><div class="tr"><span class="tw"><span class="tm" id="zTm">—</span><span class="sc" id="zSc"></span></span><span class="pd" id="zPd"></span></div><div class="dt"><div id="zHj">—</div><div id="zGr">—</div><div class="hj2" id="zHj2"><span id="zHjA"></span><span id="zHjB"></span></div><div class="gr2" id="zGr2"><span id="zGrA"></span><span id="zGrB"></span></div></div><div class="rm" id="zRm"></div></div><div class="mn" id="zMn"></div></div>';
+    var t = document.createElement('section'); t.id = 'zToday'; t.innerHTML = '<div class="c"><div class="l"><div class="wd" id="zWd">—</div><div class="wp" id="zWp"></div><div class="tr"><span class="tw"><span class="tm" id="zTm">—</span><span class="sc" id="zSc"></span><span class="ap" id="zAp"></span></span><span class="pd" id="zPd"></span></div><div class="dt"><div id="zHj">—</div><div id="zGr">—</div><div class="hj2" id="zHj2"><span id="zHjA"></span><span id="zHjB"></span></div><div class="gr2" id="zGr2"><span id="zGrA"></span><span id="zGrB"></span></div></div><div class="rm" id="zRm"></div></div><div class="mn" id="zMn"></div></div>';
     var g = document.createElement('section'); g.id = 'zTiles';
     var dial = '<svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="27" fill="#0f1424" stroke="#c9a35d" stroke-width="2.5"/><circle cx="30" cy="30" r="20" fill="none" stroke="#7c5f30" stroke-dasharray="1.5 3"/><path id="zMiniH" d="M30 30V18" stroke="#eddba0" stroke-width="3" stroke-linecap="round"/><path id="zMiniM" d="M30 30V11" stroke="#eddba0" stroke-width="2" stroke-linecap="round"/><circle cx="30" cy="30" r="2.5" fill="#c9a35d"/></svg>';
     var I = function (p) { return '<svg viewBox="0 0 24 24" fill="none" stroke="#e6c983" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' + p + '</svg>'; };
@@ -281,6 +295,7 @@
       document.body.classList.toggle('zk-night', isNight());
       var nx = $('zNx'), nt = nextText(); if (nx && nx.textContent !== nt) nx.textContent = nt;
       // «الأحد صباحًا»: the day and the part of the day in one line (English keeps AM/PM beside the time)
+      setTxt('zAp', window.ZIJ_LANG === 'en' ? period() : '');
       setTxt('zWp', window.ZIJ_LANG === 'en' ? ($('zWd') ? $('zWd').textContent : '') : (($('zWd') ? $('zWd').textContent : '') + ' ' + period()).trim());
       if ($('zHj')) { var hy = splitYear($('zHj').textContent); setTxt('zHjA', hy[0]); setTxt('zHjB', hy[1]); }
       if ($('zGr')) { var gy = splitYear($('zGr').textContent); setTxt('zGrA', gy[0]); setTxt('zGrB', gy[1]); }
@@ -288,7 +303,8 @@
   }
   function setTxt(id, x) { var e = document.getElementById(id); if (e && e.textContent !== x) e.textContent = x; }
   // «١٢ جمادى الآخرة ١٤٤٨ هـ» → [«١٢ جمادى الآخرة», «١٤٤٨ هـ»] (the day and month on one line, the year under it)
-  function splitYear(x) { var m = String(x || '').trim().match(/^(.*?)\s+([0-9٠-٩]{3,4}\s*(?:هـ|م|AH|CE|AD)?)$/); return m ? [m[1], m[2]] : [String(x || ''), '']; }
+  function splitYear(x) { x = String(x || '').replace(/-/g, '-\u2060');   // «al-Akhirah» never breaks after its hyphen
+    var m = x.trim().match(/^(.*?)\s+([0-9٠-٩]{3,4}\s*(?:هـ|م|AH|CE|AD)?)$/); return m ? [m[1], m[2]] : [String(x || ''), '']; }
   // the next prayer in words, read from the hero card: «العصر بعد ساعتين و١٠ دقائق», or «حان الآن أذان العصر» in its first minutes
   function nextText() {
     var $ = function (i) { return document.getElementById(i); }, hw = $('zHeroWrap'), txt = '';
@@ -310,6 +326,7 @@
     var bar = document.getElementById('zVarBar');
     if (bar) bar.querySelectorAll('button').forEach(function (b) { b.classList.toggle('on', b.dataset.v === v); });
     window.scrollTo(0, 0); tick();
+    try { window.dispatchEvent(new Event('resize')); } catch (e) {}   // the dial places its words again for the new size
   }
 
   function init() {
