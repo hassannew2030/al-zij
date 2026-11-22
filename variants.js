@@ -56,7 +56,7 @@
     '#zToday .sc{font-family:"EB Garamond",serif;font-size:30px;color:#d8ccaa;direction:ltr;unicode-bidi:isolate;display:inline-block;margin-left:2px;font-variant-numeric:tabular-nums}',
     '#zToday .pd{font-size:29px;color:#f5e6b4;margin-inline-start:10px}',
     '#zToday .dt{font-size:18px;color:#d8ccaa;line-height:1.5}',
-    '#zToday .rm{font-size:18px;color:#e6c983}',
+    '#zToday .rm{font-size:18px;color:#e6c983;display:inline-block;margin-top:7px}   /* room for the tanween of «يومًا» under the date line (Hassan 23 Nov) */',
     '#zToday .mn{text-align:center;font-size:18px;color:#d8ccaa;min-width:70px}',
     '#zToday .mn svg{width:56px;height:56px;display:block;margin:0 auto 2px}',
     '#zToday .mn{cursor:pointer;line-height:1.35;max-width:120px}','#zToday .mn img{width:76px;height:76px;display:block;margin:0 auto 4px;border-radius:50%}',
@@ -73,7 +73,7 @@
     'body.zv-b .pc .pri{margin:0!important;width:26px!important;height:26px!important}',
     'body.zv-b .pc .pn{font-size:18px!important}',
     'body.zv-b .pc .pt{font-size:29px!important}',
-    'body.zv-b .pc.cur::after{content:var(--zcd,"");grid-column:1/-1;font:700 18px Amiri,serif;color:#b8eee2}',
+    'body.zv-b .pc.cur::after{content:var(--zcd,"");grid-column:1/-1;font:700 18px Amiri,serif;color:#e6c983}',
     'body.zv-a #hBottom,body.zv-b #hBottom,body.zv-c #hBottom,body.zv-a #zHeroWrap,body.zv-b #zHeroWrap,body.zv-c #zHeroWrap{width:100%;max-width:560px;box-sizing:border-box;margin-left:auto;margin-right:auto;align-self:center}'
   ].join('\n');
   /* «الساعة والقمر» (k/l) — the whole entry screen on one page: the time, the date, the Moon and the dial, nothing else.
@@ -84,7 +84,7 @@
   css.textContent += '\n' + [
     '#zNx{display:none}', '#zToday .hj2,#zToday .gr2,#zToday .wp,#zToday .ap{display:none}',
     'body.zv-k #hTop,body.zv-k #hNote,body.zv-k #zHeroWrap,body.zv-k #hBottom,body.zv-k #zTiles,body.zv-k #zdLen,body.zv-k>noscript,body.zv-k #zd24Sw{display:none!important}',
-    'body.zv-k{--k-ink:#fbf4e2;--k-gold:#f5e6b4;--k-dim:#d8ccaa;--k-brass:#c9a35d;--k-teal:#b8eee2;--k-line:rgba(201,163,93,.28)}',
+    'body.zv-k{--k-ink:#fbf4e2;--k-gold:#f5e6b4;--k-dim:#d8ccaa;--k-brass:#c9a35d;--k-teal:#e6c983;--k-line:rgba(201,163,93,.28)}',
     'body.zv-k.zk-night{--k-ink:#f0cf94;--k-gold:#e6c287;--k-dim:#cdb185;--k-brass:#a8813f;--k-teal:#cdb185;--k-line:rgba(168,129,63,.26);background:#030406!important}',
     'html:has(body.zv-k.zk-night){background:#030406!important}',
     'body.zv-k.zk-night .htab{background:rgba(3,4,6,.95)}',
@@ -212,7 +212,8 @@
     if (window.ZIJ_LANG === 'en') return new Date().getHours() < 12 ? 'AM' : 'PM';   // the Arabic period words have no English twin
     var d = new Date(), now = d.getHours() * 60 + d.getMinutes(), M = sixMin();
     if (!M) return '';
-    if (now < M[0]) return 'ليلًا'; if (now < M[1]) return 'فجرًا'; if (now < M[2]) return 'صباحًا'; if (now < M[3]) return 'ظهرًا';
+    // Hassan 23 Nov: from 12:00:01 it is «صباحًا», not «ليلًا»
+    if (now < M[0]) return 'صباحًا'; if (now < M[1]) return 'فجرًا'; if (now < M[2]) return 'صباحًا'; if (now < M[3]) return 'ظهرًا';
     if (now < M[4]) return 'عصرًا'; if (now < M[5]) return 'مساءً'; return 'ليلًا';
   }
   function build() {
