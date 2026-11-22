@@ -112,7 +112,7 @@
     'body.zv-k #zToday .mn .nm{color:var(--k-gold);font-size:17px}', 'body.zv-k #zToday .mn .pp{display:none}', 'body.zv-k #zToday .mn .ev{font-size:16px;color:var(--k-dim)}',
     'body.zv-k #zNx{grid-area:nx;font:400 19px/1.4 Amiri,serif;color:var(--k-teal);cursor:pointer;min-height:1.4em}',
     'html[data-lang=en] body.zv-k #zNx,html[data-lang=en] body.zv-k #zToday>*{font-family:"EB Garamond",Amiri,serif}',
-    ks(' #zNx') + '{display:block}', 'body.zv-k.zv-l #zNx{display:none!important}',
+    ks(' #zNx') + '{display:block}', 'body.zv-k[data-scr]:not([data-scr="clock"]) #zDial{display:none!important}',   /* the dial belongs to this page only, as in «القائمة» */ 'body.zv-k.zv-l #zNx{display:none!important}',
     'body.zv-k #zDial{grid-area:dial;width:min(calc(100vw - 8px),600px)!important;justify-self:center;max-width:none;height:100%;min-height:0;margin:0!important;align-self:stretch;cursor:pointer}',
     'body.zv-k #zDial svg{width:100%;height:100%}',
     /* ---- A «الزيج أولًا»: a slim header (day and dates, the Moon), the dial as the hero, the time under it like a watch's window */
