@@ -7274,8 +7274,11 @@ body.simple-view .wrap{display:none!important}`;
     /* the labels: name over time just outside the ring, a short mark on the ring's outer edge at the moment (Hassan 22 Nov:
        no dots, no long white lines), nudged apart so no two touch */
     const K={ink:'#efe4c6',dim:'#b9ad8e',bg:'#080b13'};
-    const R0=RB[1]+16,PAD=4,VB=[-72,-46,672,646];
+    const R0=RB[1]+22,PAD=4,VB=[-72,-46,672,646];
     const L=EV.map(e=>({...e,a:A(e.t),b:A(e.t),fs:e.kind==='p'||e.lit?33:25,ft:e.kind==='p'||e.lit?33:25,time:e.until?(en?'until ':'حتى ')+f12(e.until):f12(e.t),next:e===nx}));
+    /* the Sun's label, written like a prayer's (Hassan 22 Nov: «اعمل شرح = الصلاة للشمس»): «الآن» over the time, in the Sun's colour */
+    const sunUp=nm>=p.sunrise&&nm<p.maghrib;
+    L.push({kind:'s',name:en?'Now':'الآن',time:f12(nm),a:A(nm)+3.2,b:A(nm)+3.2,fs:30,ft:30});
     const size=l=>{l.w=Math.max(tw(l.name,l.fs,700),tw(l.time,l.ft,700))+8;l.h=l.fs*1.08+l.ft*1.16;};
     const place=l=>{for(let k=0;;k++){let r=R0;for(;r<R0+200;r+=1){const [x,y]=P(l.b,r),x0=x-l.w/2,x1=x+l.w/2,y0=y-l.h/2,y1=y+l.h/2;
         const nx2=Math.min(Math.max(C,x0),x1),ny=Math.min(Math.max(C,y0),y1);if(Math.hypot(nx2-C,ny-C)>=R0)break;}
@@ -7287,12 +7290,12 @@ body.simple-view .wrap{display:none!important}`;
     for(let it=0;it<400;it++){let moved=false;
       for(let i=0;i<L.length;i++)for(let j=i+1;j<L.length;j++){const u=L[i],v=L[j];if(!hit(u,v))continue;
         let d=norm(v.b-u.b);if(d>180)d-=360;const s1=d>=0?1:-1;
-        if(u.kind==='n'&&v.kind==='p')u.b-=s1*1.2;else if(v.kind==='n'&&u.kind==='p')v.b+=s1*1.2;else{u.b-=s1*.6;v.b+=s1*.6;}   // night marks give way to prayers
+        if(u.kind==='n'&&v.kind!=='n')u.b-=s1*1.2;else if(v.kind==='n'&&u.kind!=='n')v.b+=s1*1.2;else{u.b-=s1*.6;v.b+=s1*.6;}   // night marks give way to prayers
         place(u);place(v);moved=true;}
       if(!moved)break;}
-    L.forEach(l=>{const col=l.next?PC:(l.lit?'#c9d2ff':(l.kind==='n'?K.dim:K.ink)),fw=l.next?' font-weight="700"':'',halo=` stroke="${K.bg}" stroke-width="9" paint-order="stroke" stroke-linejoin="round"`;
-      const [x1,y1]=P(l.a,RB[1]+1),[x2,y2]=P(l.a,RB[1]+13);
-      if(!l.lit)s+=`<line data-k="${l.kind==='p'?KEYS[l.i]:'n'}" data-m="${(+l.t).toFixed(2)}" x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${col}" stroke-width="${l.next?4:3}" stroke-linecap="round"/>`;
+    L.forEach(l=>{const col=l.kind==='s'?(sunUp?'#ffd25a':'#d9c48e'):l.next?PC:(l.lit?'#c9d2ff':(l.kind==='n'?K.dim:K.ink)),fw=l.next?' font-weight="700"':'',halo=` stroke="${K.bg}" stroke-width="9" paint-order="stroke" stroke-linejoin="round"`;
+      const [x1,y1]=P(l.a,RB[1]+6.5),[x2,y2]=P(l.a,RB[1]+18);
+      if(!l.lit&&l.kind!=='s')s+=`<line data-k="${l.kind==='p'?KEYS[l.i]:'n'}" data-m="${(+l.t).toFixed(2)}" x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${col}" stroke-width="${l.next?4:3}" stroke-linecap="round"/>`;
       const y0=l.y-l.h/2+l.fs*.86;
       // one <text> per line (Safari splits a word when one <text> holds two positioned lines)
       s+=`<text x="${l.x.toFixed(1)}" y="${y0.toFixed(1)}" font-family="${FONT}" font-size="${l.fs}" text-anchor="middle" fill="${col}"${fw}${halo}>${l.name}</text>`+
