@@ -7379,13 +7379,15 @@ ${clipDefs}<clipPath id="zdMoonClip"><circle r="13"/></clipPath></defs><g id="zd
     const night=nm>=p.isha||nm<p.fajr;
     const K={brass:night?'#a8813f':'#c9a35d',ink:night?'#f0cf94':'#fbf4e2',gold:night?'#e6c287':'#f5e6b4',past:night?'#b09872':'#b9b09a',bg:night?'#030406':'#0a0c12'};
     const MIDN=en?'Midnight':'منتصف الليل',THIRD=en?'Last third':'الثلث الأخير';
+    /* «الساعة والقمر» (variants.js k/l) shows this dial as the whole page at ~380 px: the night marks are a size up there so they stay ≥ 15 px */
+    const NF=document.body.classList.contains('zv-k')?31:25;
     if(d24){
       // next prayer (sunrise counts as an event, like the hero card)
       let nx=-1;T.forEach((t,i)=>{if(nx<0&&t>nm)nx=i;});   // after Isha nothing of today is ahead — the hero card counts to Fajr
       T.forEach((t,i)=>{const tmr=aftM&&i<2,tl=(tmr?(en?'tmrw ':'غدًا '):'')+f12(t);
         L.push({a:ga(t),t,key:KEYS[i],name:nmOf(i,0),time:tl,fs:33,ft:33,next:i===nx,past:t<nm,kind:'p'});});
-      L.push({a:ga(midN),t:midN,key:'mid',name:MIDN,time:f12(midN),fs:25,ft:25,kind:'n',past:midN<nm});
-      L.push({a:ga(third),t:third,key:'third',name:THIRD,time:f12(third),fs:25,ft:25,kind:'n',past:third<nm});
+      L.push({a:ga(midN),t:midN,key:'mid',name:MIDN,time:f12(midN),fs:NF,ft:NF,kind:'n',past:midN<nm});
+      L.push({a:ga(third),t:third,key:'third',name:THIRD,time:f12(third),fs:NF,ft:NF,kind:'n',past:third<nm});
     }else{
       /* 12 h: only what lies in the coming 12 hours. A prayer that began before now has no place on this ring — its moment is
          behind the hand, where the ring already shows the hours 12 hours ahead (the cards above still show it). */
@@ -7415,8 +7417,8 @@ ${clipDefs}<clipPath id="zdMoonClip"><circle r="13"/></clipPath></defs><g id="zd
       // inside the last third: «الثلث الأخير — حتى ٥:٢٠» over the lit ring, in place of its mark
       const inThird=nm>=mN+(fN-mN)*2/3&&nm<fN;
       marks.forEach(([key,t])=>{if(key==='third'&&inThird)return;
-        L.push({a:ga(t),t,key,name:key==='mid'?MIDN:THIRD,time:f12(t),fs:25,ft:25,kind:'n',past:t<nm});});
-      if(inThird){const t=(nm+fN)/2;L.push({a:ga(t),t,key:'third',name:THIRD,time:(en?'until ':'حتى ')+f12(fN),fs:30,ft:30,kind:'span',past:false});}
+        L.push({a:ga(t),t,key,name:key==='mid'?MIDN:THIRD,time:f12(t),fs:NF,ft:NF,kind:'n',past:t<nm});});
+      if(inThird){const t=(nm+fN)/2;L.push({a:ga(t),t,key:'third',name:THIRD,time:(en?'until ':'حتى ')+f12(fN),fs:NF>25?32:30,ft:NF>25?32:30,kind:'span',past:false});}
     }
     const R0=RB[1]+22,PAD=4,VB=[-72,-46,672,646];   // VB: the svg's viewBox edges
     const size=l=>{l.w=Math.max(tw(l.name,l.fs,700),tw(l.time,l.ft,700))+8;l.h=l.fs*1.08+l.ft*1.16;};
@@ -7600,6 +7602,7 @@ body.simple-view .gl{font-size:16px!important;color:#e6dcbd!important;padding:8p
   })();
 })();
 </script>
+<script src="dial24.js?v=1"></script><!-- «ساعة ٢٤» (Hassan 22 Nov): the 24-hour clock as its own layout -->
 <script id="calendarJs">
 /* #51 / #52 — التقويم الكامل (هجري / ميلادي، بالقمر والشمس) + تذكيراتك الشخصية بكرت تنبيه + محوّل التاريخ + جدول مواقيت الشهر (مشاركة وطباعة) */
 (function(){
@@ -8215,7 +8218,12 @@ ${c.friIqama?friBlk(k,c.friIqama):''}
   /* Hassan 19 Nov 18:57 («قراري حذف وحدة مكررة، وتعديل وحدة، والشاشة التي فيها القمر تذهب إلى القمر»): «الساعة أولًا» is removed (the
      duplicate), «القائمة» is the edited one and the entry home, «منحنى القمر» lives in السماء ← القمر. All the others stay as they were. */
   const O=[['b','القائمة','List','الوقت والتاريخ ثم الصلوات في قائمة كبيرة','The time and date, then the prayers in a large list'],
+    /* Hassan 22 Nov («بدون قوائم ونوافذ الصلاة»): the time, the date, the Moon and the dial only — variants.js k (with one line for
+       the next prayer) and l (without it). Which layout is the default stays Hassan's decision; nothing here changes it. */
+    ['k','الساعة والقمر','Clock and Moon','الوقت والتاريخ والقمر والزيج، وسطر للصلاة القادمة','The time, the date, the Moon and the dial, with one line for the next prayer'],
+    ['l','الساعة والقمر فقط','Clock and Moon only','الشاشة نفسها بلا سطر الصلاة القادمة','The same screen without the next-prayer line'],
     ['orig','الأصل','Original','الساعة كما هي','The clock as it is'],
+    ['h','ساعة ٢٤','24-hour clock','الأصل بساعة الأربع والعشرين ساعة','The original with the 24-hour clock'],
     ['a','اليوم','Today','الصلاة القادمة ثم الصلوات ثم اليوم','Next prayer, the prayers, then the day'],
     ['c','الساعة تحت','Clock below','الصلوات أولًا والساعة تحتها','Prayers first, the clock below'],
     ['e','الأفق','Horizon','اليوم كله مسار الشمس','The whole day as the Sun’s path'],
