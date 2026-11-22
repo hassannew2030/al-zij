@@ -7374,7 +7374,7 @@ ${clipDefs}<clipPath id="zdMoonClip"><circle r="13"/></clipPath></defs><g id="zd
     const K={brass:night?'#a8813f':'#c9a35d',ink:night?'#f0cf94':'#fbf4e2',gold:night?'#e6c287':'#f5e6b4',past:night?'#b09872':'#b9b09a',bg:night?'#030406':'#0a0c12'};
     const MIDN=en?'Midnight':'منتصف الليل',THIRD=en?'Last third':'الثلث الأخير';
     /* «الساعة والقمر» (variants.js k/l) shows this dial as the whole page at ~380 px: the night marks are a size up there so they stay ≥ 15 px */
-    const NF=document.body.classList.contains('zv-k')?30:25;
+    const NF=document.body.classList.contains('zv-k')?31:25;
     if(d24){
       // next prayer (sunrise counts as an event, like the hero card)
       let nx=-1;T.forEach((t,i)=>{if(nx<0&&t>nm)nx=i;});   // after Isha nothing of today is ahead — the hero card counts to Fajr
@@ -7397,7 +7397,7 @@ ${clipDefs}<clipPath id="zdMoonClip"><circle r="13"/></clipPath></defs><g id="zd
       [[py.maghrib-1440,p.fajr],[p.maghrib,pt.fajr+1440]].forEach(([m0,f0])=>[[(m0+f0)/2,'mid',MIDN],[m0+(f0-m0)*2/3,'third',THIRD]].forEach(([t,key,name])=>{
         if(t>=H0&&t<W1&&NIGHT)L.push({a:ga(t),t,key,name,time:f12(t),fs:NF,ft:NF,kind:'n',past:t<nm});}));
       // inside the last third (its start has passed): «الثلث الأخير — حتى ٥:٢٠» over the lit ring, like a prayer (Hassan 22 Nov, from بيتا ٢)
-      {const th3=mN+(fN-mN)*2/3;if(nm>=th3&&nm<fN){const t=(nm+fN)/2;L.push({a:ga(t),t,key:'third',name:THIRD,time:(en?'until ':'حتى ')+f12(fN),fs:30,ft:30,kind:'span',past:false});}}
+      {const th3=mN+(fN-mN)*2/3;if(nm>=th3&&nm<fN){const t=(nm+fN)/2;L.push({a:ga(t),t,key:'third',name:THIRD,time:(en?'until ':'حتى ')+f12(fN),fs:NF>25?32:30,ft:NF>25?32:30,kind:'span',past:false});}}
     }
     const R0=RB[1]+22,PAD=4,VB=[-72,-46,672,646];   // VB: the svg's viewBox edges
     const size=l=>{l.w=Math.max(tw(l.name,l.fs,700),tw(l.time,l.ft,700))+8;l.h=l.fs*1.08+l.ft*1.16;};
