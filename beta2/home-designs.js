@@ -8,7 +8,7 @@
    مقياس الخط ثلاثة أحجام فقط من النسبة الذهبية: ١٨ × φ⁰ ، ١٨ × φ ≈ ٢٩ ، ١٨ × φ³ ≈ ٧٦. */
 (function () {
   /* 13 Nov: on the main site too — the floating switcher is hidden; the choice lives in المزيد ← شكل الصفحة الرئيسية (#mHome) */
-  var KEY = 'zijHomeDesign', SEEN = 'zijHomeDesignSeen2';
+  var KEY = 'zijHomeDesign2', SEEN = 'zijHomeDesign2Seen2';
   var MINE = ['d', 'e', 'h', 'g', 'f'];
   var OPTS = [['d', 'د'], ['e', 'هـ'], ['h', 'ح'], ['g', 'ز'], ['f', 'و'], ['a', 'أ'], ['b', 'ب'], ['c', 'ج'], ['orig', 'الأصل']];
   var TITLES = { d: ['الساعة أولًا', 'Time first'], e: ['كيرف الشمس', 'Sun curve'], g: ['السماء الحقيقية', 'The real sky'], h: ['كيرف القمر', 'Moon curve'], f: ['الجملة', 'The sentence'] };
@@ -156,7 +156,8 @@
   function actsHtml() {
     return '<div class="acts">' +
       '<button type="button" class="zij s1" data-a="zij">' + DIAL + '<span>' + T('الزيج', 'Al-Zij') + '</span></button>' +
-      /* بيتا ١ — ط: «الزيج» alone, as in «القائمة»: digits are in المزيد ← العرض, the calendar opens from the date */
+      '<button type="button" class="s1" data-a="cal">' + CAL + '<span>' + T('التقويم', 'Calendar') + '</span></button>' +
+      '<button type="button" class="dgt s1" data-a="dgt" data-nodigit aria-label="' + T('شكل الأرقام', 'Digits') + '"><span data-k="dgt"></span></button>' +
       '</div>';
   }
   function topHtml() { return '<div class="top"><button type="button" class="city s1" data-a="city">' + PIN + '<span data-k="city"></span></button></div>'; }
@@ -176,7 +177,7 @@
     },
     e: function () {
       return topHtml() +
-        '<div class="day" data-a="cal" role="button" tabindex="0" style="cursor:pointer"><div class="s1"><span class="wd b" data-k="wd"></span> · <span data-k="hj"></span></div><div class="gr s1" data-k="gr"></div></div>' +
+        '<div class="day"><div class="s1"><span class="wd b" data-k="wd"></span> · <span data-k="hj"></span></div><div class="gr s1" data-k="gr"></div></div>' +
         '<div class="g1"></div>' +
         '<div class="clock"><span class="tm s3 n" data-k="tm"></span><span class="per s2" data-k="per"></span></div>' +
         nextHtml() +
@@ -185,7 +186,7 @@
     },
     f: function () {
       return topHtml() +
-        '<div class="day" data-a="cal" role="button" tabindex="0" style="cursor:pointer"><div class="s2 b wdl">' + T('اليوم ', '') + '<span class="wd" data-k="wd"></span></div><div class="s1"><span data-k="hj"></span>' + T('، الموافق', ',') + '</div><div class="gr s1" data-k="gr"></div></div>' +
+        '<div class="day"><div class="s2 b wdl">' + T('اليوم ', '') + '<span class="wd" data-k="wd"></span></div><div class="s1"><span data-k="hj"></span>' + T('، الموافق', ',') + '</div><div class="gr s1" data-k="gr"></div></div>' +
         '<div class="g1"></div>' +
         '<div class="say s1">' + T('الساعة الآن', 'The time now') + '</div>' +
         '<div class="clock"><span class="tm s3 n" data-k="tm"></span><span class="per s2" data-k="per"></span></div>' +
@@ -536,24 +537,24 @@
   var bar = null;
   function paintBar() {
     if (!bar) return;
-    var on = MINE.indexOf(cur) >= 0 ? cur : (LS.get('zijBetaVariant') || 'orig');
+    var on = MINE.indexOf(cur) >= 0 ? cur : (LS.get('zijBetaVariant2') || 'orig');
     bar.querySelectorAll('button[data-v]').forEach(function (b) { b.classList.toggle('on', b.dataset.v === on); });
   }
   function choose(v) {
     var old = $('zVarBar');
     if (MINE.indexOf(v) >= 0) {
       LS.set(KEY, v);
-      var ob = old && old.querySelector('button[data-v="orig"]'); if (ob) ob.click(); else LS.set('zijBetaVariant', 'orig');
+      var ob = old && old.querySelector('button[data-v="orig"]'); if (ob) ob.click(); else LS.set('zijBetaVariant2', 'orig');
       cur = v; document.body.classList.add('zhd'); document.body.classList.remove('zhd-dial'); build(v);
     } else {
       LS.set(KEY, 'off');
       cur = null; document.body.classList.remove('zhd', 'zhd-night', 'zhd-dial');
-      var vb = old && old.querySelector('button[data-v="' + v + '"]'); if (vb) vb.click(); else LS.set('zijBetaVariant', v);
+      var vb = old && old.querySelector('button[data-v="' + v + '"]'); if (vb) vb.click(); else LS.set('zijBetaVariant2', v);
     }
     paintBar(); window.scrollTo(0, 0);
   }
   window.zijHome = { choose: function (v) { if (!bar) return false; choose(v); return true; },
-    current: function () { return MINE.indexOf(cur) >= 0 ? cur : (LS.get('zijBetaVariant') || 'orig'); } };
+    current: function () { return MINE.indexOf(cur) >= 0 ? cur : (LS.get('zijBetaVariant2') || 'orig'); } };
   function init() {
     if (!$('zVarBar') && init.n++ < 10) { setTimeout(init, 200); return; } // let variants.js build its bar first
     bar = document.createElement('div'); bar.id = 'zhdBar'; bar.setAttribute('data-notr', ''); bar.setAttribute('data-nodigit', '');
