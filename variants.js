@@ -112,7 +112,8 @@
     var M = [].map.call(cells, function (c, i) { var t = String(c.textContent).replace(/[٠-٩]/g, function (x) { return x.charCodeAt(0) - 1632; }).match(/(\d{1,2}):(\d{2})/);
       if (!t) return null; var h = +t[1], m = +t[2]; if (i >= 2 && h < 12) h += 12; if (i < 2 && h === 12) h = 0; return h * 60 + m; });
     if (M.length < 6 || M.some(function (x) { return x == null; })) return '';
-    if (now < M[0]) return 'صباحًا'; if (now < M[1]) return 'فجرًا';   // Hassan 23 Nov: from 12:00:01 it is «صباحًا», not «ليلًا» if (now < M[2]) return 'صباحًا'; if (now < M[3]) return 'ظهرًا';
+    // Hassan 23 Nov: from 12:00:01 it is «صباحًا», not «ليلًا»
+    if (now < M[0]) return 'صباحًا'; if (now < M[1]) return 'فجرًا'; if (now < M[2]) return 'صباحًا'; if (now < M[3]) return 'ظهرًا';
     if (now < M[4]) return 'عصرًا'; if (now < M[5]) return 'مساءً'; return 'ليلًا';
   }
   function build() {
