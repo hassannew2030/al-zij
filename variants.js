@@ -53,7 +53,7 @@
     '#zToday .sc{font-family:"EB Garamond",serif;font-size:30px;color:#d8ccaa;direction:ltr;unicode-bidi:isolate;display:inline-block;margin-left:2px;font-variant-numeric:tabular-nums}',
     '#zToday .pd{font-size:29px;color:#f5e6b4;margin-inline-start:10px}',
     '#zToday .dt{font-size:18px;color:#d8ccaa;line-height:1.5}',
-    '#zToday .rm{font-size:18px;color:#e6c983}',
+    '#zToday .rm{font-size:18px;color:#e6c983;display:inline-block;margin-top:7px}   /* room for the tanween of «يومًا» under the date line (Hassan 23 Nov) */',
     '#zToday .mn{text-align:center;font-size:18px;color:#d8ccaa;min-width:70px}',
     '#zToday .mn svg{width:56px;height:56px;display:block;margin:0 auto 2px}',
     '#zToday .mn{cursor:pointer;line-height:1.35;max-width:120px}','#zToday .mn img{width:76px;height:76px;display:block;margin:0 auto 4px;border-radius:50%}',
@@ -70,7 +70,7 @@
     'body.zv-b .pc .pri{margin:0!important;width:26px!important;height:26px!important}',
     'body.zv-b .pc .pn{font-size:18px!important}',
     'body.zv-b .pc .pt{font-size:29px!important}',
-    'body.zv-b .pc.cur::after{content:var(--zcd,"");grid-column:1/-1;font:700 18px Amiri,serif;color:#b8eee2}',
+    'body.zv-b .pc.cur::after{content:var(--zcd,"");grid-column:1/-1;font:700 18px Amiri,serif;color:#e6c983}',
     'body.zv-a #hBottom,body.zv-b #hBottom,body.zv-c #hBottom,body.zv-a #zHeroWrap,body.zv-b #zHeroWrap,body.zv-c #zHeroWrap{width:100%;max-width:560px;box-sizing:border-box;margin-left:auto;margin-right:auto;align-self:center}'
   ].join('\n');
   document.head.appendChild(css);
@@ -112,7 +112,7 @@
     var M = [].map.call(cells, function (c, i) { var t = String(c.textContent).replace(/[٠-٩]/g, function (x) { return x.charCodeAt(0) - 1632; }).match(/(\d{1,2}):(\d{2})/);
       if (!t) return null; var h = +t[1], m = +t[2]; if (i >= 2 && h < 12) h += 12; if (i < 2 && h === 12) h = 0; return h * 60 + m; });
     if (M.length < 6 || M.some(function (x) { return x == null; })) return '';
-    if (now < M[0]) return 'ليلًا'; if (now < M[1]) return 'فجرًا'; if (now < M[2]) return 'صباحًا'; if (now < M[3]) return 'ظهرًا';
+    if (now < M[0]) return 'صباحًا'; if (now < M[1]) return 'فجرًا';   // Hassan 23 Nov: from 12:00:01 it is «صباحًا», not «ليلًا» if (now < M[2]) return 'صباحًا'; if (now < M[3]) return 'ظهرًا';
     if (now < M[4]) return 'عصرًا'; if (now < M[5]) return 'مساءً'; return 'ليلًا';
   }
   function build() {
