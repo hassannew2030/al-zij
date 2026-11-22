@@ -5954,7 +5954,7 @@ const shareBox=document.querySelector('button[onclick^="shareClock"]');if(shareB
     ['الجمعة','Friday','يوم الجمعة تُكتب «الجمعة» مكان «الظهر».','On Friday, Jumu’ah is written instead of Dhuhr.'],
     ['منتصف الليل والثلث الأخير','Midnight and last third','علامتان أرفع. منتصف الليل وسط ما بين المغرب والفجر، والثلث الأخير آخر ثلث منه.','Two thinner marks: midnight is halfway from Maghrib to Fajr; the last third is its final third.'],
     ['«الثلث الأخير حتى الفجر»','“Last third until Fajr”','حين نكون فيه تضيء الحلقة بالأزرق من العقرب إلى الفجر.','While we are in it, the ring is lit blue from the hand to Fajr.'],
-    ['ما مضى','What has passed','يختفي من الحلقة، ويبقى في صف الصلوات تحت القرص.','It leaves the ring; it stays in the row of prayers under the dial.'],
+    ['صلوات اليوم','Today\'s prayers','ثابتة على الحلقة طوال اليوم بلون واحد، وعند منتصف الليل تظهر صلوات اليوم الجديد.','Fixed on the ring all day in one colour; at midnight the new day\'s prayers appear.'],
     ['سطر النهار والليل','Day and night line','النهار من الفجر إلى المغرب، والليل من المغرب إلى الفجر.','Day from Fajr to Maghrib; night from Maghrib to Fajr.']];
   const draw=()=>{const en=window.ZIJ_LANG==='en';
     box.innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:16px;line-height:1.65">`+R.map(r=>`<tr><th style="text-align:start;vertical-align:top;padding:8px 6px;color:var(--h-brass-l);width:34%;border-bottom:1px solid rgba(201,163,93,.2)">${en?r[1]:r[0]}</th><td style="padding:8px 6px;border-bottom:1px solid rgba(201,163,93,.2)">${en?r[3]:r[2]}</td></tr>`).join('')+`</table>`;};
@@ -7337,7 +7337,9 @@ ${clipDefs}<clipPath id="zdMoonClip"><circle r="13"/></clipPath></defs><g id="zd
     }else{
       /* 12 h: only what lies in the coming 12 hours. A prayer that began before now has no place on this ring — its moment is
          behind the hand, where the ring already shows the hours 12 hours ahead (the cards above still show it). */
-      const EVh=EV.filter(e=>e.t>=H0-10&&e.t<W1),nx12=EVh.findIndex(e=>e.t>nm-10);   // Hassan 22 Nov: a prayer stays 10 min after its adhan
+      /* Hassan 22 Nov: the prayers of today stay fixed on the ring all day, in one colour; at 12:00:01 midnight the new
+         day's open. Nothing of tomorrow is mixed in (after Isha nothing is marked as next). */
+      const EVh=KEYS.map((k,i)=>({i,k,t:p[k]}));let nx12=-1;EVh.forEach((e,j)=>{if(nx12<0&&e.t>nm-10)nx12=j;});
       EVh.forEach((e,j)=>{const tmr=e.t>=1440,tl=(tmr?(en?'tomorrow ':'غدًا '):'')+f12(e.t);
         L.push({a:ga(e.t),t:e.t,key:e.k,name:nmOf(e.i,Math.floor(e.t/1440)),time:tl,fs:33,ft:33,next:j===nx12,past:e.t<nm-10,kind:'p'});});
       // midnight and the last third of last night and of tonight, when they fall in the 12 hours
@@ -7378,11 +7380,11 @@ ${clipDefs}<clipPath id="zdMoonClip"><circle r="13"/></clipPath></defs><g id="zd
       if(SWB)for(const u of L)if(hit(u,SWB)){let d=norm(u.b-SWB.a);if(d>180)d-=360;u.b+=d>=0?.6:-.6;place(u);moved=true;}
       if(!moved)break;}
     // still crowded: the oldest past names give way (their dots stay on the ring) — as on the sun curve
-    {const past=L.filter(l=>l.past).sort((u,v)=>u.t-v.t);
+    {const past=L.filter(l=>l.past&&l.kind!=='p').sort((u,v)=>u.t-v.t);   // a prayer of today is never hidden
       for(const l of past){if(L.some(v=>v!==l&&!v.hide&&hit(l,v)))l.hide=true;}}
     let lab='';
     L.forEach(l=>{const [dx,dy]=P(l.a,RBm),[ex,ey]=P(l.a,RB[1]+6.5),[fx,fy]=P(l.a,RB[1]+18);
-      const foc=l.next,col=foc?K.gold:(l.past?K.past:K.ink),fw=foc?' font-weight="700"':'',halo=` stroke="${K.bg}" stroke-width="9" paint-order="stroke" stroke-linejoin="round"`;
+      const foc=l.next,col=foc?K.gold:(l.past&&l.kind!=='p'?K.past:K.ink),fw=foc?' font-weight="700"':'',halo=` stroke="${K.bg}" stroke-width="9" paint-order="stroke" stroke-linejoin="round"`;
       /* Hassan 22 Nov («مؤشرات الصلوات مثل بيتا، واضحة للعين على سطح الفلك»): a short bold mark on the ring's outer edge at the
          moment, in the label's colour; a faint line to the name only when the name had to move aside */
       if(l.kind!=='span')lab+=`<line x1="${ex.toFixed(1)}" y1="${ey.toFixed(1)}" x2="${fx.toFixed(1)}" y2="${fy.toFixed(1)}" stroke="${col}" stroke-width="${foc?4:(l.kind==='n'?2.6:3.2)}" stroke-linecap="round"/>`;
