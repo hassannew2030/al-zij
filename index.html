@@ -5844,9 +5844,9 @@ function tick(){
   const WIN=25,fri=curI>=0&&list[curI][0]==='dhuhr'&&friday,EN=window.ZIJ_LANG==='en';
   let friIq=0;try{const A=JSON.parse(localStorage.getItem('zijAlerts')||'null'),f=A&&A.p&&A.p.dhuhr&&A.p.dhuhr.friIqama;if(f&&f.on&&+f.min>0)friIq=+f.min;}catch(e){}
   const atSub=()=>EN?fmt(p[list[curI][0]]):'الساعة '+fmt(p[list[curI][0]])+((c=>c&&!/موقع|°|—|اضغط/.test(c)?' حسب توقيت '+c:'')(((window.zijCityName&&zijCityName())||'').split(/[·•(]/)[0].trim()));
-  if(curIsPrayer&&sinceMin<1){hero.classList.add('now');$('hLbl').textContent='';$('hCd').textContent=EN?(fri?'Time for Jumu\'ah prayer':'Time for the '+((window.ZIJ_EN||{})[list[curI][1]]||list[curI][1])+' adhan'):'حان الآن '+(fri?'وقت صلاة الجمعة':'وقت أذان '+list[curI][1]);$('hSub').textContent=atSub();}
-  else if(curIsPrayer&&sinceMin<WIN&&fri&&!(friIq&&sinceMin<friIq)){hero.classList.add('now');$('hLbl').textContent='';$('hCd').textContent=EN?'Friday sermon':'خطبة الجمعة';$('hSub').textContent=atSub();}
-  else if(curIsPrayer&&sinceMin<WIN){hero.classList.remove('now');
+  if(curIsPrayer&&sinceMin<1){hero.classList.add('now');hero.classList.remove('subrep');$('hLbl').textContent='';$('hCd').textContent=EN?(fri?'Time for Jumu\'ah prayer':'Time for the '+((window.ZIJ_EN||{})[list[curI][1]]||list[curI][1])+' adhan'):'حان الآن '+(fri?'وقت صلاة الجمعة':'وقت أذان '+list[curI][1]);$('hSub').textContent=atSub();}
+  else if(curIsPrayer&&sinceMin<WIN&&fri&&!(friIq&&sinceMin<friIq)){hero.classList.add('now');hero.classList.remove('subrep');$('hLbl').textContent='';$('hCd').textContent=EN?'Friday sermon':'خطبة الجمعة';$('hSub').textContent=atSub();}
+  else if(curIsPrayer&&sinceMin<WIN){hero.classList.remove('now');hero.classList.remove('subrep');
     if(fri){const l=Math.max(0,(friIq-sinceMin)*60);$('hLbl').textContent=EN?'Iqamah in':'باقي على الإقامة';$('hCd').textContent=ar(two(Math.floor(l/60))+':'+two(Math.floor(l%60)));}
     else{const e=Math.max(0,sinceMin*60);$('hLbl').textContent=EN?'Since the '+((window.ZIJ_EN||{})[list[curI][1]]||list[curI][1])+' adhan':'مضى على أذان '+list[curI][1];$('hCd').textContent=ar(two(Math.floor(e/60))+':'+two(Math.floor(e%60)));}
     $('hSub').textContent=atSub();}
@@ -5857,7 +5857,10 @@ function tick(){
     if(ramadan&&list[nextI][0]==='fajr'){lbl='الإمساك بعد';sub='الفجر '+fmt(nextMin);}
     if(list[nextI][0]==='sunrise'){sub='الشروق '+fmt(nextMin)+'، آخر وقت الفجر';}
     const left=Math.max(0,(nextMin-nm)*60),H=Math.floor(left/3600),M=Math.floor(left%3600/60),S=Math.floor(left%60);
-    $('hLbl').textContent=lbl;$('hCd').textContent=ar((H?H+':':'')+two(M)+':'+two(S));$('hSub').textContent=sub;}
+    $('hLbl').textContent=lbl;$('hCd').textContent=ar((H?H+':':'')+two(M)+':'+two(S));$('hSub').textContent=sub;
+    // Hassan 26 Nov 00:22 («سطر الأذان تحت العدّاد — موافق»): the coming prayer's time is already in the prayer row under the card;
+    // only the sunrise line says more («آخر وقت الفجر»), so it stays
+    hero.classList.toggle('subrep',list[nextI][0]!=='sunrise');}
   // prayer row
   // the gold box sits on what is coming next; only in the first minutes after an adhan it stays on that prayer
   const focusI=(curIsPrayer&&sinceMin<WIN)?curI:nextI;
@@ -7796,6 +7799,7 @@ body:not(.simple-view) #hDate .brk{display:none}
    مواقيت اليوم + التاريخ هجري + ميلادي + ساعة رقمية فقط»): the home screen's countdown card and clock stay on the home screen only —
    since 22 Nov they also showed on the Prayer and More tabs, under the status bar. The Prayer tab opens with its own short header. */
 body[data-scr]:not([data-scr=clock]) #zHeroWrap,body[data-scr]:not([data-scr=clock]) #zDial{display:none!important}
+.hero.subrep #hSub{display:none}   /* the coming prayer's time is in the prayer row under the card (Hassan 26 Nov) */
 #zPrHead{text-align:center;margin:2px 0 14px}
 #zPrHead .t{font-family:'EB Garamond',Georgia,serif;font-size:44px;line-height:1.05;color:#f3e3ae;font-variant-numeric:tabular-nums;direction:ltr;unicode-bidi:isolate;display:inline-flex;align-items:baseline;gap:8px}
 #zPrHead .t .ap{font-family:Amiri,serif;font-size:20px;color:var(--h-brass-l)}
@@ -8476,6 +8480,6 @@ ${c.friIqama?friBlk(k,c.friIqama):''}
   paint();
 })();
 </script>
-<script src="home-designs.js?v=1795633152" defer></script>
+<script src="home-designs.js?v=1795642000" defer></script>
 </body>
 </html>
