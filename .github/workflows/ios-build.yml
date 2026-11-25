@@ -101,14 +101,19 @@ jobs:
           xcrun simctl location "$UDID" set 21.5433,39.1728 || true
           xcrun simctl privacy "$UDID" grant location com.alzijapp.app || true
           mkdir -p build/shots
-          xcrun simctl launch --stdout="$PWD/build/shots/app-console.txt" --stderr="$PWD/build/shots/app-console.txt" "$UDID" com.alzijapp.app
+          # NSUnbufferedIO: the app's print() (Capacitor writes the page's console.log with it) reaches the file at once, not at exit
+          SIMCTL_CHILD_NSUnbufferedIO=YES xcrun simctl launch --stdout="$PWD/build/shots/app-console.txt" --stderr="$PWD/build/shots/app-console-err.txt" "$UDID" com.alzijapp.app
           sleep 20; xcrun simctl io "$UDID" screenshot build/shots/1-after-20s.png
           sleep 25; xcrun simctl io "$UDID" screenshot build/shots/2-after-45s.png
           xcrun simctl spawn "$UDID" launchctl list | grep -q com.alzijapp.app || { echo "::error::the app is not running 45 s after launch (crash?)"; exit 1; }
           echo "the app is still running after 45 s"
           # #98: the page must see the app's own Apple Maps plugin, and a place name must come back from Apple (25 Nov: «UNIMPLEMENTED» on the phone)
-          grep -a 'zij-' build/shots/app-console.txt | tail -n 20 || true
-          grep -aq '\[zij-plugins\].*"geo":true' build/shots/app-console.txt || { echo "::error::the page cannot see the ZijGeocoder plugin (place names from Apple would fail)"; exit 1; }
+          echo "app console: $(wc -c < build/shots/app-console.txt) bytes"; grep -a 'zij-' build/shots/app-console.txt | tail -n 20 || true
+          if ! grep -aq '\[zij-plugins\].*"geo":true' build/shots/app-console.txt; then
+            echo "--- app console (first 8 kB) ---"; head -c 8000 build/shots/app-console.txt; echo
+            echo "--- app stderr (first 4 kB) ---"; head -c 4000 build/shots/app-console-err.txt 2>/dev/null; echo
+            echo "::error::the page cannot see the ZijGeocoder plugin (place names from Apple would fail)"; exit 1
+          fi
           grep -aq '\[zij-geo\] ok' build/shots/app-console.txt && echo "Apple place name: OK" || echo "::warning::no Apple place name within 45 s (network in the simulator?) — the plugin itself is visible"
           # a small copy of the last screenshot in the log itself (readable where the artifact cannot be downloaded)
           sips -Z 420 build/shots/2-after-45s.png --out build/shots/small.png >/dev/null && sips -s format jpeg -s formatOptions 60 build/shots/small.png --out build/shots/small.jpg >/dev/null
