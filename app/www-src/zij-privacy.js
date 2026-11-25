@@ -103,7 +103,9 @@
     MAIN_WX.forEach(function (id) { var el = doc.getElementById(id); if (el && el.parentElement) { el.parentElement.style.display = 'none'; shown++; } });
     if (!shown) return;
     // the «🌤️ الطقس» heading now only heads the elevation cell
-    [].forEach.call(doc.querySelectorAll('h4'), function (h) { if (/الطقس/.test(h.textContent) && h.textContent.length < 30) h.textContent = 'الارتفاع'; });
+    [].forEach.call(doc.querySelectorAll('h4'), function (h) {
+      if (/الطقس|Weather/.test(h.textContent) && h.textContent.length < 30) h.textContent = root.ZIJ_LANG === 'en' ? 'Elevation' : 'الارتفاع';
+    });
   }
   var SKY_CSS = 'section.card:has(#wx),#cloudTonight,.eve-cloud{display:none!important}';
   function hideSky(doc) {

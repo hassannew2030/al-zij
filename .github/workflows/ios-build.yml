@@ -104,6 +104,9 @@ jobs:
           sleep 25; xcrun simctl io "$UDID" screenshot build/shots/2-after-45s.png
           xcrun simctl spawn "$UDID" launchctl list | grep -q com.alzijapp.app || { echo "::error::the app is not running 45 s after launch (crash?)"; exit 1; }
           echo "the app is still running after 45 s"
+          # a small copy of the last screenshot in the log itself (readable where the artifact cannot be downloaded)
+          sips -Z 420 build/shots/2-after-45s.png --out build/shots/small.png >/dev/null && sips -s format jpeg -s formatOptions 60 build/shots/small.png --out build/shots/small.jpg >/dev/null
+          echo "ZIJ-SHOT-BEGIN"; base64 -i build/shots/small.jpg | fold -w 1000; echo "ZIJ-SHOT-END"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
