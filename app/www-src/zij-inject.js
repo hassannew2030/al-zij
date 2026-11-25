@@ -4,8 +4,9 @@
 (function (root) {
   'use strict';
   var MARK = '<!-- zij-native -->';
-  // load order matters: Capacitor core (registerPlugin), the three plugins, the planner, the bridge, this injector (for the updater), the updater
-  var SCRIPTS = ['native/capacitor.js', 'native/app.js', 'native/local-notifications.js', 'native/filesystem.js',
+  // load order matters: Capacitor core (registerPlugin), the privacy guard (before any request the page makes, table #98),
+  // the three plugins, the planner, the bridge, this injector (for the updater), the updater
+  var SCRIPTS = ['native/capacitor.js', 'native/zij-privacy.js', 'native/app.js', 'native/local-notifications.js', 'native/filesystem.js',
                  'native/zij-schedule.js', 'native/zij-native.js', 'native/zij-inject.js', 'native/zij-live-update.js'];
 
   function inject(html, cfg) {

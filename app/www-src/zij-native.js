@@ -105,15 +105,23 @@
     return window.ZijSchedule.plan({ days: days(now, daysNeeded(S)), settings: S, now: now, lang: LANG(), digits: LS.get('zijDigits') === 'en' ? 'en' : 'ar' });
   }
 
-  // wait (briefly) for the official Saudi table so the first plan uses it, exactly like the screen
+  // wait (briefly) for the official table — Umm al-Qura (Saudi Arabia) or JAKIM (Malaysia) — so the first plan uses it, exactly
+  // like the screen (review 18 Nov, item 4: without the JAKIM wait the first week in Malaysia was planned from the formula)
+  function jakimReady() {
+    try {
+      var M = typeof ZIJ_METHODS !== 'undefined' && observer.activeMethod ? ZIJ_METHODS[observer.activeMethod()] : null;
+      if (!M || !M.my || !window.zijMY) return true;                 // not on the JAKIM method: nothing to wait for
+      zijMY.ensure(observer.lat, observer.lon);
+      return !!zijMY.lookup(observer.lat, observer.lon, new Date());
+    } catch (e) { return true; }
+  }
   function uqSettled() {
     return new Promise(function (res) {
       var t0 = Date.now();
       (function poll() {
         try {
-          if (!window.zijUQ) return res();
-          zijUQ.ensure(observer.lat, observer.lon);
-          if (zijUQ.ready()) return res();
+          var uq = !window.zijUQ || (zijUQ.ensure(observer.lat, observer.lon), zijUQ.ready());
+          if (uq && jakimReady()) return res();
         } catch (e) { return res(); }
         if (Date.now() - t0 > 6000) return res();
         setTimeout(poll, 150);
@@ -250,7 +258,8 @@
   // a fingerprint of everything that changes the alerts: settings, place, method, Asr school, mosque offsets, language, digits, date
   function fingerprint() {
     if (!engineReady()) return '';
-    var keys = ['zijAlerts', 'zijCalcMethod', 'zijAsr', 'zijAdhanOffsets', 'zijHighLat', 'zijLang', 'zijDigits', 'zijCountry'];
+    // zijMyZone / zijRegion: the JAKIM zone chosen by hand or by state (review 18 Nov, item 5)
+    var keys = ['zijAlerts', 'zijCalcMethod', 'zijAsr', 'zijAdhanOffsets', 'zijHighLat', 'zijLang', 'zijDigits', 'zijCountry', 'zijMyZone', 'zijRegion'];
     var day = new Date(); day = day.getFullYear() + '-' + day.getMonth() + '-' + day.getDate();
     // + the phone's time-zone offset: travelling to another zone changes nothing else here, but the plan must be rebuilt
     return keys.map(function (k) { return LS.get(k) || ''; }).join('§') + '§' + (+observer.lat).toFixed(3) + ',' + (+observer.lon).toFixed(3) +

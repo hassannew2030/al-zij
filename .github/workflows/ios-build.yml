@@ -9,7 +9,7 @@ on:
   push:
     branches: [ios-app]
     tags: ['ios-v*']
-    paths: ['app/**', 'index.html', 'data/uq/**', 'fonts/**', 'icons/**', '.github/workflows/ios-build.yml']
+    paths: ['app/**', 'index.html', '*.js', 'voice/**', 'data/uq/**', 'data/my/**', 'fonts/**', 'icons/**', '.github/workflows/ios-build.yml']
   workflow_dispatch:
     inputs:
       testflight:
@@ -77,12 +77,39 @@ jobs:
           grep -q 'zij-native' "$APPB/public/index.html"
           test -f "$APPB/public/data/uq/c/74.json"
           test -f "$APPB/PrivacyInfo.xcprivacy"
+          # every script the page loads is in the app (review 18 Nov, item 1), and the privacy guard (#98)
+          for f in variants.js voice.js home-designs.js native/zij-privacy.js data/my/index.json; do test -f "$APPB/public/$f" || { echo "::error::missing public/$f"; exit 1; }; done
+          ls "$APPB/public/voice" | head -3
+          # the app's own plugin (Apple place names, #98) is compiled in, and the storyboard starts the view controller that registers it
+          grep -aq ZijGeocoderPlugin "$APPB/App" || { echo "::error::ZijGeocoderPlugin is not in the binary"; exit 1; }
+          grep -raq ZijViewController "$APPB/Base.lproj/Main.storyboardc" || { echo "::error::Main.storyboard does not use ZijViewController"; exit 1; }
           ls "$APPB"/*.wav
           # Time Sensitive entitlement wired into the project (#71); signing itself is checked in the TestFlight job
           plutil -lint ios/App/App/App.entitlements
           grep -q 'CODE_SIGN_ENTITLEMENTS = App/App.entitlements' ios/App/App.xcodeproj/project.pbxproj
           /usr/libexec/PlistBuddy -c 'Print :CFBundleDisplayName' "$APPB/Info.plist"
           du -sh "$APPB"
+      - name: Open the app in an iPhone simulator (Jeddah) and take screenshots
+        run: |
+          APPB=$(find build/Build/Products -name 'App.app' -maxdepth 3 | head -1)
+          UDID=$(xcrun simctl list devices available -j | python3 -c "import json,sys; d=json.load(sys.stdin)['devices']; print(next(x['udid'] for k,v in sorted(d.items(), reverse=True) if 'iOS' in k for x in v if x['name'].startswith('iPhone')))")
+          echo "simulator: $UDID"
+          xcrun simctl boot "$UDID"; xcrun simctl bootstatus "$UDID" -b
+          xcrun simctl install "$UDID" "$APPB"
+          xcrun simctl location "$UDID" set 21.5433,39.1728 || true
+          xcrun simctl privacy "$UDID" grant location com.alzijapp.app || true
+          mkdir -p build/shots
+          xcrun simctl launch "$UDID" com.alzijapp.app
+          sleep 20; xcrun simctl io "$UDID" screenshot build/shots/1-after-20s.png
+          sleep 25; xcrun simctl io "$UDID" screenshot build/shots/2-after-45s.png
+          xcrun simctl spawn "$UDID" launchctl list | grep -q com.alzijapp.app || { echo "::error::the app is not running 45 s after launch (crash?)"; exit 1; }
+          echo "the app is still running after 45 s"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: al-zij-simulator-shots
+          path: app/build/shots
+          retention-days: 14
       - uses: actions/upload-artifact@v4
         with:
           name: al-zij-simulator-app

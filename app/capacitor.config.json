@@ -3,7 +3,7 @@
   "appName": "الزيج",
   "webDir": "www",
   "backgroundColor": "#0a0c12",
-  "loggingBehavior": "debug",
+  "loggingBehavior": "production",
   "ios": {
     "contentInset": "never",
     "backgroundColor": "#0a0c12",

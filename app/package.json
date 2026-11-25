@@ -7,7 +7,7 @@
   "scripts": {
     "sounds": "python3 scripts/make-sounds.py www-src/sounds",
     "bundle": "node scripts/bundle-web.mjs",
-    "test": "node --test test/schedule.test.mjs test/inject.test.mjs",
+    "test": "node --test test/schedule.test.mjs test/inject.test.mjs test/privacy.test.mjs",
     "test:e2e": "node test/bridge.e2e.mjs",
     "sync": "npm run bundle && npx cap sync ios"
   },

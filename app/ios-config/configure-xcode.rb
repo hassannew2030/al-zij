@@ -11,6 +11,14 @@ files.each do |name|
   ref = group.new_reference(name)
   target.resources_build_phase.add_file_reference(ref, true)
 end
+# the app's own Swift code (copied by configure-ios.sh): compiled into the App target
+swift = Dir[File.expand_path('../ios/App/App/Zij*.swift', __dir__)].map { |f| File.basename(f) }
+swift.each do |name|
+  next if group.files.any? { |f| f.path == name }
+  ref = group.new_reference(name)
+  target.source_build_phase.add_file_reference(ref, true)
+end
+files += swift
 version = ENV['ZIJ_MARKETING_VERSION'] || '1.0.0'
 build = ENV['ZIJ_BUILD_NUMBER'] || '1'
 target.build_configurations.each do |c|

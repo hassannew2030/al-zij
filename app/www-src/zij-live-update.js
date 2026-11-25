@@ -10,8 +10,9 @@
      bundled build always wins, and a missing folder can never stop the app from opening.
    - Health check: if the snapshot page does not reach a working state within 20 s, it is marked bad and the app returns
      to the bundled copy; that build is never tried again.
-   - Only index.html comes from the site; fonts and data come from the app itself. If the site ever changes fonts or the
-     data/uq tables, those reach the app with the next store release (or extend this with a file list on the site).
+   - index.html and every script it loads (<script src>: variants.js, voice.js …) come from the site together, so a page and its
+     scripts are always the same version (review 18 Nov, item 2). Fonts, data and sounds come from the app itself; if the site
+     ever changes fonts or the data tables, those reach the app with the next store release.
    - A snapshot is tied to the native build that made it (ZIJ_NATIVE_CFG.native): after a store update it is rebuilt. */
 (function () {
   'use strict';
@@ -72,6 +73,12 @@
   function b64(blob) {
     return new Promise(function (res, rej) { var fr = new FileReader(); fr.onload = function () { res(String(fr.result).split(',')[1] || ''); }; fr.onerror = rej; fr.readAsDataURL(blob); });
   }
+  // the page's own scripts (not the native ones): they are downloaded with the page
+  function pageScripts(html) {
+    var out = [], re = /<script\b[^>]*\bsrc=["']([^"'?#:]+)(?:\?[^"']*)?["']/gi, m;
+    while ((m = re.exec(html))) if (m[1].indexOf('native/') !== 0 && out.indexOf(m[1]) === -1) out.push(m[1]);
+    return out;
+  }
   var running = false;
   function maybeDownload() {
     if (running || !FS || !WV || !navigator.onLine) return;
@@ -90,17 +97,27 @@
       cfg.build = target; cfg.snapshot = target;
       var page = window.ZijInject.inject(html, cfg);
       var dir = ROOT + '/' + target;
+      var fromSite = pageScripts(html);
       return fetch('native/files.json').then(function (r) { return r.json(); }).then(function (files) {
-        // copy the app's own files one by one (fonts, icons, data, sounds, native scripts); index.html comes from the site
-        var i = 0;
+        // the page's scripts from the site (same version as the page); the app's own files one by one (fonts, icons, data,
+        // sounds, native scripts) from the app; index.html last
+        var list = files.filter(function (f) { return f !== 'index.html' && fromSite.indexOf(f) === -1; });
+        var i = 0, j = 0;
+        function site() {
+          if (j >= fromSite.length) return Promise.resolve();
+          var f = fromSite[j++];
+          return getText(SITE + '/' + f + '?t=' + Date.now()).then(function (js) {
+            if (js.length < 50 || /^\s*</.test(js)) throw new Error('not a script: ' + f);
+            return FS.writeFile({ path: dir + '/' + f, data: js, directory: DIR, encoding: 'utf8', recursive: true });
+          }).then(site);
+        }
         function next() {
-          if (i >= files.length) return Promise.resolve();
-          var f = files[i++];
-          if (f === 'index.html') return next();
+          if (i >= list.length) return Promise.resolve();
+          var f = list[i++];
           return fetch(f).then(function (r) { if (!r.ok) throw new Error('missing ' + f); return r.blob(); }).then(b64)
             .then(function (data) { return FS.writeFile({ path: dir + '/' + f, data: data, directory: DIR, recursive: true }); }).then(next);
         }
-        return next();
+        return site().then(next);
       }).then(function () {
         return FS.writeFile({ path: dir + '/index.html', data: page, directory: DIR, encoding: 'utf8', recursive: true });
       }).then(function () { return FS.getUri({ path: dir, directory: DIR }); })

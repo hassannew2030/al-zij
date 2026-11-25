@@ -45,10 +45,15 @@ const MOCK = () => {
     },
   };
   rec.writes = {}; rec.base = [];
-  const Filesystem = { writeFile: async o => { rec.files.push(o.path); rec.writes[o.path] = typeof o.data === 'string' ? o.data.length : 0; if (o.path.endsWith('/index.html')) rec.page = o.data; return { uri: 'file:///lib/' + o.path }; },
+  rec.siteJs = {};
+  const Filesystem = { writeFile: async o => { rec.files.push(o.path); rec.writes[o.path] = typeof o.data === 'string' ? o.data.length : 0; if (o.path.endsWith('/index.html')) rec.page = o.data;
+      if (typeof o.data === 'string' && o.data.endsWith('/* from-site */')) rec.siteJs[o.path] = 1; return { uri: 'file:///lib/' + o.path }; },
     getUri: async o => ({ uri: 'file:///Library/NoCloud/' + o.path }), rmdir: async () => {} };
   const WebView = { setServerBasePath: async o => { rec.base.push(o.path); }, setServerAssetPath: async o => { rec.base.push('asset:' + o.path); } };
-  window.Capacitor = { isNativePlatform: () => true, getPlatform: () => 'ios', Plugins: { LocalNotifications, Filesystem, WebView, App: { addListener: () => {} } } };
+  // the app's own plugin: Apple's place names (#98)
+  rec.geo = [];
+  const ZijGeocoder = { reverse: async o => { rec.geo.push(o); return { city: 'جدة', hood: 'الروضة', subAdmin: 'جدة', admin: 'منطقة مكة المكرمة', country: 'السعودية', countryCode: 'SA' }; } };
+  window.Capacitor = { isNativePlatform: () => true, getPlatform: () => 'ios', Plugins: { LocalNotifications, Filesystem, WebView, ZijGeocoder, App: { addListener: () => {} } } };
 };
 
 const b = await chromium.launch();
@@ -65,12 +70,15 @@ async function open({ zone, loc, method, lang, at }) {
     if (method) localStorage.setItem('zijCalcMethod', method);
   }, [loc, method, lang]);
   const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message));
+  p.on('console', m => { if (/\[zij-update\]/.test(m.text())) console.log('   ' + m.text()); });   // the updater's own log, when a check fails
   // a fixed clock for the checks that depend on the calendar (e.g. a window that must cross a summer-time change)
   if (at) await p.clock.setFixedTime(new Date(at));
   // the real Capacitor scripts would look for the iOS bridge; the mock stands in for them
   await p.route(/\/native\/(capacitor|app|local-notifications|filesystem)\.js$/, r => r.fulfill({ body: '', contentType: 'text/javascript' }));
   await p.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort());
+  const out = []; p.on('request', q => { if (!q.url().startsWith(BASE)) out.push(q.url()); });   // every request that tried to leave the phone
   await p.goto(BASE + 'index.html'); await p.waitForTimeout(3500);
+  p.out = out;
   return { ctx, p, errs };
 }
 
@@ -193,10 +201,17 @@ async function open({ zone, loc, method, lang, at }) {
   const cors = { 'access-control-allow-origin': '*' };
   await p.route('https://alzijapp.com/version.json*', r => r.fulfill({ body: JSON.stringify({ build: next }), contentType: 'application/json', headers: cors }));
   await p.route('https://alzijapp.com/index.html*', r => r.fulfill({ body: newer, contentType: 'text/html', headers: cors }));
+  // the page's own scripts come from the site with the page (review 18 Nov, item 2); marked so the test can tell them apart
+  await p.route(/^https:\/\/alzijapp\.com\/[\w-]+\.js(\?|$)/, r => {
+    const f = new URL(r.request().url()).pathname.slice(1);
+    r.fulfill({ body: fs.readFileSync(path.join(ROOT, f), 'utf8') + '\n/* from-site */', contentType: 'text/javascript', headers: cors });
+  });
   await p.waitForTimeout(15000);
   let r = await p.evaluate(() => ({ snap: JSON.parse(localStorage.getItem('zijLiveSnap') || 'null'), files: __nat.files.filter(f => f.startsWith('zij-web/')), page: __nat.page || '' }));
   check(r.snap && r.snap.build === next && /zij-web\/\d+$/.test(r.snap.path), 'newer build downloaded and saved as a snapshot: ' + (r.snap && r.snap.path));
   check(r.files.includes('zij-web/' + next + '/index.html') && r.files.includes('zij-web/' + next + '/data/uq/c/74.json') && r.files.includes('zij-web/' + next + '/native/zij-native.js'), `snapshot is complete (${r.files.length} files: page + fonts, data, sounds, native scripts)`);
+  const sj = await p.evaluate(() => Object.keys(__nat.siteJs || {}));
+  check(['variants.js', 'voice.js', 'home-designs.js'].every(f => sj.includes('zij-web/' + next + '/' + f)), 'the page\'s scripts came from the site with the page: ' + sj.map(f => f.split('/').pop()).join(', '));
   check(r.page.includes('<!-- zij-native -->') && r.page.includes('"snapshot":"' + next + '"'), 'downloaded page got the native bridge');
   const p2 = await ctx.newPage(); p2.on('pageerror', e => errs.push(e.message));
   await p2.route(/\/native\/(capacitor|app|local-notifications|filesystem)\.js$/, x => x.fulfill({ body: '', contentType: 'text/javascript' }));
@@ -204,6 +219,32 @@ async function open({ zone, loc, method, lang, at }) {
   await p2.goto(BASE + 'index.html'); await p2.waitForTimeout(1500);
   r = await p2.evaluate(() => __nat.base);
   check(r.length === 1 && /zij-web\/\d+$/.test(r[0]), 'next launch switches the web view to the snapshot: ' + r[0]);
+  check(errs.length === 0, 'no page errors' + (errs.length ? ': ' + errs.slice(0, 3).join(' | ') : ''));
+  await ctx.close();
+}
+
+/* ---- 3b · privacy in the app (#98): no weather, place names from Apple, nothing to OpenStreetMap / BigDataCloud / Open-Meteo weather ---- */
+{
+  const { ctx, p, errs } = await open({ zone: 'Asia/Riyadh', loc: { lat: 21.5433, lon: 39.1728 }, lang: 'ar' });
+  await p.waitForTimeout(4000);
+  const r = await p.evaluate(() => {
+    const hidden = id => { const e = document.getElementById(id); return !e || getComputedStyle(e.parentElement).display === 'none'; };
+    let place = null; try { place = JSON.parse(localStorage.getItem('zijPlace2') || 'null'); } catch (e) {}
+    return { geo: __nat.geo.length, place, wx: ['dataTemp', 'dataAQI', 'dataWeatherCondition', 'dataHumidity'].every(hidden),
+             elev: !hidden('dataElevation'), guard: !!window.__zijGuard };
+  });
+  // the Sky screen is its own frame: it must get the same guard, and its weather card must be hidden
+  const sky = await p.evaluate(() => new Promise(res => zijLoadMod('sky', w => setTimeout(() => {
+    const card = w.document.getElementById('wx'), sec = card && card.closest('section');
+    res({ guard: !!w.__zijGuard, hidden: !sec || w.getComputedStyle(sec).display === 'none' });
+  }, 2500))));
+  check(sky.guard && sky.hidden, 'Sky screen: guarded, weather card hidden');
+  const leaked = p.out.filter(u => /open-meteo\.com\/v1\/forecast|air-quality-api|nominatim\.openstreetmap|bigdatacloud/.test(u));
+  check(r.guard, 'privacy guard installed before the page scripts');
+  check(leaked.length === 0, 'no request to Open-Meteo weather/air quality, OpenStreetMap or BigDataCloud' + (leaked.length ? ': ' + leaked.slice(0, 3).join(' | ') : ''));
+  check(r.geo > 0 && r.place && r.place.city === 'جدة' && r.place.hood === 'الروضة', 'place name from Apple\'s map service: ' + JSON.stringify(r.place && [r.place.city, r.place.hood, r.place.src]));
+  check(r.wx, 'weather and air-quality cells hidden in the app');
+  check(r.elev, 'elevation still shown (waiting for Hassan\'s decision)');
   check(errs.length === 0, 'no page errors' + (errs.length ? ': ' + errs.slice(0, 3).join(' | ') : ''));
   await ctx.close();
 }

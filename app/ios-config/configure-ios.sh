@@ -47,6 +47,14 @@ cp ios-config/PrivacyInfo.xcprivacy "$APPDIR/"
 cp ios-config/App.entitlements "$APPDIR/"
 plutil -lint "$APPDIR/App.entitlements"
 
+# the app's own native code (table #98): Apple place names, and the view controller that registers that plugin
+cp ios-config/native/*.swift "$APPDIR/"
+SB=$APPDIR/Base.lproj/Main.storyboard
+if ! grep -q 'customClass="ZijViewController"' "$SB"; then
+  sed -i '' -E 's/customClass="CAPBridgeViewController"( customModule="Capacitor")?/customClass="ZijViewController" customModule="App" customModuleProvider="target"/' "$SB"
+fi
+grep -q 'customClass="ZijViewController" customModule="App"' "$SB" || { echo "::error::Main.storyboard: CAPBridgeViewController not found — the app would start without its own plugins"; exit 1; }
+
 # add the new files to the Xcode target, iPhone only, version numbers
 gem list -i xcodeproj >/dev/null 2>&1 || gem install --user-install xcodeproj >/dev/null
 ruby ios-config/configure-xcode.rb
