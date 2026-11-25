@@ -8,9 +8,9 @@ PLIST=$APPDIR/Info.plist
 PB=/usr/libexec/PlistBuddy
 [ -f "$PLIST" ] || { echo "no $PLIST — run: npx cap add ios"; exit 1; }
 
-set_key() { # key type value — string values are quoted for PlistBuddy («phone's» broke it: «Parse Error: Unclosed Quotes»)
+set_key() { # key type value — strings through plutil (the value is its own argument): PlistBuddy breaks on «phone's» («Unclosed Quotes»)
   $PB -c "Delete :$1" "$PLIST" >/dev/null 2>&1 || true
-  if [ "$2" = string ]; then $PB -c "Add :$1 string \"${3//\"/\\\"}\"" "$PLIST"; else $PB -c "Add :$1 $2 $3" "$PLIST"; fi
+  if [ "$2" = string ]; then plutil -replace "$1" -string "$3" "$PLIST"; else $PB -c "Add :$1 $2 $3" "$PLIST"; fi
   [ "$($PB -c "Print :$1" "$PLIST")" = "$3" ] || { echo "::error::Info.plist $1 was not set as given"; exit 1; }
 }
 set_key CFBundleDisplayName string "الزيج"
