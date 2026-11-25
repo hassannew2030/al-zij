@@ -5888,7 +5888,11 @@ function tick(){
    else{const tm=new Date(now.getTime()+864e5);ev='الشروق '+fmt(observer.realPrayerTimes(tm,hijriCal.fromGregorian(tm)).sunrise).replace(/ [صم]$/,'');}
    // too narrow for both: when the weather is known the chip takes turns every 4 s (weather as before ↔ sunrise/sunset)
    const wx=tv?ar(Math.round(+tv[0]))+'°'+(c&&c.textContent&&c.textContent!=='—'?' '+c.textContent.split(/[ (]/)[0]:''):'';
-   $('glSkyTxt').textContent=wx&&Math.floor(Date.now()/4000)%2?wx:ev;}
+   // Hassan 25 Nov 23:53 («Take your scissors ✂️ for the app»): sunrise and sunset are already in the prayer row above, so the card
+   // no longer repeats them — in the app (no weather) it is gone; on the website it shows the weather only, and hides until it is known
+   const sky=$('glSky');void ev;
+   if(window.ZIJ_NATIVE_CFG||!wx){if(sky&&sky.style.display!=='none')sky.style.display='none';}
+   else{if(sky&&sky.style.display==='none')sky.style.display='';$('glSkyTxt').textContent=wx;}}
   $('glQiblaTxt').textContent=ar(Math.round(observer.computeQiblaBearing(observer.lat,observer.lon)))+'°';
   }catch(e){console.error('home tick',e);}
 }
