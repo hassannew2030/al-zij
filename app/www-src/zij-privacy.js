@@ -7,21 +7,15 @@
    - Place names come from Apple's own map service on the iPhone (the app's ZijGeocoder plugin → CLGeocoder), not from
      OpenStreetMap or BigDataCloud. Those two requests are answered here, on the phone, in their own JSON shape, so the page
      works unchanged. Apple: «You are not responsible for disclosing data collected by Apple.»
-   - Every other request passes as before. The ones still waiting for Hassan's decision are listed in PENDING; moving a line
-     from PENDING to BLOCK switches that request off in the app.
+   - Hassan, 25 Nov 2026 9:27 pm, option (أ), on the hadith's rule «دع ما يريبك إلى ما لا يريبك»: nothing else leaves the app on its
+     own. Only the app's own files and alzijapp.com (the page's updates, the phone-clock check) pass; every other address is refused
+     here — Aladhan, Open-Meteo (elevation, city search), the IP-location services, sunrise-sunset.org, and anything added later.
+     A city is searched with Apple's map service (forward), and «allow location» opens the app's page in Settings (openSettings).
    - Links to the site's own pages (/privacy/, /support/ …) open on alzijapp.com in Safari instead of a blank page in the app. */
 (function (root) {
   'use strict';
-  var BLOCK = [
-    /^https:\/\/api\.open-meteo\.com\/v1\/forecast/,                // weather (main page and Sky screen)
-    /^https:\/\/air-quality-api\.open-meteo\.com\//                  // air quality
-  ];
-  var PENDING = [                                                    // allowed until Hassan decides (table #98)
-    /^https:\/\/api\.aladhan\.com\//,                                // the daily check and the inspector's Qibla check
-    /^https:\/\/api\.open-meteo\.com\/v1\/elevation/,               // height above sea level
-    /^https:\/\/(ipwho\.is|ipapi\.co|get\.geojs\.io)\//,             // rough place from the IP when location is refused
-    /^https:\/\/api\.sunrise-sunset\.org\//                          // «الميزان», only when the user runs it
-  ];
+  var SITE_RE = /^https:\/\/alzijapp\.com(\/|$)/;                  // the page's updates and the phone-clock check: no user data
+  var blocked = [];                                                  // what was refused this launch (host only), for «عندي مشكلة»
   var NOMINATIM = /^https:\/\/nominatim\.openstreetmap\.org\/reverse\?/;
   var BDC = /^https:\/\/api\.bigdatacloud\.net\/data\/reverse-geocode-client\?/;
   var SITE = ((root.ZIJ_NATIVE_CFG || {}).site || 'https://alzijapp.com').replace(/\/+$/, '');
@@ -37,6 +31,13 @@
     for (var i = 0; i < MY.length; i++) if (MY[i][1].test(a)) return MY[i][0];
     return '';
   }
+  // the app's own files: a relative address, or the app's own origin (capacitor://localhost), data: and blob:
+  function own(url, win) {
+    if (/^(data|blob):/i.test(url)) return true;
+    if (!/^[a-z][a-z0-9+.-]*:/i.test(url) && url.slice(0, 2) !== '//') return true;
+    try { var o = (win && win.location && win.location.origin) || ''; return !!o && o !== 'null' && url.indexOf(o + '/') === 0; } catch (e) { return false; }
+  }
+  function allowed(url, win) { return own(url, win) || SITE_RE.test(url) || url.indexOf(SITE + '/') === 0; }
   function param(url, k) { var m = new RegExp('[?&]' + k + '=([^&]*)').exec(url); return m ? decodeURIComponent(m[1]) : ''; }
 
   // ---- Apple's map service, through the app's own plugin (one answer per spot and language, kept for this launch) ----
@@ -90,23 +91,44 @@
     };
     win.fetch = function (input, init) {
       var url = typeof input === 'string' ? input : (input && input.url) || String(input);
-      var i;
-      for (i = 0; i < BLOCK.length; i++) if (BLOCK[i].test(url)) return Promise.reject(new TypeError('Failed to fetch'));
       if (NOMINATIM.test(url)) return geocode(param(url, 'lat'), param(url, 'lon'), param(url, 'accept-language') || 'ar').then(function (p) { return answer(asNominatim(p)); });
       if (BDC.test(url)) return geocode(param(url, 'latitude'), param(url, 'longitude'), param(url, 'localityLanguage') || 'ar').then(function (p) { return answer(asBigDataCloud(p)); });
-      return orig.apply(this, arguments);
+      if (allowed(url, win)) return orig.apply(this, arguments);
+      var host = (/^[a-z]+:\/\/([^\/?#]+)/i.exec(url) || [])[1] || url.slice(0, 40);
+      if (blocked.indexOf(host) === -1 && blocked.length < 20) blocked.push(host);
+      return Promise.reject(new TypeError('Failed to fetch'));
     };
   }
 
+  // ---- a city by name, from Apple's map service (the same service that names the district) ----
+  function forward(q, lang) {
+    var P = plugin();
+    if (!P || !P.forward) return Promise.reject(new TypeError('Apple: no ZijGeocoder plugin'));
+    return new Promise(function (res, rej) {
+      var t = setTimeout(function () { rej(new TypeError('Apple: no answer in 12 s')); }, 12000);
+      P.forward({ q: String(q || ''), lang: lang || 'ar' }).then(function (r) { clearTimeout(t); res((r && r.results) || []); },
+        function (e) { clearTimeout(t); rej(new TypeError('Apple: ' + ((e && (e.code || e.message)) || 'failed'))); });
+    });
+  }
+  // «allow location»: the app's own page in the iPhone's Settings
+  function openSettings() {
+    var P = plugin();
+    if (!P || !P.openSettings) return Promise.reject(new TypeError('no plugin'));
+    return P.openSettings();
+  }
+
   // ---- what is hidden in the app: the weather and air-quality panels ----
-  var MAIN_WX = ['dataWeatherCondition', 'dataTemp', 'dataFeelsLike', 'dataHumidity', 'dataWind', 'dataUV', 'dataCloud', 'dataPressure', 'dataVisibility', 'dataAQI'];
+  var MAIN_WX = ['dataWeatherCondition', 'dataTemp', 'dataFeelsLike', 'dataHumidity', 'dataWind', 'dataUV', 'dataCloud', 'dataPressure', 'dataVisibility', 'dataAQI', 'dataElevation'];
   function hideMain(doc) {
     var shown = 0;
     MAIN_WX.forEach(function (id) { var el = doc.getElementById(id); if (el && el.parentElement) { el.parentElement.style.display = 'none'; shown++; } });
     if (!shown) return;
-    // the «🌤️ الطقس» heading now only heads the elevation cell
+    // nothing is left under the «🌤️ الطقس» heading (elevation went too, 25 Nov): hide the heading and its empty grid
     [].forEach.call(doc.querySelectorAll('h4'), function (h) {
-      if (/الطقس|Weather/.test(h.textContent) && h.textContent.length < 30) h.textContent = root.ZIJ_LANG === 'en' ? 'Elevation' : 'الارتفاع';
+      if (/الطقس|Weather|الارتفاع|Elevation/.test(h.textContent) && h.textContent.length < 30) {
+        h.style.display = 'none';
+        var g = h.nextElementSibling; if (g && g.querySelector('#dataElevation')) g.style.display = 'none';
+      }
     });
   }
   var SKY_CSS = 'section.card:has(#wx),#cloudTonight,.eve-cloud{display:none!important}';
@@ -148,7 +170,8 @@
     }, true);
   }
 
-  var api = { guard: guard, child: child, BLOCK: BLOCK, PENDING: PENDING, asNominatim: asNominatim, asBigDataCloud: asBigDataCloud, myRegion: myRegion };
+  var api = { guard: guard, child: child, allowed: allowed, forward: forward, openSettings: openSettings, blocked: blocked, version: 2,
+              asNominatim: asNominatim, asBigDataCloud: asBigDataCloud, myRegion: myRegion };
   if (typeof module === 'object' && module.exports) { module.exports = api; return; }
   root.ZijPrivacy = api;
   if (!root.ZIJ_NATIVE_CFG) return;          // only inside the app

@@ -58,11 +58,29 @@ test('no Apple answer (plugin missing or failing) = offline, never a fallback to
   assert.deepEqual(sent.concat(f.sent), []);
 });
 
-test('everything else passes unchanged (own files, the site, requests still waiting for a decision)', async () => {
+test('only the app itself and alzijapp.com pass; everything else is refused (option أ, 25 Nov)', async () => {
   const { win, sent } = fakeWindow();
-  const urls = ['data/uq/index.json', 'https://alzijapp.com/version.json?t=1', 'https://api.aladhan.com/v1/timings/25-11-2026?latitude=21.54&longitude=39.17&method=4'];
-  for (const u of urls) await win.fetch(u);
-  assert.deepEqual(sent, urls);
+  win.location = { origin: 'capacitor://localhost' };
+  const pass = ['data/uq/index.json', 'version.json?zclock=1', 'capacitor://localhost/sounds/adhan.m4a', 'https://alzijapp.com/version.json?t=1', 'https://alzijapp.com/'];
+  for (const u of pass) await win.fetch(u);
+  assert.deepEqual(sent, pass);
+  const refused = ['https://api.aladhan.com/v1/timings/25-11-2026?latitude=21.54&longitude=39.17&method=4',
+                   'https://api.aladhan.com/v1/qibla/21.54330/39.17280',
+                   'https://api.open-meteo.com/v1/elevation?latitude=21.4&longitude=39.2',
+                   'https://geocoding-api.open-meteo.com/v1/search?name=Jeddah&count=5&language=ar',
+                   'https://ipwho.is/?lang=ar', 'https://ipapi.co/json/', 'https://get.geojs.io/v1/ip/geo.json',
+                   'https://api.sunrise-sunset.org/json?lat=21.4&lng=39.2', '//example.com/x.js', 'https://alzijapp.com.evil.net/'];
+  for (const u of refused) await assert.rejects(win.fetch(u), TypeError, u);
+  assert.deepEqual(sent, pass, 'nothing refused reached the network');
+  assert.ok(P.blocked.includes('api.aladhan.com') && P.blocked.includes('ipwho.is'));
+});
+
+test('a city by name comes from Apple (forward), never from a third party', async () => {
+  globalThis.Capacitor = { registerPlugin: () => ({ forward: async (o) => ({ results: [{ name: 'تبوك', city: 'تبوك', lat: 28.38, lon: 36.57, countryCode: 'SA', tz: 'Asia/Riyadh', q: o.q }] }) }), Plugins: {} };
+  const r = await P.forward('تبوك', 'ar');
+  assert.equal(r[0].city, 'تبوك'); assert.equal(r[0].q, 'تبوك'); assert.equal(r[0].tz, 'Asia/Riyadh');
+  globalThis.Capacitor = undefined;
+  await assert.rejects(P.forward('x', 'ar'), TypeError);
 });
 
 test('the Malaysian states map to ISO 3166-2:MY', () => {
