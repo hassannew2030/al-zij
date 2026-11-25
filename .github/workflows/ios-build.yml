@@ -126,12 +126,14 @@ jobs:
   #   APPLE_TEAM_ID — developer.apple.com → Membership
   # and create the app record in App Store Connect with the same bundle id (com.alzijapp.app, proposal).
   # Start it with:  git tag ios-v1.0.0-1 && git push origin ios-v1.0.0-1   (version 1.0.0, build = the run number)
+  #            or:  a commit on ios-app whose message contains [testflight]  (version 1.0.0 unless ZIJ_MARKETING_VERSION)
   # Not run yet: it can only be tested once the account and the secrets exist.
   # ---------------------------------------------------------------------------------------------------------
   testflight:
     name: Sign and upload to TestFlight
     needs: test
-    if: ${{ (github.event_name == 'workflow_dispatch' && inputs.testflight) || startsWith(github.ref, 'refs/tags/ios-v') }}
+    # also from a push to ios-app whose commit message contains [testflight] (tags cannot be pushed from Claude's sessions)
+    if: ${{ (github.event_name == 'workflow_dispatch' && inputs.testflight) || startsWith(github.ref, 'refs/tags/ios-v') || (github.event_name == 'push' && github.ref == 'refs/heads/ios-app' && contains(github.event.head_commit.message, '[testflight]')) }}
     runs-on: macos-26
     defaults: { run: { working-directory: app } }
     env:
