@@ -5836,7 +5836,7 @@ function tick(){
   const friday=lp.wd===5,ramadan=h.month===9;
   // header
   const city=(document.getElementById('dataLoc')&&document.getElementById('dataLoc').textContent.trim())||observer.name||'جدة';
-  $('hCityName').textContent=(window.zijPlaceLabel&&zijPlaceLabel())||(observer.name&&!/موقع|مثبّت|محفوظ/.test(observer.name)?observer.name:city.split('·')[0].split('(')[0].trim())||'—';
+  $('hCityName').textContent=(window.zijPlaceLabel&&zijPlaceLabel())||(observer.name&&!/موقع|مثبّت|محفوظ/.test(observer.name)?observer.name:city.split(/[·•]/)[0].split('(')[0].trim())||'—';   // the data line is «name • 21.54°, 39.17°»: the name only
   $('hWd').textContent=WD[lp.wd];
   $('hHijri').textContent=ar(h.day)+' '+HM[h.month-1]+' '+ar(h.year)+' هـ';
   $('hGreg').textContent=ar(lp.d)+' '+GM[lp.m]+' '+ar(lp.y)+' م';
@@ -6496,8 +6496,15 @@ document.addEventListener('click',e=>{if(e.target&&e.target.id==='zLocAsk'){LS.s
     if(zq('zWelcome')){setTimeout(()=>zijPlaceCard(why),900);return;}                                     // after the welcome
     if(zq('zPlaceCard'))return;
     if(why==='denied')LS.set('zijCardShown','1');
-    const pk=zijPickInUse(),start=Math.abs(observer.lat-21.5433)<1e-4&&Math.abs(observer.lon-39.1728)<1e-4;
-    const here=pk?pk.name:start?L('جدة (موقع البداية)','Jeddah (the starting point)'):(((window.zijCityName&&zijCityName())||'').replace(/^موقعك$/,'')||L('آخر موقع محفوظ','the last saved place'));
+    // the name the city chip shows, never bare coordinates (Hassan's photo, 26 Nov 02:38: «آخر موقع محفوظ • 21،54°, 39،17°» under the chip
+    // «جدة · الحي»); kept in step with the chip while the card is open, since the district name can arrive a moment later
+    const hereNow=()=>{const pk=zijPickInUse();if(pk)return pk.name;
+      if(Math.abs(observer.lat-21.5433)<1e-4&&Math.abs(observer.lon-39.1728)<1e-4)return L('جدة (موقع البداية)','Jeddah (the starting point)');
+      const saved=L('آخر موقع محفوظ','the last saved place');
+      const n=((window.zijCityName&&zijCityName())||'').split(/\s*[•·]\s*(?=[-\d٠-٩])/)[0].replace(/^موقعك$/,'').trim();
+      if(!n||/^آخر موقع محفوظ|°/.test(n))return saved;
+      return LS.get('zijLocDenied')==='1'?n+' ('+saved+')':n;};
+    const here=hereNow();
     const denied=LS.get('zijLocDenied')==='1',apple=!!(window.ZijPrivacy&&ZijPrivacy.forward),settings=!!(window.ZijPrivacy&&ZijPrivacy.openSettings);
     const title=why==='tz'?L('🌍 تغيّرت المنطقة الزمنية في جوالك — هل سافرت؟','🌍 Your phone\'s time zone changed — are you travelling?')
       :denied?L('📍 لم تسمح بالموقع — لا بأس، هذا اختيارك.','📍 Location not allowed — that is fine, it is your choice.'):L('📍 اختر مدينتك','📍 Choose your city');
@@ -6507,7 +6514,7 @@ document.addEventListener('click',e=>{if(e.target&&e.target.id==='zLocAsk'){LS.s
     o.innerHTML='<div style="width:100%;max-width:560px;background:#11141d;border:1px solid #7c5f30;border-radius:22px 22px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px));max-height:88vh;overflow:auto;direction:'+L('rtl','ltr')+'">'+
       '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px"><div style="font-size:21px;color:#eddba0;font-weight:700;line-height:1.5">'+title+'</div>'+
       '<button type="button" id="zPCx" aria-label="close" style="background:transparent;border:0;color:#8a8570;font-size:24px;cursor:pointer">✕</button></div>'+
-      '<div style="font-size:16px;color:#cfc4a4;margin-top:6px">'+L('يعمل الزيج الآن على: ','Al-Zij is now set to: ')+'<b>'+here+'</b></div>'+
+      '<div style="font-size:16px;color:#cfc4a4;margin-top:6px">'+L('يعمل الزيج الآن على: ','Al-Zij is now set to: ')+'<b id="zPChere">'+here+'</b></div>'+
       '<div style="font-size:16px;color:#cfc4a4;margin-top:12px">'+L('لتكون المواقيت والقبلة لمدينتك، اضغط مدينتك:','For your own prayer times and Qibla, tap your city:')+'</div>'+
       '<div id="zPCbig" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px"></div>'+
       '<input id="zPCq" type="search" enterkeyhint="search" autocomplete="off" placeholder="'+L('أو اكتب اسم مدينتك…','or type your city…')+'" style="'+inp+';width:100%;box-sizing:border-box;margin-top:12px">'+
@@ -6526,6 +6533,7 @@ document.addEventListener('click',e=>{if(e.target&&e.target.id==='zLocAsk'){LS.s
       '</div>';
     document.body.appendChild(o);
     const close=()=>o.remove();
+    const hereT=setInterval(()=>{const b=zq('zPChere');if(!b||!o.isConnected){clearInterval(hereT);return;}const h=hereNow();if(b.textContent!==h)b.textContent=h;},1000);
     zq('zPCx').onclick=close;o.addEventListener('click',e=>{if(e.target===o)close();});
     const row=(c,lab)=>{const b=document.createElement('button');b.type='button';b.textContent=lab;b.style.cssText=B;b.onclick=()=>zijPickCity(c);return b;};
     (await big()).forEach(c=>zq('zPCbig')&&zq('zPCbig').appendChild(row(c,c.name)));
