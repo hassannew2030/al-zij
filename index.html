@@ -895,7 +895,7 @@ window.ZIJ_CN={day:['يوم واحد','يومان','يومين','أيام','يو
 "حالة الطقس الآن": "Current weather",
 "حان الآن": "It's now time",
 "حان الآن موعد أذان": "It's now time for the Adhan of",
-"حان الآن وقتُ أذان": "It's now time for the Adhan of",
+"حان الآن وقت أذان": "It's now time for the Adhan of",
 "حان الآن وقت إقامة صلاة": "It's now time for the Iqamah of",
 "حاول مرة أخرى": "Try again",
 "حتى لو أعطى الـGPS قراءة مختلفة": "even if GPS gives a different reading",
@@ -2161,8 +2161,10 @@ html:not([data-lang="en"]) body:not(.zv-a):not(.zv-b):not(.zv-c) #hGreg::before{
 .htab a,.htab button{background:none;border:0;color:var(--h-dim);font-family:'Amiri',serif;font-size:12px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 0;cursor:pointer;text-decoration:none}
 .htab svg{width:24px;height:24px}
 .htab .on{color:var(--h-brass-l)}
-.htab .disc{width:58px;height:58px;margin-top:-26px;border-radius:50%;background:radial-gradient(circle at 50% 35%,#2a2416,#0d0b07);border:2px solid var(--h-brass);display:grid;place-items:center;box-shadow:0 0 0 4px var(--h-bg)}
-.htab .disc svg{width:34px;height:34px}
+/* Hassan 25 Nov (#100 ⑤): the Qibla button the same size as the others, in the middle, in gold (no raised disc over the content) */
+.htab .disc{display:grid;place-items:center;width:24px;height:24px}
+.htab .disc svg{width:28px;height:28px;margin:-2px}
+.htab [data-go="qibla"]{color:var(--h-brass-l)}
 #hToast{position:fixed;left:0;right:0;bottom:calc(96px + env(safe-area-inset-bottom,0px));text-align:center;font-family:'Amiri',serif;color:var(--h-teal);font-size:13.5px;pointer-events:none;z-index:60}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -5078,7 +5080,7 @@ function checkAdhanAndIqama(now, prayerTimeMap){
     // الأذان: أول ثانية بعد دخول الوقت (فرق أقل من 30 ثانية)
     if (Math.abs(nowMin - tmin) < 0.5 && _adhanFiredToday[id] !== todayKey){
       _adhanFiredToday[id] = todayKey;
-      showAdhanBanner('🕌 حان الآن وقتُ أذان '+names[id]);
+      showAdhanBanner('🕌 حان الآن وقت أذان '+names[id]);
     }
     // الإقامة: بعد مدة محددة من الأذان
     const iqamaMin = tmin + IQAMA_DELAY_MIN;
@@ -5752,6 +5754,8 @@ body[data-scr]:not([data-scr="clock"]) #hTop,
 body[data-scr]:not([data-scr="clock"]) #hNote,
 body[data-scr]:not([data-scr="clock"]) .wrap,
 body[data-scr]:not([data-scr="clock"]) #hBottom{display:none!important}
+/* Hassan 25 Nov: on the iPhone app the page scrolls under the status bar and the top card looked cut — a solid band behind it */
+body::before{content:"";position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top,0px);background:var(--h-bg,#0a0c12);z-index:45;pointer-events:none}
 .scr{display:none;max-width:560px;margin:0 auto;padding:calc(12px + env(safe-area-inset-top,0px)) 16px 24px;font-family:'Amiri','Geeza Pro',serif;direction:rtl;color:var(--h-ink)}
 body[data-scr="prayer"] #scr-prayer,body[data-scr="more"] #scr-more{display:block}
 .modframe{display:none;position:fixed;left:0;right:0;top:env(safe-area-inset-top,0px);width:100%;height:calc(100% - 78px - env(safe-area-inset-bottom,0px) - env(safe-area-inset-top,0px));border:0;background:#0a0c12;z-index:5}
@@ -5892,7 +5896,17 @@ function tick(){
   const sinceMin=!afterMidnight?nm-p[list[curI][0]]:999, curIsPrayer=curI>=0&&list[curI][0]!=='sunrise';
   // hero
   const hero=$('hHero');
-  if(curIsPrayer&&sinceMin<10){hero.classList.add('now');$('hLbl').textContent='';$('hCd').textContent=window.ZIJ_LANG==='en'?(list[curI][0]==='dhuhr'&&friday?'Time for Jumu\'ah prayer':'Time for the '+((window.ZIJ_EN||{})[list[curI][1]]||list[curI][1])+' adhan'):'حان الآن '+(list[curI][0]==='dhuhr'&&friday?'وقتُ صلاة الجمعة':'وقتُ أذان '+list[curI][1]);$('hSub').textContent=window.ZIJ_LANG==='en'?fmt(p[list[curI][0]]):'الساعة '+fmt(p[list[curI][0]])+((c=>c&&!/موقع|°|—|اضغط/.test(c)?' حسب توقيت '+c:'')(((window.zijCityName&&zijCityName())||'').split(/[·•(]/)[0].trim()));}
+  /* Hassan 25 Nov (#100): «حان الآن وقت أذان …» for one minute, then «مضى على أذان …» up to 25 minutes, then the next prayer as before.
+     Friday: «خطبة الجمعة» (no counter: the sermon's length differs), or «باقي على الإقامة» for whoever turned on Friday's iqamah. */
+  const WIN=25,fri=curI>=0&&list[curI][0]==='dhuhr'&&friday,EN=window.ZIJ_LANG==='en';
+  let friIq=0;try{const A=JSON.parse(localStorage.getItem('zijAlerts')||'null'),f=A&&A.p&&A.p.dhuhr&&A.p.dhuhr.friIqama;if(f&&f.on&&+f.min>0)friIq=+f.min;}catch(e){}
+  const atSub=()=>EN?fmt(p[list[curI][0]]):'الساعة '+fmt(p[list[curI][0]])+((c=>c&&!/موقع|°|—|اضغط/.test(c)?' حسب توقيت '+c:'')(((window.zijCityName&&zijCityName())||'').split(/[·•(]/)[0].trim()));
+  if(curIsPrayer&&sinceMin<1){hero.classList.add('now');$('hLbl').textContent='';$('hCd').textContent=EN?(fri?'Time for Jumu\'ah prayer':'Time for the '+((window.ZIJ_EN||{})[list[curI][1]]||list[curI][1])+' adhan'):'حان الآن '+(fri?'وقت صلاة الجمعة':'وقت أذان '+list[curI][1]);$('hSub').textContent=atSub();}
+  else if(curIsPrayer&&sinceMin<WIN&&fri&&!(friIq&&sinceMin<friIq)){hero.classList.add('now');$('hLbl').textContent='';$('hCd').textContent=EN?'Friday sermon':'خطبة الجمعة';$('hSub').textContent=atSub();}
+  else if(curIsPrayer&&sinceMin<WIN){hero.classList.remove('now');
+    if(fri){const l=Math.max(0,(friIq-sinceMin)*60);$('hLbl').textContent=EN?'Iqamah in':'باقي على الإقامة';$('hCd').textContent=ar(two(Math.floor(l/60))+':'+two(Math.floor(l%60)));}
+    else{const e=Math.max(0,sinceMin*60);$('hLbl').textContent=EN?'Since the '+((window.ZIJ_EN||{})[list[curI][1]]||list[curI][1])+' adhan':'مضى على أذان '+list[curI][1];$('hCd').textContent=ar(two(Math.floor(e/60))+':'+two(Math.floor(e%60)));}
+    $('hSub').textContent=atSub();}
   else{hero.classList.remove('now');
     // Hassan 22 Nov: the times are adhan times — «أذان العصر بعد», not «العصر بعد» (and not «صلاة»: the congregation is after the iqamah)
     let lbl=(list[nextI][0]==='sunrise'||window.ZIJ_LANG==='en'?nextName:'أذان '+nextName)+' بعد',sub='الأذان '+fmt(nextMin);
@@ -5903,7 +5917,7 @@ function tick(){
     $('hLbl').textContent=lbl;$('hCd').textContent=ar((H?H+':':'')+two(M)+':'+two(S));$('hSub').textContent=sub;}
   // prayer row
   // the gold box sits on what is coming next; only in the first minutes after an adhan it stays on that prayer
-  const focusI=(curIsPrayer&&sinceMin<10)?curI:nextI;
+  const focusI=(curIsPrayer&&sinceMin<WIN)?curI:nextI;
   $('hRow').innerHTML=list.map((x,i)=>`<div class="pc${x[0]==='sunrise'?' minor':''}${i===focusI?' cur':''}${i===nextI&&i!==focusI?' next':''}">${zijPrIcon(x[0])}<div class="pn">${x[1]}</div><div class="pt">${fmt(i===nextI?nextMin:p[x[0]]).replace(/ [صم]$/,'')}</div></div>`).join('');
   // context note: one line, only when there is something worth saying today
   const ph=Ephemeris.moonPhase(now),notes=[];
@@ -6135,7 +6149,12 @@ function renderPrayer(){
   if(cur===5&&nm>=iN&&nm>=midN)cur=-2; // Isha ends at the middle of the night (11:29 in Jeddah): after that Isha is simply off
   const isIsha=cur===5&&L[5][0]==='isha',el=Math.max(0,(nm-iN)*60),eH=Math.floor(el/3600),eM=Math.floor(el%3600/60),eS=Math.floor(el%60);
   const elTxt=ar((eH?eH+':':'')+two(eM)+':'+two(eS));
-  const rowsP=L.map((x,i)=>`<li class="${x[0]==='sunrise'?'minor':''}${i===cur?' cur':''}${i===nx?' next':''}"><span class="n">${zijPrIcon(x[0])}${x[1]}${i===cur&&isIsha&&i!==nx?'<span class="tag el">مضى على الأذان <b style="font-family:\'EB Garamond\',serif;direction:ltr;unicode-bidi:isolate">'+elTxt+'</b></span>':i===cur&&x[0]!=='sunrise'&&i!==nx?'<span class="tag">الآن</span>':''}${i===nx?'<span class="tag cd">'+nxWord+' <b style="font-family:\'EB Garamond\',serif;direction:ltr;unicode-bidi:isolate">'+cdTxt+'</b></span>':''}</span><span class="t">${fmt(i===nx?nmin:p[x[0]])}</span></li>`);
+  // #100: after every adhan «مضى على الأذان» for 25 minutes (Isha: to the middle of the night, as before); Friday: the sermon
+  const sinceC=cur>=0&&cur<6?nm-p[L[cur][0]]:999,fridayDhuhr=friday&&cur===2;
+  let friIqL=0;try{const A=JSON.parse(localStorage.getItem('zijAlerts')||'null'),f=A&&A.p&&A.p.dhuhr&&A.p.dhuhr.friIqama;if(f&&f.on&&+f.min>0)friIqL=+f.min;}catch(e){}
+  const sTxt=ar(two(Math.floor(Math.max(0,sinceC)))+':'+two(Math.floor(Math.max(0,sinceC)*60%60)));
+  const curTag=sinceC>=0&&sinceC<25?(fridayDhuhr?(friIqL&&sinceC<friIqL?'<span class="tag el">باقي على الإقامة <b style="font-family:\'EB Garamond\',serif;direction:ltr;unicode-bidi:isolate">'+ar(two(Math.floor((friIqL-sinceC)))+':'+two(Math.floor((friIqL-sinceC)*60%60)))+'</b></span>':'<span class="tag el">خطبة الجمعة</span>'):'<span class="tag el">مضى على الأذان <b style="font-family:\'EB Garamond\',serif;direction:ltr;unicode-bidi:isolate">'+sTxt+'</b></span>'):'<span class="tag">الآن</span>';
+  const rowsP=L.map((x,i)=>`<li class="${x[0]==='sunrise'?'minor':''}${i===cur?' cur':''}${i===nx?' next':''}"><span class="n">${zijPrIcon(x[0])}${x[1]}${i===cur&&isIsha&&i!==nx?'<span class="tag el">مضى على الأذان <b style="font-family:\'EB Garamond\',serif;direction:ltr;unicode-bidi:isolate">'+elTxt+'</b></span>':i===cur&&x[0]!=='sunrise'&&i!==nx?curTag:''}${i===nx?'<span class="tag cd">'+nxWord+' <b style="font-family:\'EB Garamond\',serif;direction:ltr;unicode-bidi:isolate">'+cdTxt+'</b></span>':''}</span><span class="t">${fmt(i===nx?nmin:p[x[0]])}</span></li>`);
   rowsP.splice(2,0,`<li class="minor extra"><span class="n">${zijPrIcon('duha')}الضحى <small>يبدأ</small></span><span class="t">${fmt(duha)}</span></li>`);
   rowsP.push(`<li class="minor extra"><span class="n">${zijPrIcon('night')}ثلث الليل الأخير <small>قيام الليل</small></span><span class="t">${fmt(third)}</span></li>`);
   $('pList').innerHTML=rowsP.join('');
@@ -8167,7 +8186,7 @@ html[data-lang=en] .zSh .sh{font-family:'EB Garamond',Amiri,serif}
   function fire(kind,k,cfg){
     const n=pname(k);let text,secs=20;
     if(kind==='pre')text=EN?n+' adhan in '+mins(cfg.min):'أذان '+n+' بعد '+mins(cfg.min);
-    else if(kind==='adhan'){text=EN?'🕌 It is now time for the '+n+' adhan':'🕌 حان الآن وقتُ أذان '+n;secs=60;}
+    else if(kind==='adhan'){text=EN?'🕌 It is now time for the '+n+' adhan':'🕌 حان الآن وقت أذان '+n;secs=60;}
     // Friday's optional iqamah is for someone praying away from the mosque — whether it is Jumu'ah or Dhuhr is not ours to name (same text as the app)
     else if(k==='dhuhr'&&isFriday())text=EN?'🕌 It is now time for the iqamah':'🕌 حان الآن وقت إقامة الصلاة';
     else text=EN?'🕌 It is now time for the '+n+' iqamah':'🕌 حان الآن وقت إقامة صلاة '+n;
