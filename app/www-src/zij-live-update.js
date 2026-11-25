@@ -13,7 +13,10 @@
    - index.html and every script it loads (<script src>: variants.js, voice.js …) come from the site together, so a page and its
      scripts are always the same version (review 18 Nov, item 2). Fonts, data and sounds come from the app itself; if the site
      ever changes fonts or the data tables, those reach the app with the next store release.
-   - A snapshot is tied to the native build that made it (ZIJ_NATIVE_CFG.native): after a store update it is rebuilt. */
+   - A snapshot is tied to the native build that made it (ZIJ_NATIVE_CFG.native): after a store update it is rebuilt.
+   - When (Hassan 25 Nov 2026 22:20, «نفذ»): the site is asked at every opening of the app — the launch and every return to it —
+     no longer once in 6 hours (two checks are at least 2 minutes apart). A snapshot that is ready is switched to the moment the
+     user leaves the app, out of sight, so the next opening already shows it; a launch from scratch switches to it as before. */
 (function () {
   'use strict';
   if (!window.ZIJ_NATIVE) return;
@@ -45,6 +48,7 @@
       setTimeout(check, 500);
     })();
     window.addEventListener('load', function () { setTimeout(maybeDownload, 8000); });
+    watchOpenings();
     return;
   }
 
@@ -56,6 +60,25 @@
     return;   // the web view reloads from the snapshot; its own copy of this script carries on
   }
   window.addEventListener('load', function () { setTimeout(maybeDownload, 8000); });
+  watchOpenings();
+
+  /* ---- D · every opening asks the site; leaving the app switches to a ready, newer snapshot out of sight ---- */
+  function readySnap() {
+    var s = null; try { s = JSON.parse(LS.get(KEY) || 'null'); } catch (e) {}
+    return s && s.path && s.native === CFG.native && num(s.build) > num(CFG.snapshot || CFG.build) && bad.indexOf(String(s.build)) === -1 ? s : null;
+  }
+  function left() {
+    var s = readySnap();
+    if (!s || !WV || sessionStorage.getItem('zijLiveSwitch') === String(s.build)) return;
+    try { sessionStorage.setItem('zijLiveSwitch', String(s.build)); } catch (e) {}
+    log('switching to', s.build, 'while the app is out of sight');
+    WV.setServerBasePath({ path: s.path }).catch(function (e) { log('switch failed', e && e.message); });
+  }
+  function watchOpenings() {
+    var on = function (active) { if (active) setTimeout(maybeDownload, 3000); else left(); };
+    document.addEventListener('visibilitychange', function () { on(document.visibilityState === 'visible'); });
+    try { var App = P('App'); if (App && App.addListener) App.addListener('appStateChange', function (st) { on(!!(st && st.isActive)); }); } catch (e) {}
+  }
 
   /* ---- C · look for a newer build on the site and prepare it for the next launch ---- */
   function getText(url) {
@@ -83,7 +106,7 @@
   function maybeDownload() {
     if (running || !FS || !WV || !navigator.onLine) return;
     var last = num(LS.get('zijLiveCheck'));
-    if (Date.now() - last < 6 * 3600e3) return;      // at most every 6 hours
+    if (Date.now() - last < 2 * 60e3) return;        // every opening (was every 6 hours until 25 Nov); two checks ≥ 2 min apart
     running = true; LS.set('zijLiveCheck', String(Date.now()));
     var target;
     getText(SITE + '/version.json?t=' + Date.now()).then(function (t) {

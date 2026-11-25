@@ -217,6 +217,13 @@ async function open({ zone, loc, method, lang, at, refused }) {
   const sj = await p.evaluate(() => Object.keys(__nat.siteJs || {}));
   check(['variants.js', 'voice.js', 'home-designs.js'].every(f => sj.includes('zij-web/' + next + '/' + f)), 'the page\'s scripts came from the site with the page: ' + sj.map(f => f.split('/').pop()).join(', '));
   check(r.page.includes('<!-- zij-native -->') && r.page.includes('"snapshot":"' + next + '"'), 'downloaded page got the native bridge');
+  // Hassan 25 Nov 22:20: no 6-hour wait — leaving the app switches to the ready page out of sight, so the next opening shows it
+  await p.evaluate(() => { Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => 'hidden' }); document.dispatchEvent(new Event('visibilitychange')); });
+  await p.waitForTimeout(500);
+  const sw = await p.evaluate(() => __nat.base.slice());
+  check(sw.length === 1 && /zij-web\/\d+$/.test(sw[0]), 'leaving the app switches to the ready page at once (no 6-hour wait, no fresh launch needed): ' + sw[0]);
+  await p.evaluate(() => { document.dispatchEvent(new Event('visibilitychange')); });
+  check((await p.evaluate(() => __nat.base.length)) === 1, 'and only once');
   const p2 = await ctx.newPage(); p2.on('pageerror', e => errs.push(e.message));
   await p2.route(/\/native\/(capacitor|app|local-notifications|filesystem)\.js$/, x => x.fulfill({ body: '', contentType: 'text/javascript' }));
   await p2.route(/^https?:\/\/(?!127\.0\.0\.1)/, x => x.abort());
