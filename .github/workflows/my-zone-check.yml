@@ -1,0 +1,24 @@
+# Malaysia: check Al-Zij's JAKIM zone choice against waktusolat.app for ~75 towns (tools/my_zone_check.js). Report: data/my/zone-check.txt
+name: JAKIM zone check
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['tools/my_zone_check.js', '.github/workflows/my-zone-check.yml']
+permissions:
+  contents: write
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - run: node tools/my_zone_check.js
+      - name: Commit report
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add data/my/zone-check.txt
+          git commit -m "JAKIM zone check report [skip ci]" || echo 'nothing new'
+          git pull --rebase origin main && git push origin HEAD:main

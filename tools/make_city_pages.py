@@ -101,13 +101,13 @@ parts = []
 for rid in sorted(groups, key=lambda r: (caps[r]['name_ar'] if r in caps else '')):
     cap = caps.get(rid); lst = sorted(groups[rid], key=lambda c: (not c.get('is_region_capital'), c['name_ar']))
     parts.append('<h3>منطقة %s</h3><div class="grid">%s</div>' % (cap['name_ar'] if cap else '', ''.join('<a href="/mawaqit/%s/">%s</a>' % (c['slug'], c['name_ar']) for c in lst)))
-body = ('<h1>مواقيت الصلاة في مدن المملكة</h1>\n<div class="date">%d مدينة ومحافظة · من جدول تقويم أم القرى الرسمي · %s</div>\n'
+body = ('<h1>مواقيت الصلاة في مدن المملكة</h1>\n<div class="date">%s مدينة ومحافظة · من جدول تقويم أم القرى الرسمي · %s</div>\n'
         '<div class="box">اختر مدينتك لترى مواقيت الصلاة لكل يوم مع التاريخ الهجري. أو <a href="/">افتح الزيج</a> ليحسب مواقيت مكانك بالضبط مع تنبيه الأذان واتجاه القبلة.</div>\n%s\n'
         '<section class="en" lang="en"><h2>Prayer times in Saudi Arabia</h2><p>Official Umm al-Qura prayer times for %d Saudi cities and governorates, every day, with the Hijri date.</p></section>\n') % (
-        len(cities), span_ar, '\n'.join(parts), len(cities))
+        str(len(cities)).translate(AR), span_ar, '\n'.join(parts), len(cities))
 os.makedirs(R + 'mawaqit', exist_ok=True)
 open(R + 'mawaqit/index.html', 'w', encoding='utf-8').write(page('مواقيت الصلاة في مدن السعودية — تقويم أم القرى الرسمي',
-    'مواقيت الصلاة الرسمية لـ%d مدينة ومحافظة في السعودية من تقويم أم القرى، لكل يوم مع التاريخ الهجري.' % len(cities), 'https://alzijapp.com/mawaqit/', body))
+    'مواقيت الصلاة الرسمية لـ%s مدينة ومحافظة في السعودية من تقويم أم القرى، لكل يوم مع التاريخ الهجري.' % str(len(cities)).translate(AR), 'https://alzijapp.com/mawaqit/', body))
 # sitemap
 urls = ['/', '/about/', '/mawaqit/', '/support/', '/privacy/', '/llms.txt'] + ['/mawaqit/%s/' % c['slug'] for c in cities]
 open(R + 'sitemap.xml', 'w').write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
