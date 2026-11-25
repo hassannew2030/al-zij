@@ -55,11 +55,13 @@
     var key = (+lat).toFixed(4) + ',' + (+lon).toFixed(4) + '|' + lang;
     if (memo[key]) return memo[key];
     var P = plugin();
-    if (!P || !isFinite(+lat) || !isFinite(+lon)) return Promise.reject(new TypeError('Failed to fetch'));
+    // a failure says why (it reaches the «عندي مشكلة» report as «OSM: Apple: …»), but always as a network-style TypeError
+    if (!P) return Promise.reject(new TypeError('Apple: no ZijGeocoder plugin'));
+    if (!isFinite(+lat) || !isFinite(+lon)) return Promise.reject(new TypeError('Apple: no coordinates'));
     var call = new Promise(function (res, rej) {
-      var t = setTimeout(function () { rej(new TypeError('Failed to fetch')); }, 12000);
+      var t = setTimeout(function () { rej(new TypeError('Apple: no answer in 12 s')); }, 12000);
       P.reverse({ lat: +lat, lon: +lon, lang: lang }).then(function (r) { clearTimeout(t); res(r || {}); },
-        function (e) { clearTimeout(t); rej(new TypeError('Failed to fetch')); });
+        function (e) { clearTimeout(t); rej(new TypeError('Apple: ' + ((e && (e.code || e.message)) || 'failed'))); });
     });
     memo[key] = call;
     call.catch(function () { delete memo[key]; });   // a failed answer is asked again next time
