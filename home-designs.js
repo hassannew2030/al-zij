@@ -496,7 +496,8 @@
     if (D.nowState || D.left == null) { setK('lbl', D.cd); }
     else { setK('lbl', (cur === 'f' && !EN() && D.lbl ? 'و' : '') + (D.lbl ? D.lbl + ' ' : '') + words(D.left)); }
     // «كيرف الشمس»: the adhan time and the Moon are already drawn on the curve, so they are not repeated in text
-    setK('sub', (cur === 'd' || cur === 'e' || cur === 'g' || cur === 'h') ? '' : (EN() ? D.sub : D.sub.replace(/\s+[صم]$/, ''))); // the prayer name already says which half of the day
+    // «الجملة» (f) too since 26 Nov (Hassan: the time is in the row of six under it)
+    setK('sub', (cur === 'd' || cur === 'e' || cur === 'f' || cur === 'g' || cur === 'h') ? '' : (EN() ? D.sub : D.sub.replace(/\s+[صم]$/, ''))); // the prayer name already says which half of the day
     var note = (cur === 'e' || cur === 'g' || cur === 'h') ? D.note : [D.note, D.moon && !/—/.test(D.moon) && D.note.indexOf(D.moon) < 0 ? T('القمر: ', 'Moon: ') + D.moon : ''].filter(Boolean).join(' · ');
     setK('note', note);
     var dt = root.querySelector('[data-k="dgt"]'); if (dt) { var en = digitsEn(); if (dt.dataset.m !== String(en)) { dt.dataset.m = String(en); dt.innerHTML = '<b class="' + (en ? '' : 'on') + '">١٢٣</b><i>|</i><b class="' + (en ? 'on' : '') + '">123</b>'; } }
