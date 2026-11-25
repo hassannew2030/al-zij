@@ -62,6 +62,9 @@
     '#zhd .s1{font-size:18px;line-height:1.45}',
     '#zhd .s2{font-size:29px;line-height:1.25}',
     '#zhd .s3{font-size:76px;line-height:1;letter-spacing:-.5px}',
+    /* Hassan 25 Nov 21:50: «أي ساعة رقمية في الزيج لا يوجد فيها ثواني — أضف خانة الثواني» — small seconds after the minutes, as in «القائمة» */
+    '#zhd .tw{direction:ltr;unicode-bidi:isolate;display:inline-block;white-space:nowrap}',
+    '#zhd .sc{font-size:30px;line-height:1;margin-left:4px;color:var(--k-dim,#d8ccaa);font-weight:400;font-variant-numeric:tabular-nums}',
     '#zhd .n{font-variant-numeric:tabular-nums;unicode-bidi:isolate}',
     'html[data-digits=en] #zhd .n{font-family:"EB Garamond",Amiri,serif;font-variant-numeric:lining-nums tabular-nums}',
     '#zhd .b{font-weight:700}',
@@ -143,7 +146,7 @@
     '#zhd.f .six .c .nm{display:block;white-space:nowrap}',
     '#zhd.f .six .c.past{color:var(--k-past)}',
     '#zhd.f .six .c.foc{color:var(--k-gold);font-weight:700;border-bottom-color:var(--k-brass)}',
-    '@media (max-width:380px){#zhd.f .six .c{font-size:17px}#zhd .s3{font-size:68px}}',
+    '@media (max-width:380px){#zhd.f .six .c{font-size:17px}#zhd .s3{font-size:68px}#zhd .sc{font-size:26px}}',
     '@media (prefers-reduced-motion:reduce){#zhd .secs i{transition:none}}'
   ].join('\n');
   document.head.appendChild(css);
@@ -168,7 +171,7 @@
       return topHtml() +
         '<div class="day" data-a="cal" role="button" tabindex="0" style="cursor:pointer"><div class="wd s2 b" data-k="wd"></div><div class="hj s1 b" data-k="hj"></div><div class="gr s1" data-k="gr"></div></div>' +
         '<div class="g1"></div>' +
-        '<div class="clock" aria-live="off"><span class="tm s3 n" data-k="tm"></span><span class="per s2" data-k="per"></span></div>' +
+        '<div class="clock" aria-live="off"><span class="tw"><span class="tm s3 n" data-k="tm"></span><span class="sc n" data-k="sc"></span></span><span class="per s2" data-k="per"></span></div>' +
         '<div class="secs" aria-hidden="true"><i data-k="secs"></i></div>' +
         nextHtml() +
         '<div class="g2"></div>' +
@@ -179,7 +182,7 @@
       return topHtml() +
         '<div class="day"><div class="s1"><span class="wd b" data-k="wd"></span> · <span data-k="hj"></span></div><div class="gr s1" data-k="gr"></div></div>' +
         '<div class="g1"></div>' +
-        '<div class="clock"><span class="tm s3 n" data-k="tm"></span><span class="per s2" data-k="per"></span></div>' +
+        '<div class="clock"><span class="tw"><span class="tm s3 n" data-k="tm"></span><span class="sc n" data-k="sc"></span></span><span class="per s2" data-k="per"></span></div>' +
         nextHtml() +
         '<div class="hz" data-k="hz"></div>' +
         '<div class="note s1" data-k="note"></div>' + actsHtml();
@@ -189,7 +192,7 @@
         '<div class="day"><div class="s2 b wdl">' + T('اليوم ', '') + '<span class="wd" data-k="wd"></span></div><div class="s1"><span data-k="hj"></span>' + T('، الموافق', ',') + '</div><div class="gr s1" data-k="gr"></div></div>' +
         '<div class="g1"></div>' +
         '<div class="say s1">' + T('الساعة الآن', 'The time now') + '</div>' +
-        '<div class="clock"><span class="tm s3 n" data-k="tm"></span><span class="per s2" data-k="per"></span></div>' +
+        '<div class="clock"><span class="tw"><span class="tm s3 n" data-k="tm"></span><span class="sc n" data-k="sc"></span></span><span class="per s2" data-k="per"></span></div>' +
         nextHtml() +
         '<div class="g1"></div>' +
         '<div class="six s1" data-k="list"></div>' +
@@ -487,7 +490,7 @@
     document.body.classList.toggle('zhd-night', night);
     setK('city', D.city);
     setK('wd', D.wd); setK('hj', D.hj); setK('gr', D.gr);
-    if (D.H != null) setK('tm', dg((D.h12 || 12) + ':' + two(D.mi)));
+    if (D.H != null) { setK('tm', dg((D.h12 || 12) + ':' + two(D.mi))); setK('sc', dg(':' + two(D.se || 0))); }
     setK('per', period(D));
     var si = root.querySelector('[data-k="secs"]'); if (si && D.se != null) si.style.width = (D.se / 59 * 100).toFixed(1) + '%';
     if (D.nowState || D.left == null) { setK('lbl', D.cd); }
