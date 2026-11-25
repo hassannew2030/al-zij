@@ -6626,7 +6626,7 @@ window.zijFullCheck=zijFullCheck;
 function zijReport(topic,words,chk){
   const L=k=>{try{return localStorage.getItem(k);}catch(e){return null;}};
   const en=L('zijDigits')==='en',n=x=>en?String(x):String(x).replace(/\d/g,d=>'٠١٢٣٤٥٦٧٨٩'[d]).replace(/\./g,'٫');
-  const ua=navigator.userAgent,br=/CriOS/.test(ua)?'كروم':/FxiOS/.test(ua)?'فايرفوكس':/FBAN|FBAV|Instagram|Snapchat|TikTok|Line\//.test(ua)?'متصفح داخل تطبيق':/Safari/.test(ua)&&/iPhone|iPad/.test(ua)?'سفاري':/Android/.test(ua)?'أندرويد':'كمبيوتر';
+  const ua=navigator.userAgent,br=window.zijNative?(/iPad/.test(ua)?'آيباد':'آيفون'):/CriOS/.test(ua)?'كروم':/FxiOS/.test(ua)?'فايرفوكس':/FBAN|FBAV|Instagram|Snapchat|TikTok|Line\//.test(ua)?'متصفح داخل تطبيق':/Safari/.test(ua)&&/iPhone|iPad/.test(ua)?'سفاري':/Android/.test(ua)?'أندرويد':'كمبيوتر';
   const ios=(ua.match(/OS (\d+)_(\d+)/)||[]).slice(1).join('.');
   const where=window.zijNative?'تطبيق الزيج':(navigator.standalone||matchMedia('(display-mode: standalone)').matches)?'مضاف للشاشة الرئيسية':'من المتصفح';
   const sel=document.getElementById('calcMethodSel');
@@ -6644,6 +6644,9 @@ function zijReport(topic,words,chk){
     '',
     '— جهازك —',
     'الجوال: '+br+(ios?' · iOS '+ios:'')+' · '+where,
+    // #98, 25 Nov: what the app sees of its own Apple Maps plugin (a place name that does not arrive says why here)
+    ...((()=>{try{const d=window.ZIJ_NATIVE_CFG&&window.ZijPrivacy&&ZijPrivacy.diag&&ZijPrivacy.diag();
+      return d?['خرائط آبل في التطبيق: '+(d.geo?'متصلة ('+d.methods.join('، ')+')':'غير متصلة')+(d.last?' · آخر جواب: '+d.last:'')]:[];}catch(e){return [];}})()),
     'الشاشة: '+n(innerWidth+'×'+innerHeight),
     'نسخة الزيج: '+n(window.ZIJ_BUILD||'?'),
     '',
