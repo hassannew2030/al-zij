@@ -137,7 +137,9 @@
         function next() {
           if (i >= list.length) return Promise.resolve();
           var f = list[i++];
-          return fetch(f).then(function (r) { if (!r.ok) throw new Error('missing ' + f); return r.blob(); }).then(b64)
+          // judged by the contents, not r.ok: Capacitor answers audio files (.wav …) with a plain, non-HTTP response, which the page reads
+          // as «not ok» although the file is there — that stopped every silent update on the phone (simulator log, 26 Nov: «missing sounds/zij-bell.wav»)
+          return fetch(f).then(function (r) { return r.blob().then(function (b) { if (!r.ok && !(b && b.size)) throw new Error('missing ' + f); return b; }); }).then(b64)
             .then(function (data) { return FS.writeFile({ path: dir + '/' + f, data: data, directory: DIR, recursive: true }); }).then(next);
         }
         return site().then(next);
