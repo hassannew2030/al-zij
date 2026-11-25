@@ -8,9 +8,10 @@ PLIST=$APPDIR/Info.plist
 PB=/usr/libexec/PlistBuddy
 [ -f "$PLIST" ] || { echo "no $PLIST — run: npx cap add ios"; exit 1; }
 
-set_key() { # key type value
+set_key() { # key type value — string values are quoted for PlistBuddy («phone's» broke it: «Parse Error: Unclosed Quotes»)
   $PB -c "Delete :$1" "$PLIST" >/dev/null 2>&1 || true
-  $PB -c "Add :$1 $2 $3" "$PLIST"
+  if [ "$2" = string ]; then $PB -c "Add :$1 string \"${3//\"/\\\"}\"" "$PLIST"; else $PB -c "Add :$1 $2 $3" "$PLIST"; fi
+  [ "$($PB -c "Print :$1" "$PLIST")" = "$3" ] || { echo "::error::Info.plist $1 was not set as given"; exit 1; }
 }
 set_key CFBundleDisplayName string "الزيج"
 set_key CFBundleDevelopmentRegion string ar
@@ -20,7 +21,8 @@ $PB -c "Add :CFBundleLocalizations:0 string ar" "$PLIST"
 $PB -c "Add :CFBundleLocalizations:1 string en" "$PLIST"
 set_key ITSAppUsesNonExemptEncryption bool false
 # the web app asks for these itself, only when the user opens the matching screen
-set_key NSLocationWhenInUseUsageDescription string "الزّيج يستعمل موقعك لحساب مواقيت الصلاة واتجاه القبلة على جوالك فقط، ولا يُرسل إلى أحد. — Al-Zij uses your location only on your phone, to compute prayer times and the Qibla direction. It is never sent anywhere."
+# (25 Nov: «ولا يُرسل إلى أحد» removed — the district name now comes from Apple Maps, and the Aladhan check still waits for Hassan's decision)
+set_key NSLocationWhenInUseUsageDescription string "يستعمل الزّيج موقعك على جوالك لحساب مواقيت الصلاة واتجاه القبلة، ولمعرفة اسم مدينتك وحيّك من خرائط آبل. — Al-Zij uses your location on your phone to compute prayer times and the Qibla direction, and to name your city and district with Apple Maps."
 set_key NSMotionUsageDescription string "بوصلة القبلة تستعمل حساسات الحركة في جوالك. — The Qibla compass uses your phone's motion sensors."
 # portrait only, like the web app's manifest
 $PB -c "Delete :UISupportedInterfaceOrientations" "$PLIST" >/dev/null 2>&1 || true

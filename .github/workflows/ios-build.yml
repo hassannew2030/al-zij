@@ -157,9 +157,21 @@ jobs:
         env: { ZIJ_BUILD_NUMBER: '${{ github.run_number }}' }
       - run: npx cap sync ios
       - name: API key file
+        # the key text arrives as it was pasted (from a phone: line breaks may become spaces); rebuild a clean PEM from its base64 body
+        env: { P8: '${{ secrets.APPSTORE_KEY_P8 }}' }
         run: |
           mkdir -p ~/private_keys
-          printf '%s' "${{ secrets.APPSTORE_KEY_P8 }}" > ~/private_keys/AuthKey_${KEY_ID}.p8
+          python3 - "$HOME/private_keys/AuthKey_${KEY_ID}.p8" <<'PY'
+          import os, re, sys, textwrap
+          t = os.environ.get('P8', '')
+          t = re.sub(r'(?i)(BEGIN|END)\s*(EC\s*)?PRIVATE\s*KEY', ' ', t)        # the two marker lines, whatever the dashes became
+          body = re.sub(r'[^A-Za-z0-9+/=]', '', t)                                 # dashes, spaces, line breaks, anything pasted around it
+          open(sys.argv[1], 'w').write('-----BEGIN PRIVATE KEY-----\n' + '\n'.join(textwrap.wrap(body, 64)) + '\n-----END PRIVATE KEY-----\n')
+          print('key body: %d base64 characters' % len(body))
+          PY
+          openssl pkey -in ~/private_keys/AuthKey_${KEY_ID}.p8 -noout 2>/dev/null || {
+            echo "::error::APPSTORE_KEY_P8 is not a readable private key — paste the whole text of the .p8 file again (from -----BEGIN to END-----)"; exit 1; }
+          echo "API key file OK"
       - name: Archive (automatic signing through the API key)
         run: |
           if [ -d ios/App/App.xcworkspace ]; then SRC="-workspace ios/App/App.xcworkspace"; else SRC="-project ios/App/App.xcodeproj"; fi
