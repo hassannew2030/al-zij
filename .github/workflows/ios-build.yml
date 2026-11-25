@@ -142,6 +142,7 @@ jobs:
       TEAM: ${{ secrets.APPLE_TEAM_ID }}
     steps:
       - name: Secrets present?
+        working-directory: .        # runs before the checkout, when app/ does not exist yet
         run: |
           for v in KEY_ID ISSUER TEAM; do [ -n "${!v}" ] || { echo "::error::secret for $v is missing — see app/README.md"; exit 1; }; done
       - uses: actions/checkout@v4
