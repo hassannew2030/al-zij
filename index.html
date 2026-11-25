@@ -6485,7 +6485,7 @@ function zijFullCheck(){
   // 4 · the phone's time zone against the place (known offline for Saudi Arabia and Malaysia)
   safe('zone','🕐','المنطقة الزمنية',()=>{
     const have=-now.getTimezoneOffset()/60,U=(typeof zijUqCheck==='function')?zijUqCheck(now):null,want=U?3:(p.official&&p.official.my)?8:null;
-    const u=x=>'UTC'+(x>=0?'+':'−')+n(Math.abs(x));
+    const u=x=>'غرينتش '+(x>=0?'+':'−')+n(Math.abs(x));   // «UTC+3» turns around inside Arabic text
     if(want==null)add('zone','🕐','المنطقة الزمنية','ok','الجوال على '+u(have));
     else add('zone','🕐','المنطقة الزمنية',have===want?'ok':'warn',have===want?'الجوال على توقيت المكان ('+u(have)+')':'الجوال على '+u(have)+' والمكان على '+u(want)+' — كل المواقيت تتقدّم أو تتأخر',have===want?'':'في إعدادات الجوال: عام ← التاريخ والوقت ← «تلقائيًا»');
   });
