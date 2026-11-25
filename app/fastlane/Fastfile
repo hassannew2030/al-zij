@@ -1,0 +1,48 @@
+# Al-Zij — signed build to TestFlight from GitHub's Mac machines (Hassan has no Mac). Run by .github/workflows/ios-build.yml.
+#
+# Why manual signing: Xcode's automatic signing archives with an iOS Development profile, and Apple makes one only for a team
+# with a registered device («Your team has no devices from which to generate a provisioning profile», 25 Nov 2026). An App Store
+# profile needs no device. So, through the App Store Connect API key: an Apple Distribution certificate (made fresh on this
+# machine, its private key never leaves it) + an App Store profile → archive → upload → the certificate is revoked at the end
+# (an app already uploaded keeps working: Apple re-signs App Store and TestFlight apps; the account allows only a few
+# distribution certificates, so they must not pile up).
+default_platform(:ios)
+
+platform :ios do
+  lane :testflight_upload do
+    app_id = ENV['ZIJ_APP_ID'] || 'com.alzijapp.app'
+    setup_ci(force: true)                                             # a temporary keychain for this run
+    api_key = app_store_connect_api_key(
+      key_id: ENV.fetch('KEY_ID'), issuer_id: ENV.fetch('ISSUER'),
+      key_filepath: File.expand_path("~/private_keys/AuthKey_#{ENV.fetch('KEY_ID')}.p8"), in_house: false)
+    begin
+      get_certificates(api_key: api_key, development: false, generate_apple_certs: true, force: true,
+                       keychain_path: File.expand_path('~/Library/Keychains/fastlane_tmp_keychain-db'), keychain_password: '',
+                       output_path: 'build/cert')
+      get_provisioning_profile(api_key: api_key, app_identifier: app_id, force: true, output_path: 'build/profile',
+                               cert_id: lane_context[SharedValues::CERT_CERTIFICATE_ID])
+      profile = lane_context[SharedValues::SIGH_NAME]
+      UI.message("App Store profile: #{profile}")
+      update_code_signing_settings(path: 'ios/App/App.xcodeproj', targets: ['App'], use_automatic_signing: false,
+                                   team_id: ENV.fetch('TEAM'), code_sign_identity: 'Apple Distribution',
+                                   profile_name: profile, bundle_identifier: app_id)
+      build_app(project: 'ios/App/App.xcodeproj', scheme: 'App', configuration: 'Release', clean: true,
+                output_directory: 'build/export', output_name: 'AlZij', export_method: 'app-store',
+                export_options: { provisioningProfiles: { app_id => profile } })
+      # the Time Sensitive entitlement (#71) must be in the signed app
+      sh("cd .. && rm -rf build/ipa && mkdir -p build/ipa && cd build/ipa && unzip -q ../export/AlZij.ipa && " \
+         "codesign -d --entitlements - Payload/App.app 2>/dev/null | tee ../entitlements.txt | grep -q usernotifications.time-sensitive")
+      upload_to_testflight(api_key: api_key, ipa: 'build/export/AlZij.ipa', skip_waiting_for_build_processing: true)
+    ensure
+      id = lane_context[SharedValues::CERT_CERTIFICATE_ID]
+      if id
+        begin
+          Spaceship::ConnectAPI::Certificate.get(certificate_id: id).delete!
+          UI.message("distribution certificate #{id} revoked (it was made for this run only)")
+        rescue => e
+          UI.important("could not revoke certificate #{id}: #{e.message}")
+        end
+      end
+    end
+  end
+end
