@@ -52,7 +52,9 @@ const MOCK = () => {
   const WebView = { setServerBasePath: async o => { rec.base.push(o.path); }, setServerAssetPath: async o => { rec.base.push('asset:' + o.path); } };
   // the app's own plugin: Apple's place names (#98)
   rec.geo = [];
-  const ZijGeocoder = { reverse: async o => { rec.geo.push(o); return { city: 'جدة', hood: 'الروضة', subAdmin: 'جدة', admin: 'منطقة مكة المكرمة', country: 'السعودية', countryCode: 'SA' }; } };
+  const ZijGeocoder = { forward: async o => { rec.fwd = (rec.fwd || []).concat(o.q); return { results: /قرية/.test(o.q) ? [{ name: 'قرية الاختبار', city: 'قرية الاختبار', admin: 'منطقة الباحة', country: 'السعودية', countryCode: 'SA', lat: 20.1, lon: 41.3, tz: 'Asia/Riyadh' }] : [] }; },
+    openSettings: async () => { rec.settings = 1; },
+    reverse: async o => { rec.geo.push(o); return { city: 'جدة', hood: 'الروضة', subAdmin: 'جدة', admin: 'منطقة مكة المكرمة', country: 'السعودية', countryCode: 'SA' }; } };
   window.Capacitor = { isNativePlatform: () => true, getPlatform: () => 'ios', Plugins: { LocalNotifications, Filesystem, WebView, ZijGeocoder, App: { addListener: () => {} } } };
 };
 
@@ -60,15 +62,17 @@ const b = await chromium.launch();
 let fails = 0;
 const check = (ok, msg) => { console.log((ok ? '✅ ' : '❌ ') + msg); if (!ok) fails++; };
 
-async function open({ zone, loc, method, lang, at }) {
+async function open({ zone, loc, method, lang, at, refused }) {
   const ctx = await b.newContext({ timezoneId: zone, locale: lang === 'en' ? 'en-US' : 'ar-SA', viewport: { width: 390, height: 844 } });
   await ctx.addInitScript(MOCK);
-  await ctx.addInitScript(([loc, method, lang]) => {
+  await ctx.addInitScript(([loc, method, lang, refused]) => {
     if (sessionStorage.getItem('seeded')) return; sessionStorage.setItem('seeded', '1');
-    localStorage.setItem('zijWelcomed', '1'); localStorage.setItem('zijLang', lang); localStorage.setItem('zijLocAuto', '0');
+    localStorage.setItem('zijWelcomed', '1'); localStorage.setItem('zijLang', lang);
+    if (refused) return;   // a new phone that refuses location (no permission is given to this browser context)
+    localStorage.setItem('zijLocAuto', '0');
     localStorage.setItem('zijLastLocation', JSON.stringify(loc)); localStorage.setItem('zijLocationLocked', 'true'); localStorage.setItem('zijLockByUser', '1');
     if (method) localStorage.setItem('zijCalcMethod', method);
-  }, [loc, method, lang]);
+  }, [loc, method, lang, refused]);
   const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message));
   p.on('console', m => { if (/\[zij-update\]/.test(m.text())) console.log('   ' + m.text()); });   // the updater's own log, when a check fails
   // a fixed clock for the checks that depend on the calendar (e.g. a window that must cross a summer-time change)
@@ -239,12 +243,32 @@ async function open({ zone, loc, method, lang, at }) {
     res({ guard: !!w.__zijGuard, hidden: !sec || w.getComputedStyle(sec).display === 'none' });
   }, 2500))));
   check(sky.guard && sky.hidden, 'Sky screen: guarded, weather card hidden');
-  const leaked = p.out.filter(u => /open-meteo\.com\/v1\/forecast|air-quality-api|nominatim\.openstreetmap|bigdatacloud/.test(u));
+  const leaked = p.out.filter(u => !/^https:\/\/alzijapp\.com\//.test(u));   // #98 (أ): only the app's own site may be asked
   check(r.guard, 'privacy guard installed before the page scripts');
-  check(leaked.length === 0, 'no request to Open-Meteo weather/air quality, OpenStreetMap or BigDataCloud' + (leaked.length ? ': ' + leaked.slice(0, 3).join(' | ') : ''));
+  check(leaked.length === 0, 'nothing leaves the phone except alzijapp.com (no Aladhan, Open-Meteo, OpenStreetMap, BigDataCloud, IP services)' + (leaked.length ? ': ' + leaked.slice(0, 3).join(' | ') : ''));
   check(r.geo > 0 && r.place && r.place.city === 'جدة' && r.place.hood === 'الروضة', 'place name from Apple\'s map service: ' + JSON.stringify(r.place && [r.place.city, r.place.hood, r.place.src]));
   check(r.wx, 'weather and air-quality cells hidden in the app');
-  check(r.elev, 'elevation still shown (waiting for Hassan\'s decision)');
+  check(!r.elev, 'elevation hidden too (#98 أ)');
+  check(errs.length === 0, 'no page errors' + (errs.length ? ': ' + errs.slice(0, 3).join(' | ') : ''));
+  await ctx.close();
+}
+
+/* ---- 3c · location refused (#98 أ): the card shows the alternative, the city is chosen in one tap, nothing leaves ---- */
+{
+  const { ctx, p, errs } = await open({ zone: 'Asia/Riyadh', loc: { lat: 21.5433, lon: 39.1728 }, lang: 'ar', refused: true });
+  await p.waitForTimeout(2500);
+  const big = await p.evaluate(() => [...document.querySelectorAll('#zPlaceCard #zPCbig button')].map(b => b.textContent));
+  check(big.join(',') === 'مكة المكرمة,المدينة المنورة,الرياض,جدة,الدمام', 'refusal card by itself, with the big Saudi cities: ' + big.join('، '));
+  await p.fill('#zPCq', 'تبو'); await p.waitForTimeout(1200);
+  const local = await p.evaluate(() => [...document.querySelectorAll('#zPCres button')].map(b => b.textContent).join(' | '));
+  await p.fill('#zPCq', 'قرية'); await p.waitForTimeout(1500);
+  const apple = await p.evaluate(() => [...document.querySelectorAll('#zPCres button')].map(b => b.textContent).join(' | '));
+  check(/تبوك/.test(local) && /قرية الاختبار/.test(apple), 'search: the phone\'s list (' + local.split(' | ')[0] + '), then Apple Maps (' + apple + ')');
+  await p.click('#zPCbig button:nth-child(3)'); await p.waitForTimeout(1500);
+  const after = await p.evaluate(() => ({ chip: (document.getElementById('hCityName') || {}).textContent, pick: JSON.parse(localStorage.getItem('zijPick') || 'null'), card: !!document.getElementById('zPlaceCard') }));
+  check(after.pick && after.pick.name === 'الرياض' && /الرياض \(مختارة\)/.test(after.chip) && !after.card, 'one tap: Riyadh chosen, the chip says «' + after.chip + '»');
+  const leaked = p.out.filter(u => !/^https:\/\/alzijapp\.com\//.test(u));
+  check(leaked.length === 0, 'nothing left the phone while choosing' + (leaked.length ? ': ' + leaked.slice(0, 3).join(' | ') : ''));
   check(errs.length === 0, 'no page errors' + (errs.length ? ': ' + errs.slice(0, 3).join(' | ') : ''));
   await ctx.close();
 }
