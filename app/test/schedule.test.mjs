@@ -49,7 +49,7 @@ test('Jeddah (official table): adhan alerts land on the official minute, Saudi t
   const first5 = r.notifications.filter(n => n.kind === 'adhan').slice(0, 5);
   assert.deepEqual(first5.map(n => n.prayer), PR);
   assert.deepEqual(first5.map(n => hhmm(n.at, 180)), [row[0], row[2], row[3], row[4], row[5]]);
-  assert.equal(first5[0].body, '🕌 حان الآن موعد أذان الفجر');
+  assert.equal(first5[0].body, '🕌 حان الآن وقت أذان الفجر');
   assert.equal(first5[0].title, 'الزّيج');
   assert.equal(first5[0].sound, 'zij-brass.wav');
 });
@@ -194,7 +194,7 @@ test('English wording and Friday → Jumu\'ah, matching the web app', () => {
   assert.deepEqual(d.map(n => n.body), ['Jumu\'ah adhan in 1 hour', '🕌 It is now time for the Jumu\'ah adhan', '🕌 It is now time for the iqamah']);
   assert.equal(d[0].title, 'Al-Zij');
   const ar = Z.plan({ days, settings: s, now: Date.UTC(2026, 9, 29, 21), lang: 'ar' }).notifications.filter(n => n.prayer === 'dhuhr');
-  assert.deepEqual(ar.map(n => n.body), ['بعد ساعة أذان الجمعة', '🕌 حان الآن موعد أذان الجمعة', '🕌 حان الآن وقت إقامة الصلاة']);
+  assert.deepEqual(ar.map(n => n.body), ['بعد ساعة أذان الجمعة', '🕌 حان الآن وقت أذان الجمعة', '🕌 حان الآن وقت إقامة الصلاة']);
 });
 
 /* ---- Friday iqamah (Hassan, 10 Nov): off unless chosen, its own minutes ---- */

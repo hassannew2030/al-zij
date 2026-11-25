@@ -37,7 +37,7 @@
       body: function (kind, k, cfg, friday) {
         var n = pname(k, friday);
         if (kind === 'pre') return EN ? n + ' adhan in ' + mins(cfg.min) : 'بعد ' + mins(cfg.min) + ' أذان ' + n;
-        if (kind === 'adhan') return EN ? '🕌 It is now time for the ' + n + ' adhan' : '🕌 حان الآن موعد أذان ' + n;
+        if (kind === 'adhan') return EN ? '🕌 It is now time for the ' + n + ' adhan' : '🕌 حان الآن وقت أذان ' + n   /* Hassan 25 Nov (#100 ④): «وقت», as on the screen */;
         // Friday's optional iqamah is for someone praying away from the mosque — whether it is Jumu'ah or Dhuhr is not ours to name
         if (k === 'dhuhr' && friday) return EN ? '🕌 It is now time for the iqamah' : '🕌 حان الآن وقت إقامة الصلاة';
         return EN ? '🕌 It is now time for the ' + n + ' iqamah' : '🕌 حان الآن وقت إقامة صلاة ' + n;

@@ -115,7 +115,7 @@ async function open({ zone, loc, method, lang, at }) {
   check(r.n > 0 && r.n <= 64, `scheduled ${r.n} notifications (≤ 64)`);
   check(r.same === r.adhans && r.adhans > 0, `${r.same}/${r.adhans} adhan times identical to the screen` + (r.diff.length ? ' — ' + r.diff.join(', ') : ''));
   check(r.official === r.adhans, `all ${r.official} from the official Umm al-Qura table`);
-  check(/^🕌 حان الآن موعد أذان /.test(r.first.body) && r.first.title === 'الزّيج' && r.first.sound === 'zij-brass.wav' && r.first.silent === true, 'first alert: ' + r.first.body + ' at ' + r.first.at);
+  check(/^🕌 حان الآن وقت أذان /.test(r.first.body) && r.first.title === 'الزّيج' && r.first.sound === 'zij-brass.wav' && r.first.silent === true, 'first alert: ' + r.first.body + ' at ' + r.first.at);
   check(/افتح الزّيج/.test(r.reminder || ''), 'reminder to open Al-Zij is scheduled');
   check(/✅/.test(r.status || ''), 'status line: ' + (r.status || '').trim());
   check(r.files.filter(f => /^Sounds\/zij-\w+\.wav$/.test(f)).length === 3, 'alert sounds copied to Library/Sounds');
