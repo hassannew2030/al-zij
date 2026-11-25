@@ -65,6 +65,8 @@
         function (e) { clearTimeout(t); rej(new TypeError('Apple: ' + ((e && (e.code || e.message)) || 'failed'))); });
     });
     memo[key] = call;
+    call.then(function (r) { lastGeo = 'ok ' + (r.city || '') + ' · ' + (r.hood || ''); try { console.log('[zij-geo] ok ' + (r.countryCode || '')); } catch (e) {} },
+      function (e) { lastGeo = 'fail ' + (e && e.message); try { console.log('[zij-geo] fail ' + (e && e.message)); } catch (x) {} });
     call.catch(function () { delete memo[key]; });   // a failed answer is asked again next time
     return call;
   }
@@ -99,6 +101,16 @@
       return Promise.reject(new TypeError('Failed to fetch'));
     };
   }
+
+  // ---- what the page sees of the app's own plugin (the problem report, and the simulator check in CI) ----
+  function diag() {
+    var Cap = root.Capacitor || {};
+    var h = ((Cap.PluginHeaders || []).filter(function (x) { return x && x.name === 'ZijGeocoder'; })[0]) || null;
+    return { geo: !!(h || (Cap.Plugins && Cap.Plugins.ZijGeocoder && Cap.Plugins.ZijGeocoder.reverse)),
+             methods: h ? h.methods.map(function (m) { return m.name; }).filter(function (n) { return /reverse|forward|openSettings/.test(n); }) : [],
+             headers: (Cap.PluginHeaders || []).length, last: lastGeo };
+  }
+  var lastGeo = '';
 
   // ---- a city by name, from Apple's map service (the same service that names the district) ----
   function forward(q, lang) {
@@ -170,7 +182,7 @@
     }, true);
   }
 
-  var api = { guard: guard, child: child, allowed: allowed, forward: forward, openSettings: openSettings, blocked: blocked, version: 2,
+  var api = { guard: guard, child: child, allowed: allowed, forward: forward, openSettings: openSettings, blocked: blocked, version: 3, diag: diag,
               asNominatim: asNominatim, asBigDataCloud: asBigDataCloud, myRegion: myRegion };
   if (typeof module === 'object' && module.exports) { module.exports = api; return; }
   root.ZijPrivacy = api;
@@ -181,4 +193,5 @@
   var ready = function () { try { hideMain(root.document); } catch (e) {} };
   if (root.document.readyState === 'loading') root.document.addEventListener('DOMContentLoaded', ready); else ready();
   root.addEventListener('load', ready);
+  root.addEventListener('load', function () { setTimeout(function () { try { console.log('[zij-plugins] ' + JSON.stringify(diag())); } catch (e) {} }, 1500); });
 })(typeof window !== 'undefined' ? window : this);

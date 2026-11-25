@@ -62,6 +62,8 @@ jobs:
         env:
           ZIJ_BUILD_NUMBER: ${{ github.run_number }}
       - run: npx cap sync ios
+      - name: Register the app's own plugin with Capacitor (packageClassList)
+        run: node ios-config/register-plugins.mjs
       - name: Build (simulator, no signing)
         run: |
           if [ -d ios/App/App.xcworkspace ]; then SRC="-workspace ios/App/App.xcworkspace"; else SRC="-project ios/App/App.xcodeproj"; fi
@@ -99,11 +101,15 @@ jobs:
           xcrun simctl location "$UDID" set 21.5433,39.1728 || true
           xcrun simctl privacy "$UDID" grant location com.alzijapp.app || true
           mkdir -p build/shots
-          xcrun simctl launch "$UDID" com.alzijapp.app
+          xcrun simctl launch --stdout="$PWD/build/shots/app-console.txt" --stderr="$PWD/build/shots/app-console.txt" "$UDID" com.alzijapp.app
           sleep 20; xcrun simctl io "$UDID" screenshot build/shots/1-after-20s.png
           sleep 25; xcrun simctl io "$UDID" screenshot build/shots/2-after-45s.png
           xcrun simctl spawn "$UDID" launchctl list | grep -q com.alzijapp.app || { echo "::error::the app is not running 45 s after launch (crash?)"; exit 1; }
           echo "the app is still running after 45 s"
+          # #98: the page must see the app's own Apple Maps plugin, and a place name must come back from Apple (25 Nov: «UNIMPLEMENTED» on the phone)
+          grep -a 'zij-' build/shots/app-console.txt | tail -n 20 || true
+          grep -aq '\[zij-plugins\].*"geo":true' build/shots/app-console.txt || { echo "::error::the page cannot see the ZijGeocoder plugin (place names from Apple would fail)"; exit 1; }
+          grep -aq '\[zij-geo\] ok' build/shots/app-console.txt && echo "Apple place name: OK" || echo "::warning::no Apple place name within 45 s (network in the simulator?) — the plugin itself is visible"
           # a small copy of the last screenshot in the log itself (readable where the artifact cannot be downloaded)
           sips -Z 420 build/shots/2-after-45s.png --out build/shots/small.png >/dev/null && sips -s format jpeg -s formatOptions 60 build/shots/small.png --out build/shots/small.jpg >/dev/null
           echo "ZIJ-SHOT-BEGIN"; base64 -i build/shots/small.jpg | fold -w 1000; echo "ZIJ-SHOT-END"
@@ -156,6 +162,8 @@ jobs:
           bash ios-config/configure-ios.sh
         env: { ZIJ_BUILD_NUMBER: '${{ github.run_number }}' }
       - run: npx cap sync ios
+      - name: Register the app's own plugin with Capacitor (packageClassList)
+        run: node ios-config/register-plugins.mjs
       - name: API key file
         # the key text arrives as it was pasted (from a phone: line breaks may become spaces); rebuild a clean PEM from its base64 body
         env: { P8: '${{ secrets.APPSTORE_KEY_P8 }}' }
