@@ -5753,6 +5753,7 @@ body.window-screen-mode #hTop,body.window-screen-mode #hNote,body.window-screen-
 </style>
 
 <section class="scr" id="scr-prayer" aria-label="الصلاة">
+  <div id="zPrHead" aria-label="الساعة والتاريخ"><div class="t"><span id="zPrT">—</span><span class="ap" id="zPrAp"></span></div><div class="d"><span id="zPrHj">—</span> · <span id="zPrGr">—</span></div></div>
   <div class="z-mode" role="tablist"><button type="button" data-pm="times" aria-selected="true">المواقيت</button><button type="button" data-pm="log" aria-selected="false">سجل الأذان</button></div>
   <div id="pm-times">
     <div class="z-card" id="pHero" style="text-align:center;display:none"><div style="font-size:18px;color:var(--h-brass-l);font-weight:700" id="pLbl">—</div>
@@ -6380,6 +6381,9 @@ window.zijLocInfo=function(){
   const dk=zq('dataKaabaDist');if(dk&&dk.parentElement)dk.parentElement.style.display=real?'':'none';
 };
 zijLocInfo();
+// the Prayer tab's header (Hassan 26 Nov): copies the home screen's live time and dates every second while the tab is open
+setInterval(()=>{if(document.body.dataset.scr!=='prayer')return;const c=(a,b)=>{const x=zq(a),y=zq(b);if(x&&y&&y.textContent!==x.textContent)y.textContent=x.textContent;};
+  c('hTime','zPrT');c('hAp','zPrAp');c('hHijri','zPrHj');c('hGreg','zPrGr');},1000);
 document.addEventListener('click',e=>{if(e.target&&e.target.id==='zLocAsk'){LS.set('zijLocAt','0');refreshLocation(true);}
   if(e.target&&e.target.id==='zLocPick'){try{zijPlaceCard('chip');}catch(_){}}});
 
@@ -7788,6 +7792,14 @@ body.simple-view #hDate #hClock{order:5;font-size:18px;margin:0 6px 0 0;color:#d
 body.simple-view #hDate #hClock .ap{font-size:15px;color:#d8ccaa}
 body:not(.simple-view) #hDate .brk{display:none}
 #zHeroWrap{max-width:520px;margin:8px auto 0;padding-inline:16px;font-family:'Amiri','Geeza Pro',serif;direction:rtl}
+/* Hassan 26 Nov 00:09–00:12 («للأعلى ساعة الوقت لا أراها — عيب في التصميم» … «نحذف الساعة الرقمية من الأعلى، نحذف الساعة المبسطة، يبقى:
+   مواقيت اليوم + التاريخ هجري + ميلادي + ساعة رقمية فقط»): the home screen's countdown card and clock stay on the home screen only —
+   since 22 Nov they also showed on the Prayer and More tabs, under the status bar. The Prayer tab opens with its own short header. */
+body[data-scr]:not([data-scr=clock]) #zHeroWrap,body[data-scr]:not([data-scr=clock]) #zDial{display:none!important}
+#zPrHead{text-align:center;margin:2px 0 14px}
+#zPrHead .t{font-family:'EB Garamond',Georgia,serif;font-size:44px;line-height:1.05;color:#f3e3ae;font-variant-numeric:tabular-nums;direction:ltr;unicode-bidi:isolate;display:inline-flex;align-items:baseline;gap:8px}
+#zPrHead .t .ap{font-family:Amiri,serif;font-size:20px;color:var(--h-brass-l)}
+#zPrHead .d{font-size:18px;color:#d8ccaa;margin-top:4px;line-height:1.5}
 body:not(.simple-view) #zHeroWrap{display:contents}
 body.simple-view #zHeroWrap .hero{margin:0;background:linear-gradient(180deg,#1a2133,#10141f);border:1.5px solid #c9a35d;border-radius:20px;padding:5px 12px 6px;box-shadow:0 6px 18px #0007}
 body.simple-view #zHeroWrap .hero .lbl{font-size:21px;color:#f5e6b4;line-height:1.35}
