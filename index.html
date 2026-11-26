@@ -8086,7 +8086,7 @@ html[data-lang=en] .zSh .sh{font-family:'EB Garamond',Amiri,serif}
       <div class="f2"><div class="f"><label>${L('التكرار','Repeat')}</label><select id="zTkRep"><option value="none">${L('مرة واحدة','Once')}</option><option value="year">${L('كل سنة','Every year')}</option><option value="month">${L('كل شهر','Every month')}</option></select></div>
         <div class="f"><label>${L('التنبيه','Alert')}</label><select id="zTkPre"><option value="0">${L('في يومه','On the day')}</option><option value="1">${L('في يومه وقبله بيوم','On the day and a day before')}</option></select></div></div>
       <div class="acts"><button type="button" class="bt go" data-save>${L('حفظ','Save')}</button><button type="button" class="bt" data-cancel>${L('إلغاء','Cancel')}</button></div>
-      <div class="ds" style="font-size:14.5px">${L('تظهر لك بطاقة تنبيه من الزيج في وقتها ما دام الزيج مفتوحًا، والتنبيه والجوال مقفَل يأتي مع تطبيق الزيج في المتجر قريبًا.','An Al-Zij alert card appears at its time while Al-Zij is open; alerts with the phone locked come with the store app.')}</div>`;}
+      <div class="ds" style="font-size:14.5px">${L('تظهر لك بطاقة تنبيه من الزيج في وقتها ما دام الزيج مفتوحًا.','An Al-Zij alert card appears at its time while Al-Zij is open.')}</div>`;}
   function saveForm(b){const t=(b.querySelector('#zTkT').value||'').trim();if(!t){b.querySelector('#zTkT').focus();return;}
     const D=S.sel,cal=b.querySelector('#zTkCal').value,o=cal==='h'?hj(D):(x=>({y:x.y,m:x.m,d:x.d}))(g(D));
     const a=tasks();a.push({id:'t'+Date.now().toString(36),t,cal,y:o.y,m:o.m,d:o.d,time:b.querySelector('#zTkTime').value||'',rep:b.querySelector('#zTkRep').value,pre:+b.querySelector('#zTkPre').value});
@@ -8441,7 +8441,7 @@ ${canNotif?`<button type="button" class="try" id="zAlNotif" style="margin-bottom
 <div class="row${c.pre.on?'':' dim'}"><label>${T('الصوت','Sound')}</label>${sndSel(k+'.pre.snd',c.pre.snd,['soft','bell','brass','silent'])}<button type="button" class="try" data-try="${c.pre.snd}">🔊 ${T('جرّب','Test')}</button></div></div>
 <div class="blk"><div class="bh"><span>② ${T('الأذان','The adhan')}<small>${T('عند دخول الوقت','When the time begins')}</small></span>${sw(k+'.adhan.on',c.adhan.on)}</div>
 <div class="row${c.adhan.on?'':' dim'}"><label>${T('الصوت','Sound')}</label>${sndSel(k+'.adhan.snd',c.adhan.snd,['brass','bell','soft','silent'])}<button type="button" class="try" data-try="${c.adhan.snd}">🔊 ${T('جرّب','Test')}</button></div>
-<div class="note" style="margin:6px 0 0">${T('الأذان كاملًا والتكبير فقط بصوت مؤذّن: يُضاف قريبًا.','Full adhan and takbir-only in a muezzin\'s voice: coming soon.')}</div></div>
+</div>
 <div class="blk"><div class="bh"><span>③ ${T('الإقامة','The iqamah')}<small>${c.friIqama?T('بعد الأذان بمدة تختارها، في غير الجمعة','A set time after the adhan, except on Friday'):T('بعد الأذان بمدة تختارها','A set time after the adhan')}</small></span>${sw(k+'.iqama.on',c.iqama.on)}</div>
 <div class="row${c.iqama.on?'':' dim'}"><label>${T('بعده بـ','After by')}</label>${sel(k+'.iqama.min',IQ_MIN,c.iqama.min,mins)}</div>
 <div class="row${c.iqama.on?'':' dim'}"><label>${T('الصوت','Sound')}</label>${sndSel(k+'.iqama.snd',c.iqama.snd,['bell','soft','brass','silent'])}<button type="button" class="try" data-try="${c.iqama.snd}">🔊 ${T('جرّب','Test')}</button></div></div>
