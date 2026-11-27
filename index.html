@@ -7695,9 +7695,14 @@ ${clipDefs}<clipPath id="zdMoonClip"><circle r="13"/></clipPath></defs><g id="zd
         L.push({a:ga(t),t,key,name:key==='mid'?MIDN:THIRD,time:f12(t),fs:NF,ft:NF,kind:'n',past:t<nm});});
       if(inThird){const t=(nm+fN)/2;L.push({a:ga(t),t,key:'third',name:THIRD,time:(en?'until ':'حتى ')+f12(fN),fs:NF>25?32:30,ft:NF>25?32:30,kind:'span',past:false});}
     }
-    const R0=RB[1]+22,PAD=4,VB=[-72,-46,672,646];   // VB: the svg's viewBox edges
-    const size=l=>{l.w=Math.max(tw(l.name,l.fs,700),tw(l.time,l.ft,700))+8;l.h=l.fs*1.08+l.ft*1.16;};
-    L.forEach(l=>{size(l);l.b=l.a;});
+    /* Hassan 27 Nov («أي حل لا يمسّ الشمس الطائرة… فكّر في التقاء وقت تقاطع الشمس مع الصلاة بحل جرافيكس»): while the Sun is up the
+       dial has lanes — the ring, the prayer marks, the Sun's own lane, then the names beyond it. The names never meet the Sun and never
+       move for it; each hangs from its mark by a thin thread, and at prayer time the Sun crosses that thread. Names above and below the
+       dial are written on one line so they fit beyond the lane. At night (no Sun) the names sit close to the ring as before. */
+    const LANES=!d24&&nm>=p.sunrise&&nm<p.maghrib;
+    const R0=RB[1]+(LANES?62:22),PAD=4,VB=[-72,-46,672,646];   // VB: the svg's viewBox edges
+    const size=l=>{if(l.one){l.w=tw(l.name+' '+l.time,l.fs,700)+10;l.h=l.fs*1.22;return;}l.w=Math.max(tw(l.name,l.fs,700),tw(l.time,l.ft,700))+8;l.h=l.fs*1.08+l.ft*1.16;};
+    L.forEach(l=>{const an=((l.a%360)+360)%360;l.one=LANES&&(an<42||an>318||Math.abs(an-180)<42);size(l);l.b=l.a;});
     /* a label sits just clear of the ring; one that would leave the picture (a long «tmrw 5:14» on the left or right side)
        gets slightly smaller words until it fits — never cut at the edge (#77) */
     const place=l=>{for(let k=0;;k++){let r=R0;for(;r<R0+200;r+=1){const [x,y]=P(l.b,r),x0=x-l.w/2,x1=x+l.w/2,y0=y-l.h/2,y1=y+l.h/2;
@@ -7716,14 +7721,13 @@ ${clipDefs}<clipPath id="zdMoonClip"><circle r="13"/></clipPath></defs><g id="zd
     /* Hassan 22 Nov: the Sun sits on its own orbit outside the day ring, on the hour hand's line, only while it is up;
        nothing touches it — the names slide away from it */
     const SUNUP=!d24&&nm>=p.sunrise&&nm<p.maghrib,SUNR=RB[1]+34;let SUNB=null;
-    if(SUNUP){const [x,y]=P(ga(nm),SUNR);SUNB={x,y,w:116,h:108,a:ga(nm)};}
+    
     L.forEach(place);
     for(let it=0;it<400;it++){let moved=false;
       for(let i=0;i<L.length;i++)for(let j=i+1;j<L.length;j++){const u=L[i],v=L[j];if(!hit(u,v))continue;
         let d=norm(v.b-u.b);if(d>180)d-=360;const s1=d>=0?1:-1,st=u.kind===v.kind?.6:(u.kind==='n'?1:0);   // night marks give way to prayers
         u.b-=s1*.6*(u.kind==='n'||st!==1?1:0)+(u.kind==='p'&&v.kind==='n'?0:0);v.b+=s1*.6*(v.kind==='n'||u.kind===v.kind?1:0);
         if(u.kind==='n'&&v.kind==='p')u.b-=s1*.6;place(u);place(v);moved=true;}
-      if(SUNB)for(const u of L)if(hit(u,SUNB)){let d=norm(u.b-SUNB.a);if(d>180)d-=360;u.b+=d>=0?.6:-.6;place(u);moved=true;}
       if(SWB)for(const u of L)if(hit(u,SWB)){let d=norm(u.b-SWB.a);if(d>180)d-=360;u.b+=d>=0?.6:-.6;place(u);moved=true;}
       if(!moved)break;}
     // still crowded: the oldest past names give way (their dots stay on the ring) — as on the sun curve
@@ -7736,14 +7740,15 @@ ${clipDefs}<clipPath id="zdMoonClip"><circle r="13"/></clipPath></defs><g id="zd
          moment, in the label's colour; a faint line to the name only when the name had to move aside */
       if(l.kind!=='span')lab+=`<line x1="${ex.toFixed(1)}" y1="${ey.toFixed(1)}" x2="${fx.toFixed(1)}" y2="${fy.toFixed(1)}" stroke="${col}" stroke-width="${foc?4:(l.kind==='n'?2.6:3.2)}" stroke-linecap="round"/>`;
       {let dB=Math.abs(norm(l.b-l.a));if(dB>180)dB=360-dB;
-       if(!l.hide&&dB>3&&l.kind!=='span'){const tx=Math.min(Math.max(fx,l.x-l.w/2),l.x+l.w/2),ty=Math.min(Math.max(fy,l.y-l.h/2),l.y+l.h/2);
-         lab+=`<line x1="${fx.toFixed(1)}" y1="${fy.toFixed(1)}" x2="${tx.toFixed(1)}" y2="${ty.toFixed(1)}" stroke="${col}" stroke-opacity=".35" stroke-width="1.4"/>`;}}
+       if(!l.hide&&(dB>3||LANES)&&l.kind!=='span'){const tx=Math.min(Math.max(fx,l.x-l.w/2),l.x+l.w/2),ty=Math.min(Math.max(fy,l.y-l.h/2),l.y+l.h/2);
+         lab+=`<line x1="${fx.toFixed(1)}" y1="${fy.toFixed(1)}" x2="${tx.toFixed(1)}" y2="${ty.toFixed(1)}" stroke="${col}" stroke-opacity="${LANES?(foc?.8:.45):.35}" stroke-width="${LANES&&foc?1.8:1.4}"/>`;}}
       // a mark under the «now» Sun gets a dark outline so it reads on the Sun's disc (#77 ④)
       let dA=Math.abs(norm(l.a-ga(nm)));if(dA>180)dA=360-dA;const onSun=dA<6;
       /* Hassan 22 Nov: no dot on the ring for a prayer — the colour change of the ring and the line to the name mark it.
          Only the night marks (midnight, last third) keep their diamonds. */
 
       if(l.hide)return;
+      if(l.one){lab+=`<text x="${l.x.toFixed(1)}" y="${(l.y+l.fs*.36).toFixed(1)}" font-family="${FONT}" font-size="${l.fs}" text-anchor="middle" fill="${col}"${fw}${halo}>${l.name} ${l.time}</text>`;return;}   // one line above and below the dial
       const y1=l.y-l.h/2+l.fs*.86;
       // one <text> per line (Safari splits a word when one <text> holds two positioned lines)
       lab+=`<text x="${l.x.toFixed(1)}" y="${y1.toFixed(1)}" font-family="${FONT}" font-size="${l.fs}" text-anchor="middle" fill="${col}"${fw}${halo}>${l.name}</text>`+
