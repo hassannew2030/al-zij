@@ -132,7 +132,7 @@
       '<button type="button" class="z-btn" data-eng="tts" data-lbl="' + T('صوت الجوال', 'Phone voice') + '"></button></div>' +
       '<div id="zVoiceNote" style="color:var(--h-dim);font-size:13px;margin-top:8px">' +
       '<div style="color:var(--h-ink);font-size:14px;margin-bottom:6px">🔊 ' + T('لصوت أوضح: الإعدادات ← تسهيلات الاستخدام ← المحتوى المنطوق ← الأصوات ← العربية ← نزّل <b>«ماجد (محسّن)»</b>. الصوت الحالي: ', 'For a clearer voice: Settings → Accessibility → Spoken Content → Voices → Arabic → download <b>“Majed (Enhanced)”</b>. Current voice: ') + '<span id="zVoiceNm" data-notr>—</span></div>' +
-      (hasVoice ? T('يعمل على جوالك دون إنترنت ما دام الزيج مفتوحًا. والإعلان والجوال مقفَل يأتي مع تطبيق الزيج في المتجر قريبًا.', 'Works on your phone offline while Al-Zij is open. Announcements with the phone locked come with the Al-Zij store app soon.') : T('هذا المتصفح لا يدعم الصوت.', 'This browser does not support speech.')) + '</div>';
+      (hasVoice ? T('يعمل على جوالك دون إنترنت ما دام الزيج مفتوحًا.', 'Works on your phone offline while Al-Zij is open.') : T('هذا المتصفح لا يدعم الصوت.', 'This browser does not support speech.')) + '</div>';
     var box = host.closest('.z-card');
     (box && box.parentNode ? box.parentNode : host.parentNode).insertBefore(c, box ? box.nextSibling : host.nextSibling);
     var tgl = c.querySelector('#zVoiceTgl');
