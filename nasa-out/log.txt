@@ -5,3 +5,11 @@ drwxr-xr-x 18 runner runner   4096 Oct 26 16:26 ..
 -rw-r--r--  1 runner runner     13 Oct 26 16:26 log.txt
 -rw-r--r--  1 runner runner 139068 Oct 26 16:26 lroc_color_1k.jpg
 -rw-r--r--  1 runner runner  48144 Oct 26 16:26 search.json
+svs failed
+svs2k failed
+total 196
+drwxr-xr-x  2 runner runner   4096 Nov 28 12:16 .
+drwxr-xr-x 18 runner runner   4096 Nov 28 12:16 ..
+-rw-r--r--  1 runner runner    330 Nov 28 12:16 log.txt
+-rw-r--r--  1 runner runner 139068 Nov 28 12:16 lroc_color_1k.jpg
+-rw-r--r--  1 runner runner  48144 Nov 28 12:16 search.json
