@@ -6486,7 +6486,7 @@ document.addEventListener('click',e=>{if(e.target&&e.target.id==='zLocAsk'){LS.s
     if(zq('zPlaceCard'))return;
     if(why==='denied')LS.set('zijCardShown','1');
     // the name the city chip shows, never bare coordinates (Hassan's photo, 26 Nov 02:38: «آخر موقع محفوظ • 21،54°, 39،17°» under the chip
-    // «جدة · الحي»); kept in step with the chip while the card is open, since the district name can arrive a moment later
+    // «المدينة · الحي»); kept in step with the chip while the card is open, since the district name can arrive a moment later
     const hereNow=()=>{const pk=zijPickInUse();if(pk)return pk.name;
       if(Math.abs(observer.lat-21.5433)<1e-4&&Math.abs(observer.lon-39.1728)<1e-4)return L('جدة (موقع البداية)','Jeddah (the starting point)');
       const saved=L('آخر موقع محفوظ','the last saved place');
